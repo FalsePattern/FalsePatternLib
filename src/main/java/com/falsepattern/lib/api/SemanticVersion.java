@@ -24,10 +24,18 @@ public class SemanticVersion extends Version {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
         this.patchVersion = patchVersion;
-        preRelease = preRelease.trim();
-        build = build.trim();
+        preRelease = preRelease == null ? null : preRelease.trim();
+        build = build == null ? null : build.trim();
         this.preRelease = "".equals(preRelease) ? null : preRelease;
         this.build = "".equals(build) ? null : build;
+    }
+
+    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
+        this(majorVersion, minorVersion, patchVersion, preRelease, null);
+    }
+
+    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion) {
+        this(majorVersion, minorVersion, patchVersion, null, null);
     }
 
     @Override
