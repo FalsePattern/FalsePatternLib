@@ -1,13 +1,8 @@
 package com.falsepattern.lib;
 
 import com.falsepattern.lib.api.Version;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import cpw.mods.fml.common.DummyModContainer;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;
@@ -18,13 +13,11 @@ import org.apache.logging.log4j.Logger;
 import scala.actors.threadpool.Arrays;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 
 
-@SuppressWarnings("UnstableApiUsage")
 public class FalsePatternLib extends DummyModContainer {
     public static Logger libLog = LogManager.getLogger(ModInfo.MODNAME);
     public static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
@@ -33,12 +26,9 @@ public class FalsePatternLib extends DummyModContainer {
     private static final Map<String, String> loadedLibraryMods = new HashMap<>();
     private static final Set<String> mavenRepositories = new HashSet<>();
 
-    private static boolean modWasDownloaded = false;
-
     @SuppressWarnings("unchecked")
     public FalsePatternLib() {
         super(new ModMetadata());
-        libLog.info("FalsePatternLib has been awakened!");
         libLog.info("All your libraries are belong to us!");
         val meta = getMetadata();
         meta.modId = ModInfo.MODID;
@@ -51,29 +41,12 @@ public class FalsePatternLib extends DummyModContainer {
         meta.useDependencyInformation = true;
     }
 
-    @Override
-    public boolean registerBus(EventBus bus, LoadController controller) {
-        bus.register(this);
-
-        return true;
-    }
-
-    @Subscribe
-    public void preInit(FMLPreInitializationEvent evt) {
-        if (modWasDownloaded) {
-            JOptionPane.showMessageDialog(null,
-                    "A mod has downloaded another mod as a dependency, and the game requires a restart so that the " +
-                    "downloaded mod is initialized properly! After you close this popup, FalsePatternLib will close the game.", "Reload Required", JOptionPane.WARNING_MESSAGE, null);
-            FMLCommonHandler.instance().exitJava(0, false);
-        }
-    }
-
     public static void addMavenRepo(String url) {
         mavenRepositories.add(url);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String devSuffix, boolean isMod) {
+    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String devSuffix) {
         libLog.info("Adding library {}:{}:{}, requested by mod {}", groupId, artifactId, preferredVersion, loadingModId);
         var artifact = groupId + ":" + artifactId;
         if (loadedLibraries.containsKey(artifact)) {
@@ -105,22 +78,15 @@ public class FalsePatternLib extends DummyModContainer {
         }
         val modsDir = new File(CoreLoadingPlugin.mcDir, "mods");
         val mavenJarName = String.format("%s-%s%s.jar", artifactId, preferredVersion, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
-        val jarName = String.format("%s%s", isMod ? "" : (groupId + "-"), mavenJarName);
-        File file;
-        if (isMod) {
-            file = new File(modsDir, jarName);
-        } else {
-            val libDir = new File(modsDir, "falsepattern");
-            if (!libDir.exists()) {
-                libDir.mkdirs();
-            }
-            file = new File(libDir, jarName);
+        val jarName = groupId + "-" + mavenJarName;
+        val libDir = new File(modsDir, "falsepattern");
+        if (!libDir.exists()) {
+            libDir.mkdirs();
         }
+        val file = new File(libDir, jarName);
         if (file.exists()) {
             try {
-                if (!isMod) {
-                    addToClasspath(file);
-                }
+                addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
                 libLog.info("Library {}:{}:{} successfully loaded from disk!", groupId, artifactId, preferredVersion);
                 return;
@@ -148,13 +114,6 @@ public class FalsePatternLib extends DummyModContainer {
                 libLog.info("Downloaded {}:{}:{}", groupId, artifactId, preferredVersion);
                 loadedLibraries.put(artifact, preferredVersion);
                 loadedLibraryMods.put(artifact, loadingModId);
-                if (isMod) {
-                    if (!modWasDownloaded) {
-                        modWasDownloaded = true;
-                        libLog.warn("A Minecraft mod was downloaded as a library! This will require a game restart! The game restart will trigger on preInit!");
-                    }
-                    return;
-                }
                 addToClasspath(file);
                 return;
             } catch (IOException ignored) {}
@@ -176,7 +135,6 @@ public class FalsePatternLib extends DummyModContainer {
 
     private static void download(InputStream is, File target) throws IOException {
         if (target.exists()) return;
-        val name = target.getName();
 
         var bytesRead = 0;
 
