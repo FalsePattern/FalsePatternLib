@@ -104,7 +104,8 @@ public class FalsePatternLib extends DummyModContainer {
             return;
         }
         val modsDir = new File(CoreLoadingPlugin.mcDir, "mods");
-        val jarName = String.format("%s%s-%s%s.jar", isMod ? "" : (groupId + "-"), artifactId, preferredVersion, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
+        val mavenJarName = String.format("%s-%s%s.jar", artifactId, preferredVersion, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
+        val jarName = String.format("%s%s", isMod ? "" : (groupId + "-"), mavenJarName);
         File file;
         if (isMod) {
             file = new File(modsDir, jarName);
@@ -131,7 +132,7 @@ public class FalsePatternLib extends DummyModContainer {
         for (var repo: mavenRepositories) {
             try {
                 if (!repo.endsWith("/")) repo = repo + "/";
-                val url = new URL(String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId, preferredVersion, jarName));
+                val url = new URL(String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId, preferredVersion, mavenJarName));
 
                 val connection = (HttpsURLConnection) url.openConnection();
                 connection.setConnectTimeout(1500);
