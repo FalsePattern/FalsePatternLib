@@ -6,12 +6,8 @@ name: Build and test
 on:
   pull_request:
     branches: [ master, main ]
-    paths-ignore:
-      - '**.md'
   push:
     branches: [ master, main ]
-    paths-ignore:
-      - '**.md'
 
 jobs:
   build-and-test:

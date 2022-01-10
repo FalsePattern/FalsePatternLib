@@ -1,5 +1,6 @@
 package com.falsepattern.lib;
 
+import com.falsepattern.lib.api.Version;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import cpw.mods.fml.common.DummyModContainer;
@@ -7,6 +8,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import lombok.NonNull;
 import lombok.val;
 import lombok.var;
 import net.minecraft.launchwrapper.Launch;
@@ -27,11 +29,13 @@ public class FalsePatternLib extends DummyModContainer {
     public static Logger libLog = LogManager.getLogger(ModInfo.MODNAME);
     public static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-    private static Map<String, String> loadedLibraries = new HashMap<>();
-    private static Set<String> mavenRepositories = new HashSet<>();
+    private static final Map<String, Version> loadedLibraries = new HashMap<>();
+    private static final Map<String, String> loadedLibraryMods = new HashMap<>();
+    private static final Set<String> mavenRepositories = new HashSet<>();
 
     private static boolean modWasDownloaded = false;
 
+    @SuppressWarnings("unchecked")
     public FalsePatternLib() {
         super(new ModMetadata());
         libLog.info("FalsePatternLib has been awakened!");
@@ -68,18 +72,39 @@ public class FalsePatternLib extends DummyModContainer {
         mavenRepositories.add(url);
     }
 
-    public static void loadLibrary(String groupId, String artifactId, String version, String devSuffix, boolean isMod) {
-        libLog.info("Adding library {}:{}:{}", groupId, artifactId, version);
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String devSuffix, boolean isMod) {
+        libLog.info("Adding library {}:{}:{}, requested by mod {}", groupId, artifactId, preferredVersion, loadingModId);
         var artifact = groupId + ":" + artifactId;
         if (loadedLibraries.containsKey(artifact)) {
             val currentVer = loadedLibraries.get(artifact);
-            if (!version.equals(currentVer)) {
-                libLog.warn("Tried to load library {}:{}:{}, but version {} was already loaded!", groupId, artifactId, version, currentVer);
-                return;
+            if (currentVer.equals(preferredVersion)) return;
+            val rangeString = "(minimum: " + minVersion + (maxVersion == null ? "" : ", maximum: " + maxVersion) + ")";
+            if (minVersion.compareTo(currentVer) > 0 || (maxVersion != null && maxVersion.compareTo(currentVer) < 0)) {
+                for (int i = 0; i < 16; i++) {
+                    libLog.fatal("ALERT VVVVVVVVVVVV ALERT");
+                }
+                libLog.fatal("Library {}:{} already loaded with version {}, " +
+                             "but a version in the range {} was requested! Thing may go horribly wrong! " +
+                             "Requested by mod: {}, previously loaded by mod: {}",
+                        groupId, artifactId, currentVer,
+                        rangeString,
+                        loadingModId, loadedLibraryMods.get(artifact));
+                for (int i = 0; i < 16; i++) {
+                    libLog.fatal("ALERT ^^^^^^^^^^^^ ALERT");
+                }
+            } else {
+                libLog.info("Attempted loading of library {}:{} with preferred version {}, " +
+                            "but version {} was already loaded, which matched the range {}. This is not an error. " +
+                            "Requested by mod: {}, previously loaded by mod: {}",
+                        groupId, artifactId, preferredVersion,
+                        currentVer, rangeString,
+                        loadingModId, loadedLibraryMods.get(artifact));
             }
+            return;
         }
         val modsDir = new File(CoreLoadingPlugin.mcDir, "mods");
-        val jarName = String.format("%s-%s%s.jar", artifactId, version, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
+        val jarName = String.format("%s%s-%s%s.jar", isMod ? "" : (groupId + "-"), artifactId, preferredVersion, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
         File file;
         if (isMod) {
             file = new File(modsDir, jarName);
@@ -95,32 +120,33 @@ public class FalsePatternLib extends DummyModContainer {
                 if (!isMod) {
                     addToClasspath(file);
                 }
-                loadedLibraries.put(artifact, version);
-                libLog.info("Library {}:{}:{} successfully loaded from disk!", groupId, artifactId, version);
+                loadedLibraries.put(artifact, preferredVersion);
+                libLog.info("Library {}:{}:{} successfully loaded from disk!", groupId, artifactId, preferredVersion);
                 return;
             } catch (RuntimeException e) {
-                libLog.warn("Failed to load library {}:{}:{} from file! Redownloading...", groupId, artifactId, version);
+                libLog.warn("Failed to load library {}:{}:{} from file! Redownloading...", groupId, artifactId, preferredVersion);
                 file.delete();
             }
         }
         for (var repo: mavenRepositories) {
             try {
                 if (!repo.endsWith("/")) repo = repo + "/";
-                val url = new URL(String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId, version, jarName));
+                val url = new URL(String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId, preferredVersion, jarName));
 
                 val connection = (HttpsURLConnection) url.openConnection();
                 connection.setConnectTimeout(1500);
                 connection.setReadTimeout(1500);
                 connection.setRequestProperty("User-Agent", "FalsePatternLib Downloader");
                 if (connection.getResponseCode() != 200) {
-                    libLog.info("Artifact {}:{}:{} was not found on repo {}", groupId, artifactId, version, repo);
+                    libLog.info("Artifact {}:{}:{} was not found on repo {}", groupId, artifactId, preferredVersion, repo);
                     connection.disconnect();
                     continue;
                 }
-                libLog.info("Downloading {}:{}:{} from {}", groupId, artifactId, version, repo);
+                libLog.info("Downloading {}:{}:{} from {}", groupId, artifactId, preferredVersion, repo);
                 download(connection.getInputStream(), file);
-                libLog.info("Downloaded {}:{}:{}", groupId, artifactId, version);
-                loadedLibraries.put(artifact, version);
+                libLog.info("Downloaded {}:{}:{}", groupId, artifactId, preferredVersion);
+                loadedLibraries.put(artifact, preferredVersion);
+                loadedLibraryMods.put(artifact, loadingModId);
                 if (isMod) {
                     if (!modWasDownloaded) {
                         modWasDownloaded = true;
@@ -132,7 +158,9 @@ public class FalsePatternLib extends DummyModContainer {
                 return;
             } catch (IOException ignored) {}
         }
-        throw new IllegalStateException("Failed to download library " + groupId + ":" + artifactId + ":" + version + " from any repository!");
+        val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + " from any repository! Requested by mod: " + loadingModId;
+        libLog.fatal(errorMessage);
+        throw new IllegalStateException(errorMessage);
     }
 
     private static void addToClasspath(File file) {
