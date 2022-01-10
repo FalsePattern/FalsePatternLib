@@ -21,7 +21,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return ModInfo.GROUPNAME + ".FalsePatternLib";
+        return ModInfo.GROUPNAME + ".lib.FalsePatternLib";
     }
 
     @Override
