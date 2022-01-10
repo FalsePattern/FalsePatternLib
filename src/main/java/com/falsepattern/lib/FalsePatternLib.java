@@ -1,7 +1,9 @@
 package com.falsepattern.lib;
 
 import com.falsepattern.lib.api.Version;
+import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;
+import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.ModMetadata;
 import lombok.NonNull;
 import lombok.val;
@@ -39,6 +41,12 @@ public class FalsePatternLib extends DummyModContainer {
         meta.authorList = Arrays.asList(ModInfo.AUTHORS);
         meta.description = ModInfo.DESCRIPTION;
         meta.useDependencyInformation = true;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public boolean registerBus(EventBus bus, LoadController controller) {
+        return true;
     }
 
     public static void addMavenRepo(String url) {
