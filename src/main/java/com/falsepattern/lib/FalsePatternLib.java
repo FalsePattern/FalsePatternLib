@@ -12,7 +12,6 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import scala.actors.threadpool.Arrays;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -28,7 +27,6 @@ public class FalsePatternLib extends DummyModContainer {
     private static final Map<String, String> loadedLibraryMods = new HashMap<>();
     private static final Set<String> mavenRepositories = new HashSet<>();
 
-    @SuppressWarnings("unchecked")
     public FalsePatternLib() {
         super(new ModMetadata());
         libLog.info("All your libraries are belong to us!");
