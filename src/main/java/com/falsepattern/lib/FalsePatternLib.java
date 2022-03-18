@@ -52,9 +52,10 @@ public class FalsePatternLib extends DummyModContainer {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String devSuffix) {
-        libLog.info("Adding library {}:{}:{}, requested by mod {}", groupId, artifactId, preferredVersion, loadingModId);
-        var artifact = groupId + ":" + artifactId;
+    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
+        val suffix = developerEnvironment ? devSuffix : regularSuffix;
+        libLog.info("Adding library {}:{}:{}{}, requested by mod {}", groupId, artifactId, preferredVersion, suffix != null ? "-" + suffix : "", loadingModId);
+        var artifact = groupId + ":" + artifactId + ":" + suffix;
         if (loadedLibraries.containsKey(artifact)) {
             val currentVer = loadedLibraries.get(artifact);
             if (currentVer.equals(preferredVersion)) return;
@@ -63,27 +64,27 @@ public class FalsePatternLib extends DummyModContainer {
                 for (int i = 0; i < 16; i++) {
                     libLog.fatal("ALERT VVVVVVVVVVVV ALERT");
                 }
-                libLog.fatal("Library {}:{} already loaded with version {}, " +
+                libLog.fatal("Library {}:{}{} already loaded with version {}, " +
                              "but a version in the range {} was requested! Thing may go horribly wrong! " +
                              "Requested by mod: {}, previously loaded by mod: {}",
-                        groupId, artifactId, currentVer,
+                        groupId, artifactId, suffix != null ? ":" + suffix : "", currentVer,
                         rangeString,
                         loadingModId, loadedLibraryMods.get(artifact));
                 for (int i = 0; i < 16; i++) {
                     libLog.fatal("ALERT ^^^^^^^^^^^^ ALERT");
                 }
             } else {
-                libLog.info("Attempted loading of library {}:{} with preferred version {}, " +
+                libLog.info("Attempted loading of library {}:{}{} with preferred version {}, " +
                             "but version {} was already loaded, which matched the range {}. This is not an error. " +
                             "Requested by mod: {}, previously loaded by mod: {}",
-                        groupId, artifactId, preferredVersion,
+                        groupId, artifactId, suffix != null ? ":" + suffix : "", preferredVersion,
                         currentVer, rangeString,
                         loadingModId, loadedLibraryMods.get(artifact));
             }
             return;
         }
         val modsDir = new File(CoreLoadingPlugin.mcDir, "mods");
-        val mavenJarName = String.format("%s-%s%s.jar", artifactId, preferredVersion, (developerEnvironment && devSuffix != null) ? ("-" + devSuffix) : "");
+        val mavenJarName = String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
         val jarName = groupId + "-" + mavenJarName;
         val libDir = new File(modsDir, "falsepattern");
         if (!libDir.exists()) {
@@ -94,10 +95,10 @@ public class FalsePatternLib extends DummyModContainer {
             try {
                 addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
-                libLog.info("Library {}:{}:{} successfully loaded from disk!", groupId, artifactId, preferredVersion);
+                libLog.info("Library {}:{}:{}{} successfully loaded from disk!", groupId, artifactId, preferredVersion, (suffix != null) ? ":" + suffix : "");
                 return;
             } catch (RuntimeException e) {
-                libLog.warn("Failed to load library {}:{}:{} from file! Redownloading...", groupId, artifactId, preferredVersion);
+                libLog.warn("Failed to load library {}:{}:{}{} from file! Redownloading...", groupId, artifactId, preferredVersion, (suffix != null) ? ":" + suffix : "");
                 file.delete();
             }
         }
@@ -111,20 +112,20 @@ public class FalsePatternLib extends DummyModContainer {
                 connection.setReadTimeout(1500);
                 connection.setRequestProperty("User-Agent", "FalsePatternLib Downloader");
                 if (connection.getResponseCode() != 200) {
-                    libLog.info("Artifact {}:{}:{} was not found on repo {}", groupId, artifactId, preferredVersion, repo);
+                    libLog.info("Artifact {}:{}:{}{} was not found on repo {}", groupId, artifactId, preferredVersion, (suffix != null) ? ":" + suffix : "", repo);
                     connection.disconnect();
                     continue;
                 }
-                libLog.info("Downloading {}:{}:{} from {}", groupId, artifactId, preferredVersion, repo);
+                libLog.info("Downloading {}:{}:{}{} from {}", groupId, artifactId, preferredVersion, (suffix != null) ? ":" + suffix : "", repo);
                 download(connection.getInputStream(), file);
-                libLog.info("Downloaded {}:{}:{}", groupId, artifactId, preferredVersion);
+                libLog.info("Downloaded {}:{}:{}{}", groupId, artifactId, preferredVersion, (suffix != null) ? ":" + suffix : "");
                 loadedLibraries.put(artifact, preferredVersion);
                 loadedLibraryMods.put(artifact, loadingModId);
                 addToClasspath(file);
                 return;
             } catch (IOException ignored) {}
         }
-        val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + " from any repository! Requested by mod: " + loadingModId;
+        val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + ((suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " + loadingModId;
         libLog.fatal(errorMessage);
         throw new IllegalStateException(errorMessage);
     }
