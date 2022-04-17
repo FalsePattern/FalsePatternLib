@@ -23,8 +23,8 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     Path MODS_DIRECTORY_PATH = new File(Launch.minecraftHome, "mods/").toPath();
 
     Logger getLogger();
-    ITargetedMod[] targetedModEnumValues();
-    IMixin[] mixinEnumValues();
+    ITargetedMod[] getTargetedModEnumValues();
+    IMixin[] getMixinEnumValues();
 
     @Override
     default void onLoad(String mixinPackage) {
@@ -49,7 +49,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     @Override
     default List<String> getMixins() {
         val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
-        val targetedMods = targetedModEnumValues();
+        val targetedMods = getTargetedModEnumValues();
         val loadedMods = Arrays.stream(targetedMods)
                                .filter(mod -> (mod.getLoadInDevelopment() && isDevelopmentEnvironment)
                                               || loadJarOf(mod))
@@ -65,7 +65,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         }
 
         List<String> mixins = new ArrayList<>();
-        for (val mixin : mixinEnumValues()) {
+        for (val mixin : getMixinEnumValues()) {
             if (mixin.shouldLoad(loadedMods)) {
                 String mixinClass = mixin.getMixin();
                 mixins.add(mixinClass);
