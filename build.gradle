@@ -1,9 +1,9 @@
-//version: 8fa7883b6196c1765266f4e6ddf3118d5043aafb
+//version: 1641429628falsepattern12
 /*
 DO NOT CHANGE THIS FILE!
 
 Also, you may replace this file at any time if there is an update available.
-Please check https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/build.gradle for updates.
+Please check https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/build.gradle for updates.
  */
 
 
@@ -28,11 +28,11 @@ buildscript {
         }
         maven {
             name = "jitpack"
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.4'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
     }
 }
 
@@ -87,6 +87,14 @@ checkPropertyExists("coreModClass")
 checkPropertyExists("containsMixinsAndOrCoreModOnly")
 checkPropertyExists("usesShadowedDependencies")
 checkPropertyExists("developmentEnvironmentUserName")
+
+//Properties added in fork
+checkPropertyExists("skipBuildScriptUpdateCheck")
+checkPropertyExists("repositoryURL")
+checkPropertyExists("repositoryName")
+checkPropertyExists("mavenGroupId")
+checkPropertyExists("mavenArtifactId")
+checkPropertyExists("hasMixinDeps")
 
 
 String javaSourceDir = "src/main/java/"
@@ -153,7 +161,7 @@ configurations.all {
 'git config core.fileMode false'.execute()
 // Pulls version from git tag
 try {
-    version = minecraftVersion + "-" + gitVersion()
+    version = gitVersion()
 }
 catch (Exception e) {
     throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!");
@@ -166,6 +174,7 @@ if(project.hasProperty("customArchiveBaseName") && customArchiveBaseName) {
 else {
     archivesBaseName = modId
 }
+archivesBaseName += "-mc" + minecraftVersion
 
 minecraft {
     version = minecraftVersion + "-" + forgeVersion + "-" + minecraftVersion
@@ -205,13 +214,13 @@ repositories {
         name = "Overmind forge repo mirror"
         url = "https://gregtech.overminddl1.com/"
     }
-    if(usesMixins.toBoolean()) {
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
         maven {
             name = "sponge"
-            url = "https://repo.spongepowered.org/repository/maven-public"
+            url = "https://sponge.falsepattern.com/"
         }
         maven {
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
 }
@@ -232,6 +241,17 @@ dependencies {
             exclude module: "log4j-core"
         }
         compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
+    }
+    if(hasMixinDeps.toBoolean()) {
+        runtime("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+            // Mixin includes a lot of dependencies that are too up-to-date
+            exclude module: "launchwrapper"
+            exclude module: "guava"
+            exclude module: "gson"
+            exclude module: "commons-io"
+            exclude module: "log4j-core"
+        }
+        runtime("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
     }
 }
 
@@ -318,11 +338,20 @@ afterEvaluate {
 
 runClient {
     def arguments = []
+    def jvmArguments = []
 
-    if(usesMixins.toBoolean()) {
+    if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
@@ -334,19 +363,30 @@ runClient {
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 runServer {
     def arguments = []
+    def jvmArguments = []
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if (usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -488,6 +528,7 @@ artifacts {
 }
 
 // publishing
+
 def getMavenSettingsCredentials = {
     String userHome = System.getProperty( "user.home" );
     File mavenSettings = new File(userHome, ".m2/settings.xml")
@@ -497,14 +538,19 @@ def getMavenSettingsCredentials = {
 }
 
 def getCredentials = {
-    def entries = getMavenSettingsCredentials()
-    for (entry in entries) {
-        if ( entry."id".text() == "mavenpattern" ) {
-            return [username: entry.username.text(), password: entry.password.text()]
+    try {
+        def entries = getMavenSettingsCredentials()
+        for (entry in entries) {
+            if (entry."id".text() == repositoryName) {
+                return [username: entry.username.text(), password: entry.password.text()]
+            }
         }
+    } catch (Exception ignored) {
+        return [username: "none", password: "none"]
     }
 }
 
+//Publishing
 publishing {
     publications {
         maven(MavenPublication) {
@@ -515,16 +561,16 @@ publishing {
                 artifact source: apiJar, classifier: "api"
             }
 
-            groupId = group
-            artifactId = modId
-            version = project.version
+            groupId = mavenGroupId
+            artifactId = mavenArtifactId + "-mc" + minecraftVersion
+            version = gitVersion()
         }
     }
-    
+
     repositories {
         maven {
-            name = "mavenpattern"
-            url = "https://maven.falsepattern.com/"
+            name = repositoryName
+            url = repositoryURL
             def creds = getCredentials()
             credentials {
                 username = creds == null ? "none" : creds.username
@@ -543,7 +589,7 @@ task updateBuildScript {
     }
 }
 
-if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
+if (!skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
     if (autoUpdateBuildScript.toBoolean()) {
         performBuildScriptUpdate(projectDir.toString())
     } else {
@@ -552,7 +598,7 @@ if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
 }
 
 static URL availableBuildScriptUrl() {
-    new URL("https://raw.githubusercontent.com/SinTh0r4s/ExampleMod1.7.10/main/build.gradle")
+    new URL("https://raw.githubusercontent.com/FalsePattern/ExampleMod1.7.10/main/build.gradle")
 }
 
 boolean performBuildScriptUpdate(String projectDir) {
@@ -594,7 +640,7 @@ configure(updateBuildScript) {
 
 def checkPropertyExists(String propertyName) {
     if (project.hasProperty(propertyName) == false) {
-        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/gradle.properties")
+        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/gradle.properties")
     }
 }
 
