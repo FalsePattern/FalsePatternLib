@@ -67,7 +67,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         List<String> mixins = new ArrayList<>();
         for (val mixin : getMixinEnumValues()) {
             if (mixin.shouldLoad(loadedMods)) {
-                String mixinClass = mixin.getMixin();
+                String mixinClass = mixin.getSide().name().toLowerCase() + "." + mixin.getMixin();
                 mixins.add(mixinClass);
                 getLogger().info("Loading mixin: " + mixinClass);
             }
