@@ -2,6 +2,7 @@ package com.falsepattern.lib.mixin;
 
 import lombok.val;
 import net.minecraft.launchwrapper.Launch;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -25,6 +26,10 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     Logger getLogger();
     ITargetedMod[] getTargetedModEnumValues();
     IMixin[] getMixinEnumValues();
+
+    static Logger createLogger(String modName) {
+        return LogManager.getLogger(modName + " Mixin Loader");
+    }
 
     @Override
     default void onLoad(String mixinPackage) {
