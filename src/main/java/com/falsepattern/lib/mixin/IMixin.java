@@ -21,26 +21,27 @@ public interface IMixin {
                && getFilter().test(loadedMods);
     }
 
-    static Predicate<List<ITargetedMod>> never() {
-        return (list) -> false;
-    }
+    final class PredicateHelpers {
+        public static Predicate<List<ITargetedMod>> never() {
+            return (list) -> false;
+        }
 
-    static Predicate<List<ITargetedMod>> condition(Supplier<Boolean> condition) {
-        return (list) -> condition.get();
-    }
+        public static Predicate<List<ITargetedMod>> condition(Supplier<Boolean> condition) {
+            return (list) -> condition.get();
+        }
 
-    static Predicate<List<ITargetedMod>> always() {
-        return (list) -> true;
-    }
+        public static Predicate<List<ITargetedMod>> always() {
+            return (list) -> true;
+        }
 
-    static Predicate<List<ITargetedMod>> require(ITargetedMod mod) {
-        return (list) -> list.contains(mod);
-    }
+        public static Predicate<List<ITargetedMod>> require(ITargetedMod mod) {
+            return (list) -> list.contains(mod);
+        }
 
-    static Predicate<List<ITargetedMod>> avoid(ITargetedMod mod) {
-        return (list) -> !list.contains(mod);
+        public static Predicate<List<ITargetedMod>> avoid(ITargetedMod mod) {
+            return (list) -> !list.contains(mod);
+        }
     }
-
 
     enum Side {
         COMMON,
