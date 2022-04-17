@@ -1,10 +1,6 @@
 package com.falsepattern.lib.mixin;
 
 import com.google.common.io.Files;
-import lombok.val;
-import net.minecraft.launchwrapper.Launch;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 
 import java.nio.file.Path;
 import java.util.function.Predicate;
@@ -22,7 +18,7 @@ public interface ITargetedMod {
 
     String getModName();
     Predicate<String> getCondition();
-    boolean getLoadInDevelopment();
+    boolean isLoadInDevelopment();
 
     default boolean isMatchingJar(Path path) {
         String pathString = path.toString();

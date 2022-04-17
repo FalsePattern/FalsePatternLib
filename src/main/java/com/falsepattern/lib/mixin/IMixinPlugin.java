@@ -51,7 +51,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
         val targetedMods = getTargetedModEnumValues();
         val loadedMods = Arrays.stream(targetedMods)
-                               .filter(mod -> (mod.getLoadInDevelopment() && isDevelopmentEnvironment)
+                               .filter(mod -> (mod.isLoadInDevelopment() && isDevelopmentEnvironment)
                                               || loadJarOf(mod))
                                .collect(Collectors.toList());
 
