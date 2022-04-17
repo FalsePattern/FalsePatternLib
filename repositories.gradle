@@ -1,1 +1,6 @@
-repositories {}
+repositories {
+    maven {
+        name = "sponge"
+        url = "https://sponge.falsepattern.com/"
+    }
+}
