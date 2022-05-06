@@ -1,8 +1,17 @@
 package com.falsepattern.lib.text;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import lombok.NonNull;
 import lombok.val;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.server.CommandBlockLogic;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.rcon.RConConsoleSource;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
@@ -155,12 +164,43 @@ public final class FormattedText {
         return result;
     }
 
+    public void addChatMessage(ICommandSender target) {
+        target.addChatMessage(this.toChatText());
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void addChatMessage(EntityOtherPlayerMP target) {
+        target.addChatMessage(this.toChatText());
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void addChatMessage(EntityPlayerSP target) {
+        target.addChatMessage(this.toChatText());
+    }
+
+    public void addChatMessage(CommandBlockLogic target) {
+        target.addChatMessage(this.toChatText());
+    }
+
+    public void addChatMessage(EntityPlayerMP target) {
+        target.addChatMessage(this.toChatText());
+    }
+
+    public void addChatMessage(RConConsoleSource target) {
+        target.addChatMessage(this.toChatText());
+    }
+
+    public void addChatMessage(MinecraftServer target) {
+        target.addChatMessage(this.toChatText());
+    }
+
     /**
      * {@link #draw(FontRenderer, int, int, boolean)} without drop shadows.
      * @param renderer The font renderer to use
      * @param x Left side
      * @param y Top side
      */
+    @SideOnly(Side.CLIENT)
     public void draw(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, false);
     }
@@ -172,6 +212,7 @@ public final class FormattedText {
      * @param x Left side
      * @param y Top side
      */
+    @SideOnly(Side.CLIENT)
     public void drawWithShadow(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, true);
     }
@@ -183,6 +224,7 @@ public final class FormattedText {
      * @param y Top side
      * @param shadow Whether to have drop shadow under the text
      */
+    @SideOnly(Side.CLIENT)
     public void draw(FontRenderer renderer, int x, int y, boolean shadow) {
         x += renderer.drawString(text, x, y, colorMap.get(colorStyle).getRGB(), shadow);
         if (endLine)
