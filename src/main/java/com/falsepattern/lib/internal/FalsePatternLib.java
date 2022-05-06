@@ -23,13 +23,13 @@ public class FalsePatternLib extends DummyModContainer {
 
     public FalsePatternLib() {
         super(MetadataCollection.from(ResourceUtil.getResourceFromJar("/mcmod.info", FalsePatternLib.class), Tags.MODID).getMetadataForId(Tags.MODID, null));
-        ConfigurationManager.init();
         log.info("Version " + Tags.VERSION + " initialized!");
     }
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean registerBus(EventBus bus, LoadController controller) {
+        ConfigurationManager.init();
         return true;
     }
 }
