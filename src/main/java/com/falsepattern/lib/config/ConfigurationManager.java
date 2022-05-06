@@ -8,13 +8,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.var;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Class for controlling the loading of configuration files.
@@ -86,27 +85,25 @@ public class ConfigurationManager {
             val name = Optional.ofNullable(field.getAnnotation(Config.Name.class)).map(Config.Name::value).orElse(field.getName());
             val langKey = Optional.ofNullable(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
             var boxed = false;
-            Property prop = cat.get(name);
-            prop.comment = comment;
-            prop.setLanguageKey(langKey);
-            if ((boxed = field.getType().equals(Integer.class)) || field.getType().equals(int.class)) {
+            if ((boxed = field.getType().equals(Boolean.class)) || field.getType().equals(boolean.class)) {
+                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class)).map(Config.DefaultBoolean::value).orElse(boxed ? (Boolean) field.get(null) : field.getBoolean(null));
+                field.setBoolean(null, rawConfig.getBoolean(name, category, defaultValue, comment, langKey));
+            } else if ((boxed = field.getType().equals(Integer.class)) || field.getType().equals(int.class)) {
                 val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
-                prop.setMinValue(range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE));
-                prop.setMaxValue(range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE));
-                prop.setDefaultValue(Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class)).map(Config.DefaultInt::value).orElse(boxed ? (Integer)field.get(null) : field.getInt(null)));
-                field.setInt(null, prop.getInt());
-            } else if ((boxed = field.getType().equals(Double.class)) || field.getType().equals(double.class)) {
-                val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
-                prop.setMinValue(range.map(Config.RangeDouble::min).orElse(Double.MIN_VALUE));
-                prop.setMaxValue(range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE));
-                prop.setDefaultValue(Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class)).map(Config.DefaultDouble::value).orElse(boxed ? (Double) field.get(null) : field.getDouble(null)));
-                field.setDouble(null, prop.getDouble());
-            } else if ((boxed = field.getType().equals(Boolean.class)) || field.getType().equals(boolean.class)) {
-                prop.setDefaultValue(boxed ? (Boolean)field.get(null) : field.getBoolean(null));
-                field.setBoolean(null, prop.getBoolean());
+                val min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
+                val max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
+                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class)).map(Config.DefaultInt::value).orElse(boxed ? (Integer)field.get(null) : field.getInt(null));
+                field.setInt(null, rawConfig.getInt(name, category, defaultValue, min, max, comment, langKey));
+            } else if ((boxed = field.getType().equals(Float.class)) || field.getType().equals(float.class)) {
+                val range = Optional.ofNullable(field.getAnnotation(Config.RangeFloat.class));
+                val min = range.map(Config.RangeFloat::min).orElse(Float.MIN_VALUE);
+                val max = range.map(Config.RangeFloat::max).orElse(Float.MAX_VALUE);
+                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultFloat.class)).map(Config.DefaultFloat::value).orElse(boxed ? (Float) field.get(null) : field.getFloat(null));
+                field.setDouble(null, rawConfig.getFloat(name, category, defaultValue, min, max, comment, langKey));
             } else if (field.getType().equals(String.class)) {
-                prop.setDefaultValue((String)field.get(null));
-                field.set(null, prop.getString());
+                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class)).map(Config.DefaultString::value).orElse((String)field.get(null));
+                val pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class)).map(Config.Pattern::value).map(Pattern::compile).orElse(null);
+                field.set(null, rawConfig.getString(name, category, defaultValue, comment, langKey, pattern));
             }
             if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
                 cat.setRequiresMcRestart(true);

@@ -44,6 +44,12 @@ public @interface Config {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @interface DefaultBoolean {
+        boolean value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     @interface RangeInt {
         int min() default Integer.MIN_VALUE;
 
@@ -53,21 +59,33 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultInt {
-        int value() default 0;
+        int value();
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface RangeDouble {
-        double min() default Double.MIN_VALUE;
+    @interface RangeFloat {
+        float min() default Float.MIN_VALUE;
 
-        double max() default Double.MAX_VALUE;
+        float max() default Float.MAX_VALUE;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface DefaultDouble {
-        double value() default 0d;
+    @interface DefaultFloat {
+        float value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface DefaultString {
+        String value();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface Pattern {
+        String value();
     }
 
     @Retention(RetentionPolicy.RUNTIME)
