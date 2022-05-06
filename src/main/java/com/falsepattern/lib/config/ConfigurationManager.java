@@ -76,8 +76,8 @@ public class ConfigurationManager {
             configName = cfg.modid();
         }
         val rawConfig = new Configuration(configDir.resolve(configName + ".cfg").toFile());
+        rawConfig.load();
         val cat = rawConfig.getCategory(category);
-
         for (val field: configClass.getDeclaredFields()) {
             if (field.getAnnotation(Config.Ignore.class) != null) continue;
             field.setAccessible(true);
@@ -112,5 +112,6 @@ public class ConfigurationManager {
                 cat.setRequiresWorldRestart(true);
             }
         }
+        rawConfig.save();
     }
 }
