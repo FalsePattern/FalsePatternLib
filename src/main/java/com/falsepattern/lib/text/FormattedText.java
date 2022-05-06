@@ -67,6 +67,12 @@ public final class FormattedText {
         this.endLine = endLine;
     }
 
+    /**
+     * Parse a string with minecraft style escapes (\u00a7X) into a {@link FormattedText} instance, which can then be
+     * used to generate chat or render-able text.
+     * @param text The string to parse
+     * @return The parsed text structure
+     */
     public static FormattedText parse(String text) {
         EnumChatFormatting currentColorStyle = EnumChatFormatting.WHITE;
         val currentFancyStyle = new HashSet<EnumChatFormatting>();
@@ -113,6 +119,10 @@ public final class FormattedText {
         return result;
     }
 
+    /**
+     * Converts this text structure into a chat component that can be sent to clients.
+     * @return The chat component.
+     */
     public ChatComponentText toChatText() {
         val result = new ChatComponentText(endLine ? text + "\n" : "");
         val style = new ChatStyle();
@@ -145,14 +155,34 @@ public final class FormattedText {
         return result;
     }
 
+    /**
+     * {@link #draw(FontRenderer, int, int, boolean)} without drop shadows.
+     * @param renderer The font renderer to use
+     * @param x Left side
+     * @param y Top side
+     */
     public void draw(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, false);
     }
 
+
+    /**
+     * {@link #draw(FontRenderer, int, int, boolean)} with drop shadows.
+     * @param renderer The font renderer to use
+     * @param x Left side
+     * @param y Top side
+     */
     public void drawWithShadow(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, true);
     }
 
+    /**
+     * Renders this structure as GUI text.
+     * @param renderer The font renderer to use
+     * @param x Left side
+     * @param y Top side
+     * @param shadow Whether to have drop shadow under the text
+     */
     public void draw(FontRenderer renderer, int x, int y, boolean shadow) {
         x += renderer.drawString(text, x, y, colorMap.get(colorStyle).getRGB(), shadow);
         if (endLine)
