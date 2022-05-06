@@ -8,5 +8,6 @@ package com.falsepattern.lib.api;
 public abstract class Version extends com.falsepattern.lib.version.Version {
     protected Version() {
         super();
+        Deprecation.warn();
     }
 }

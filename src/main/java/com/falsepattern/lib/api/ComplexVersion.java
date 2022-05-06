@@ -11,5 +11,6 @@ import lombok.NonNull;
 public class ComplexVersion extends com.falsepattern.lib.version.ComplexVersion {
     public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {
         super(mainVersion, subVersions);
+        Deprecation.warn();
     }
 }
