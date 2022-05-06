@@ -1,11 +1,13 @@
 package com.falsepattern.lib.dependencies;
 
+import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.val;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@StableAPI(since = "0.6.0")
 public class ComplexVersion extends Version {
     final Version[] versions;
     public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {

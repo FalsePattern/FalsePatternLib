@@ -1,11 +1,13 @@
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.StableAPI;
 import net.minecraft.util.MathHelper;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
 @Immutable
+@StableAPI(since = "0.6.0")
 public class Vec3i implements Comparable<Vec3i> {
     /**
      * An immutable vector with zero as all coordinates.

@@ -1,5 +1,6 @@
 package com.falsepattern.lib.config;
 
+import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import java.util.*;
  * Class for controlling the loading of configuration files.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@StableAPI(since = "0.6.0")
 public class ConfigurationManager {
     private static final Map<String, Set<Class<?>>> configs = new HashMap<>();
 

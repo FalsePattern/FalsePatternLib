@@ -1,7 +1,12 @@
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.StableAPI;
 import net.minecraft.entity.Entity;
 
+import javax.annotation.concurrent.Immutable;
+
+@Immutable
+@StableAPI(since = "0.6.0")
 public class ChunkPos {
     /**
      * The X position of this Chunk Coordinate Pair

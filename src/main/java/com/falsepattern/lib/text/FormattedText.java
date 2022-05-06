@@ -1,5 +1,6 @@
 package com.falsepattern.lib.text;
 
+import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import lombok.NonNull;
@@ -23,6 +24,7 @@ import java.util.*;
 /**
  * Universal escape sequence-based text rendering and chat messages.
  */
+@StableAPI(since = "0.6.0")
 public final class FormattedText {
     private static final Map<Character, EnumChatFormatting> reverseMap = new HashMap<>();
     private static final Map<EnumChatFormatting, Color> colorMap = new HashMap<>();

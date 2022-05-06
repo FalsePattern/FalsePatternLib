@@ -1,12 +1,13 @@
 package com.falsepattern.lib.config;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.falsepattern.lib.StableAPI;
 
+import java.lang.annotation.*;
+
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@StableAPI(since = "0.6.0")
 public @interface Config {
     /**
      * The mod id that this configuration is associated with.

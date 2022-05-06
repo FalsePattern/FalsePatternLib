@@ -1,7 +1,9 @@
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.StableAPI;
 import net.minecraft.util.EnumFacing;
 
+@StableAPI(since = "0.6.0")
 public enum Rotation {
     NONE("rotate_0"),
     CLOCKWISE_90("rotate_90"),

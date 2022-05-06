@@ -1,5 +1,6 @@
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.StableAPI;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import cpw.mods.fml.relauncher.Side;
@@ -16,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Immutable
+@StableAPI(since = "0.6.0")
 public class BlockPos extends Vec3i {
     /**
      * An immutable block pos with zero as all coordinates.

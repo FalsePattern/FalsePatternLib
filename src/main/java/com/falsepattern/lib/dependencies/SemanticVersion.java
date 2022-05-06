@@ -1,5 +1,6 @@
 package com.falsepattern.lib.dependencies;
 
+import com.falsepattern.lib.StableAPI;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -7,6 +8,7 @@ import lombok.val;
 
 import java.util.Objects;
 
+@StableAPI(since = "0.6.0")
 public class SemanticVersion extends Version {
     @Getter
     private final int majorVersion;

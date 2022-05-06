@@ -1,5 +1,6 @@
 package com.falsepattern.lib.util;
 
+import com.falsepattern.lib.StableAPI;
 import lombok.val;
 
 import java.io.ByteArrayOutputStream;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * A utility class for reading resources in many ways.
  */
+@StableAPI(since = "0.6.0")
 public class ResourceUtil {
 
     /**

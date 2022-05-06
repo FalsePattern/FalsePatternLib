@@ -1,5 +1,6 @@
 package com.falsepattern.lib.dependencies;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import lombok.NonNull;
@@ -13,6 +14,7 @@ import java.net.URL;
 import java.util.*;
 
 
+@StableAPI(since = "0.6.0")
 public class DependencyLoader {
 
     private static final Map<String, Version> loadedLibraries = new HashMap<>();
