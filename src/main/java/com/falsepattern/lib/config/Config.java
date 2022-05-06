@@ -25,21 +25,6 @@ public @interface Config {
      */
     String category() default "general";
 
-    public static enum Type {
-        /**
-         * Loaded once, directly after mod construction. Before pre-init.
-         * This class must have static fields.
-         */
-        INSTANCE(true);
-
-
-        private boolean isStatic = true;
-
-        private Type(boolean isStatic) {this.isStatic = isStatic;}
-
-        public boolean isStatic() {return this.isStatic;}
-    }
-
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     @interface LangKey {
@@ -66,10 +51,22 @@ public @interface Config {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @interface DefaultInt {
+        int value() default 0;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     @interface RangeDouble {
         double min() default Double.MIN_VALUE;
 
         double max() default Double.MAX_VALUE;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface DefaultDouble {
+        double value() default 0d;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
