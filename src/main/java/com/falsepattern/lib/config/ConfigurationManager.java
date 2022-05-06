@@ -72,7 +72,11 @@ public class ConfigurationManager {
     private static void processConfig(Class<?> configClass) throws IllegalAccessException {
         val cfg = configClass.getAnnotation(Config.class);
         val category = cfg.category();
-        val rawConfig = new Configuration(configDir.resolve(cfg.name()).toFile());
+        var configName = cfg.name().trim();
+        if (configName.length() == 0) {
+            configName = cfg.modid();
+        }
+        val rawConfig = new Configuration(configDir.resolve(configName + ".cfg").toFile());
         val cat = rawConfig.getCategory(category);
 
         for (val field: configClass.getDeclaredFields()) {
