@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class FalsePatternLib extends DummyModContainer {
     @Getter
-    private static final Logger log = LogManager.getLogger(ModInfo.MODNAME);
+    private static final Logger log = LogManager.getLogger(Tags.MODNAME);
 
     @Getter
     private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
@@ -26,13 +26,13 @@ public class FalsePatternLib extends DummyModContainer {
         super(new ModMetadata());
         log.info("All your libraries are belong to us!");
         val meta = getMetadata();
-        meta.modId = ModInfo.MODID;
-        meta.name = ModInfo.MODNAME;
-        meta.version = ModInfo.VERSION;
-        meta.url = ModInfo.URL;
-        meta.credits = ModInfo.CREDITS;
-        meta.authorList = Arrays.asList(ModInfo.AUTHORS);
-        meta.description = ModInfo.DESCRIPTION;
+        meta.modId = Tags.MODID;
+        meta.name = Tags.MODNAME;
+        meta.version = Tags.VERSION;
+        meta.url = Tags.URL;
+        meta.credits = Tags.CREDITS;
+        meta.authorList = Arrays.asList(Tags.AUTHORS);
+        meta.description = Tags.DESCRIPTION;
         meta.useDependencyInformation = true;
     }
 

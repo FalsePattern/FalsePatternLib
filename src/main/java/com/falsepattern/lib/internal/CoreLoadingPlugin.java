@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Map;
 
 @MCVersion("1.7.10")
-@Name(ModInfo.MODID)
+@Name(Tags.MODID)
 @SortingIndex(500)
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     public static File mcDir;
@@ -21,7 +21,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return ModInfo.GROUPNAME + ".internal.FalsePatternLib";
+        return Tags.GROUPNAME + ".internal.FalsePatternLib";
     }
 
     @Override
