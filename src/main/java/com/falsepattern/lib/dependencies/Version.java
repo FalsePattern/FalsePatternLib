@@ -1,4 +1,4 @@
-package com.falsepattern.lib.version;
+package com.falsepattern.lib.dependencies;
 
 public abstract class Version implements Comparable<Version> {
     protected Version(){}

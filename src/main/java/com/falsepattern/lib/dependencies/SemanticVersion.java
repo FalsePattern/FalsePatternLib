@@ -1,4 +1,4 @@
-package com.falsepattern.lib.version;
+package com.falsepattern.lib.dependencies;
 
 import lombok.Builder;
 import lombok.Getter;
