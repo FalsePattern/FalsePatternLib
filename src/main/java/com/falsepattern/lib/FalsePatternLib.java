@@ -1,6 +1,6 @@
 package com.falsepattern.lib;
 
-import com.falsepattern.lib.api.Version;
+import com.falsepattern.lib.version.Version;
 import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
