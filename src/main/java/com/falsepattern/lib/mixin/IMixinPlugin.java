@@ -1,5 +1,6 @@
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import lombok.val;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.walk;
 
 public interface IMixinPlugin extends IMixinConfigPlugin {
-    Path MODS_DIRECTORY_PATH = new File(Launch.minecraftHome, "mods/").toPath();
+    Path MODS_DIRECTORY_PATH = CoreLoadingPlugin.mcDir.toPath().resolve("mods");
 
     Logger getLogger();
     ITargetedMod[] getTargetedModEnumValues();

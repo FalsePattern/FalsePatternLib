@@ -1,6 +1,7 @@
 package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lombok.AccessLevel;
@@ -45,7 +46,7 @@ public class ConfigurationManager {
      */
     public static void init() {
         if (initialized) return;
-        configDir = Launch.minecraftHome.toPath().resolve("config");
+        configDir = CoreLoadingPlugin.mcDir.toPath().resolve("config");
         MinecraftForge.EVENT_BUS.register(instance);
         initialized = true;
     }
