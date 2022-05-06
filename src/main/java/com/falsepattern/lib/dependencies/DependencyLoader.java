@@ -1,7 +1,7 @@
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.CoreLoadingPlugin;
-import com.falsepattern.lib.FalsePatternLib;
+import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.FalsePatternLib;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;

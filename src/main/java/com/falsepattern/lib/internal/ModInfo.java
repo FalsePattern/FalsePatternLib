@@ -1,4 +1,4 @@
-package com.falsepattern.lib;
+package com.falsepattern.lib.internal;
 
 public class ModInfo {
     public static final String MODID = "GRADLETOKEN_MODID";

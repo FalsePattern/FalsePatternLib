@@ -1,4 +1,4 @@
-package com.falsepattern.lib;
+package com.falsepattern.lib.internal;
 
 import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;

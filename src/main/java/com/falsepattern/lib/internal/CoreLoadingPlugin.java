@@ -1,4 +1,4 @@
-package com.falsepattern.lib;
+package com.falsepattern.lib.internal;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
@@ -21,7 +21,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return ModInfo.GROUPNAME + ".FalsePatternLib";
+        return ModInfo.GROUPNAME + ".internal.FalsePatternLib";
     }
 
     @Override
