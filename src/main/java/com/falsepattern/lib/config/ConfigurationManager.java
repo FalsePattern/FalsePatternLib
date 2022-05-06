@@ -35,7 +35,7 @@ public class ConfigurationManager {
      * @param config The class to register.
      */
     public static void registerConfig(Class<?> config) throws IllegalAccessException {
-        val cfg = Optional.of(config.getAnnotation(Config.class)).orElseThrow(() -> new IllegalArgumentException("Class " + config.getName() + " does not have a @Config annotation!"));
+        val cfg = Optional.ofNullable(config.getAnnotation(Config.class)).orElseThrow(() -> new IllegalArgumentException("Class " + config.getName() + " does not have a @Config annotation!"));
         val cfgSet = configs.computeIfAbsent(cfg.modid(), (ignored) -> new HashSet<>());
         cfgSet.add(config);
         processConfig(config);
@@ -82,24 +82,24 @@ public class ConfigurationManager {
         for (val field: configClass.getDeclaredFields()) {
             if (field.getAnnotation(Config.Ignore.class) != null) continue;
             field.setAccessible(true);
-            val comment = Optional.of(field.getAnnotation(Config.Comment.class)).map(Config.Comment::value).map((lines) -> String.join("\n", lines)).orElse("");
-            val name = Optional.of(field.getAnnotation(Config.Name.class)).map(Config.Name::value).orElse(field.getName());
-            val langKey = Optional.of(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
+            val comment = Optional.ofNullable(field.getAnnotation(Config.Comment.class)).map(Config.Comment::value).map((lines) -> String.join("\n", lines)).orElse("");
+            val name = Optional.ofNullable(field.getAnnotation(Config.Name.class)).map(Config.Name::value).orElse(field.getName());
+            val langKey = Optional.ofNullable(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
             var boxed = false;
             Property prop = cat.get(name);
             prop.comment = comment;
             prop.setLanguageKey(langKey);
             if ((boxed = field.getType().equals(Integer.class)) || field.getType().equals(int.class)) {
-                val range = Optional.of(field.getAnnotation(Config.RangeInt.class));
+                val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
                 prop.setMinValue(range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE));
                 prop.setMaxValue(range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE));
-                prop.setDefaultValue(Optional.of(field.getAnnotation(Config.DefaultInt.class)).map(Config.DefaultInt::value).orElse(boxed ? (Integer)field.get(null) : field.getInt(null)));
+                prop.setDefaultValue(Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class)).map(Config.DefaultInt::value).orElse(boxed ? (Integer)field.get(null) : field.getInt(null)));
                 field.setInt(null, prop.getInt());
             } else if ((boxed = field.getType().equals(Double.class)) || field.getType().equals(double.class)) {
-                val range = Optional.of(field.getAnnotation(Config.RangeDouble.class));
+                val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
                 prop.setMinValue(range.map(Config.RangeDouble::min).orElse(Double.MIN_VALUE));
                 prop.setMaxValue(range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE));
-                prop.setDefaultValue(Optional.of(field.getAnnotation(Config.DefaultDouble.class)).map(Config.DefaultDouble::value).orElse(boxed ? (Double) field.get(null) : field.getDouble(null)));
+                prop.setDefaultValue(Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class)).map(Config.DefaultDouble::value).orElse(boxed ? (Double) field.get(null) : field.getDouble(null)));
                 field.setDouble(null, prop.getDouble());
             } else if ((boxed = field.getType().equals(Boolean.class)) || field.getType().equals(boolean.class)) {
                 prop.setDefaultValue(boxed ? (Boolean)field.get(null) : field.getBoolean(null));
