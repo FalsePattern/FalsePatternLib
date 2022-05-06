@@ -1,8 +1,10 @@
 package com.falsepattern.lib.internal;
 
+import com.falsepattern.lib.util.ResourceUtil;
 import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.ModMetadata;
 import lombok.Getter;
 import lombok.val;
@@ -23,17 +25,8 @@ public class FalsePatternLib extends DummyModContainer {
     private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     public FalsePatternLib() {
-        super(new ModMetadata());
-        log.info("All your libraries are belong to us!");
-        val meta = getMetadata();
-        meta.modId = Tags.MODID;
-        meta.name = Tags.MODNAME;
-        meta.version = Tags.VERSION;
-        meta.url = Tags.URL;
-        meta.credits = Tags.CREDITS;
-        meta.authorList = Arrays.asList(Tags.AUTHORS);
-        meta.description = Tags.DESCRIPTION;
-        meta.useDependencyInformation = true;
+        super(MetadataCollection.from(ResourceUtil.getResourceFromJar("/mcmod.info", FalsePatternLib.class), Tags.MODID).getMetadataForId(Tags.MODID, null));
+        log.info("Version " + Tags.VERSION + " initialized!");
     }
 
     @SuppressWarnings("UnstableApiUsage")
