@@ -59,7 +59,6 @@ public class ConfigurationManager {
      * @param event The event.
      */
     @SubscribeEvent
-    @SneakyThrows
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         val configClasses = configs.get(event.modID);
         if (configClasses == null)
@@ -67,11 +66,8 @@ public class ConfigurationManager {
         configClasses.forEach((config) -> {
             try {
                 processConfig(config);
-            } catch (
-                    @SuppressWarnings("CaughtExceptionImmediatelyRethrown")
-                    IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException |
-                    ConfigException e) {
-                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
     }
