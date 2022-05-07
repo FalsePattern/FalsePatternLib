@@ -118,7 +118,7 @@ public class ConfigurationManager {
                                 .map(ConfigurationManager::extractValue)
                                 .orElse(field.get(null));
                 val possibleValues = enumValues.stream().map(Enum::name).toArray(String[]::new);
-                field.set(null, fieldClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)));
+                field.set(null, fieldClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)).get(null));
             } else {
                 throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + fieldClass.getName() + "! Did you forget an @Ignore annotation?");
             }
