@@ -66,7 +66,8 @@ public class ConfigurationManager {
      * @param configClass The class to process.
      * @return The configuration elements.
      */
-    public static List<? extends IConfigElement<?>> getConfigElements(Class<?> configClass) throws ConfigException {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
         val cfg = Optional
                 .ofNullable(configClass.getAnnotation(Config.class))
                 .orElseThrow(() -> new ConfigException("Class " + configClass.getName() + " does not have a @Config annotation!"));
@@ -78,7 +79,7 @@ public class ConfigurationManager {
                 .orElseThrow(() -> new ConfigException("Tried to get config elements for non-registed config class!"));
         val category = cfg.category();
         val elements = new ConfigElement<>(rawConfig.getCategory(category)).getChildElements();
-        return elements.stream().map((element) -> new IConfigElementProxy<>((IConfigElement<?>) element, () -> {
+        return elements.stream().map((element) -> new IConfigElementProxy(element, () -> {
             try {
                 processConfigInternal(configClass, category, rawConfig);
                 rawConfig.save();
