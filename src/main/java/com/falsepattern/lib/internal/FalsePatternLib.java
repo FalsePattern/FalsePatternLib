@@ -3,12 +3,11 @@ package com.falsepattern.lib.internal;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.util.ResourceUtil;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.MetadataCollection;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import lombok.Getter;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +28,8 @@ public class FalsePatternLib extends DummyModContainer {
         log.info("Version " + Tags.VERSION + " initialized!");
     }
 
-    @Mod.EventHandler
+    @SuppressWarnings("UnstableApiUsage")
+    @Subscribe
     public void construct(FMLConstructionEvent e) {
         ConfigurationManager.init();
     }
