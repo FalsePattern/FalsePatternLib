@@ -251,11 +251,18 @@ public final class FormattedText {
      */
     @SideOnly(Side.CLIENT)
     public void draw(FontRenderer renderer, int x, int y, boolean shadow) {
-        x += renderer.drawString(text, x, y, colorMap.get(colorStyle).getRGB(), shadow);
-        if (endLine)
+        int startX = x;
+        x = renderer.drawString(text, x, y, colorMap.get(colorStyle).getRGB(), shadow);
+        if (endLine) {
             y += renderer.FONT_HEIGHT;
+            x = startX;
+        }
         for (val sibling: siblings) {
-            x += renderer.drawString(sibling.text, x, y, colorMap.get(sibling.colorStyle).getRGB(), shadow);
+            x = renderer.drawString(sibling.text, x, y, colorMap.get(sibling.colorStyle).getRGB(), shadow);
+            if (sibling.endLine) {
+                y += renderer.FONT_HEIGHT;
+                x = startX;
+            }
         }
     }
 }
