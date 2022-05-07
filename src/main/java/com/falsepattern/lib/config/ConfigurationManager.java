@@ -143,7 +143,7 @@ public class ConfigurationManager {
                 val min = range.map(Config.RangeFloat::min).orElse(Float.MIN_VALUE);
                 val max = range.map(Config.RangeFloat::max).orElse(Float.MAX_VALUE);
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultFloat.class)).map(Config.DefaultFloat::value).orElse(boxed ? (Float) field.get(null) : field.getFloat(null));
-                field.setDouble(null, rawConfig.getFloat(name, category, defaultValue, min, max, comment, langKey));
+                field.setFloat(null, rawConfig.getFloat(name, category, defaultValue, min, max, comment, langKey));
             } else if (fieldClass.equals(String.class)) {
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class)).map(Config.DefaultString::value).orElse((String)field.get(null));
                 val pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class)).map(Config.Pattern::value).map(Pattern::compile).orElse(null);
