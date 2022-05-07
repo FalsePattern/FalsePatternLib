@@ -15,14 +15,7 @@ public @interface Config {
     String modid();
 
     /**
-     * A user friendly name for the config file,
-     * the default will be modid
-     */
-    String name() default "";
-
-    /**
-     * Root element category, defaults to "general", if this is an empty string then the root category is disabled.
-     * Any primitive fields will cause an error, and you must specify sub-category objects
+     * Root element category, defaults to "general". You must not specify an empty string.
      */
     String category() default "general";
 

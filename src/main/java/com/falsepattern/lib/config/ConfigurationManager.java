@@ -3,10 +3,13 @@ package com.falsepattern.lib.config;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lombok.*;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
 import java.lang.reflect.Field;
@@ -22,7 +25,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @StableAPI(since = "0.6.0")
 public class ConfigurationManager {
-    private static final Map<String, Set<Class<?>>> configs = new HashMap<>();
+    private static final Map<String, Configuration> configs = new HashMap<>();
+
+    private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
 
     private static final ConfigurationManager instance = new ConfigurationManager();
 
@@ -31,18 +36,57 @@ public class ConfigurationManager {
     private static Path configDir;
 
     /**
-     * Registers a configuration class to be loaded.
-     * @param config The class to register.
+     * Registers a configuration class to be loaded. This should be done in preInit.
+     * @param configClass The class to register.
      */
-    public static void registerConfig(Class<?> config) throws ConfigException {
-        val cfg = Optional.ofNullable(config.getAnnotation(Config.class)).orElseThrow(() -> new ConfigException("Class " + config.getName() + " does not have a @Config annotation!"));
-        val cfgSet = configs.computeIfAbsent(cfg.modid(), (ignored) -> new HashSet<>());
-        cfgSet.add(config);
+    public static void registerConfig(Class<?> configClass) throws ConfigException {
+        val cfg = Optional
+                .ofNullable(configClass.getAnnotation(Config.class))
+                .orElseThrow(() -> new ConfigException("Class " + configClass.getName() + " does not have a @Config annotation!"));
+        val category = Optional
+                .of(cfg.category().trim())
+                .map((cat) -> cat.length() == 0 ? null : cat)
+                .orElseThrow(() -> new ConfigException("Config class " + configClass.getName() + " has an empty category!"));
+        val rawConfig = configs.computeIfAbsent(cfg.modid(), (ignored) -> {
+            val c = new Configuration(configDir.resolve(cfg.modid() + ".cfg").toFile());
+            c.load();
+            return c;
+        });
+        configToClassMap.computeIfAbsent(rawConfig, (ignored) -> new HashSet<>()).add(configClass);
         try {
-            processConfig(config);
+            processConfigInternal(configClass, category, rawConfig);
+            rawConfig.save();
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException e) {
             throw new ConfigException(e);
         }
+    }
+
+    /**
+     * Process the configuration into a list of config elements usable in config GUI code.
+     * @param configClass The class to process.
+     * @return The configuration elements.
+     */
+    public static List<? extends IConfigElement<?>> getConfigElements(Class<?> configClass) throws ConfigException {
+        val cfg = Optional
+                .ofNullable(configClass.getAnnotation(Config.class))
+                .orElseThrow(() -> new ConfigException("Class " + configClass.getName() + " does not have a @Config annotation!"));
+        val rawConfig = Optional
+                .ofNullable(configs.get(cfg.modid()))
+                .map((conf) -> Optional.ofNullable(configToClassMap.get(conf))
+                                       .map((l) -> l.contains(configClass))
+                                       .orElse(false) ? conf : null)
+                .orElseThrow(() -> new ConfigException("Tried to get config elements for non-registed config class!"));
+        val category = cfg.category();
+        val elements = new ConfigElement<>(rawConfig.getCategory(category)).getChildElements();
+        return elements.stream().map((element) -> new IConfigElementProxy<>((IConfigElement<?>) element, () -> {
+            try {
+                processConfigInternal(configClass, category, rawConfig);
+                rawConfig.save();
+            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+                     NoSuchFieldException | ConfigException e) {
+                e.printStackTrace();
+            }
+        })).collect(Collectors.toList());
     }
 
     /**
@@ -51,7 +95,7 @@ public class ConfigurationManager {
     public static void init() {
         if (initialized) return;
         configDir = CoreLoadingPlugin.mcDir.toPath().resolve("config");
-        MinecraftForge.EVENT_BUS.register(instance);
+        FMLCommonHandler.instance().bus().register(instance);
         initialized = true;
     }
 
@@ -61,27 +105,20 @@ public class ConfigurationManager {
      */
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        val configClasses = configs.get(event.modID);
-        if (configClasses == null)
+        val config = configs.get(event.modID);
+        if (config == null)
             return;
-        configClasses.forEach((config) -> {
+        val configClasses = configToClassMap.get(config);
+        configClasses.forEach((configClass) -> {
             try {
-                processConfig(config);
+                val category = Optional.ofNullable(configClass.getAnnotation(Config.class)).map(Config::category).orElseThrow(() -> new ConfigException("Failed to get config category for class " + configClass.getName()));
+                processConfigInternal(configClass, category, config);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         });
     }
-
-    private static void processConfig(Class<?> configClass) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException, ConfigException {
-        val cfg = configClass.getAnnotation(Config.class);
-        val category = cfg.category();
-        var configName = cfg.name().trim();
-        if (configName.length() == 0) {
-            configName = cfg.modid();
-        }
-        val rawConfig = new Configuration(configDir.resolve(configName + ".cfg").toFile());
-        rawConfig.load();
+    private static void processConfigInternal(Class<?> configClass, String category, Configuration rawConfig) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException, ConfigException {
         val cat = rawConfig.getCategory(category);
         for (val field: configClass.getDeclaredFields()) {
             if (field.getAnnotation(Config.Ignore.class) != null) continue;
@@ -144,7 +181,6 @@ public class ConfigurationManager {
                 cat.setRequiresWorldRestart(true);
             }
         }
-        rawConfig.save();
     }
 
     @SneakyThrows
