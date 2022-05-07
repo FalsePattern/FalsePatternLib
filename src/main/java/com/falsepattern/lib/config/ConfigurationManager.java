@@ -4,16 +4,16 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
-import lombok.var;
+import lombok.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Class for controlling the loading of configuration files.
@@ -33,11 +33,15 @@ public class ConfigurationManager {
      * Registers a configuration class to be loaded.
      * @param config The class to register.
      */
-    public static void registerConfig(Class<?> config) throws IllegalAccessException {
-        val cfg = Optional.ofNullable(config.getAnnotation(Config.class)).orElseThrow(() -> new IllegalArgumentException("Class " + config.getName() + " does not have a @Config annotation!"));
+    public static void registerConfig(Class<?> config) throws ConfigException {
+        val cfg = Optional.ofNullable(config.getAnnotation(Config.class)).orElseThrow(() -> new ConfigException("Class " + config.getName() + " does not have a @Config annotation!"));
         val cfgSet = configs.computeIfAbsent(cfg.modid(), (ignored) -> new HashSet<>());
         cfgSet.add(config);
-        processConfig(config);
+        try {
+            processConfig(config);
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException e) {
+            throw new ConfigException(e);
+        }
     }
 
     /**
@@ -55,6 +59,7 @@ public class ConfigurationManager {
      * @param event The event.
      */
     @SubscribeEvent
+    @SneakyThrows
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         val configClasses = configs.get(event.modID);
         if (configClasses == null)
@@ -62,13 +67,16 @@ public class ConfigurationManager {
         configClasses.forEach((config) -> {
             try {
                 processConfig(config);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+            } catch (
+                    @SuppressWarnings("CaughtExceptionImmediatelyRethrown")
+                    IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException |
+                    ConfigException e) {
+                throw e;
             }
         });
     }
 
-    private static void processConfig(Class<?> configClass) throws IllegalAccessException {
+    private static void processConfig(Class<?> configClass) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException, ConfigException {
         val cfg = configClass.getAnnotation(Config.class);
         val category = cfg.category();
         var configName = cfg.name().trim();
@@ -104,6 +112,19 @@ public class ConfigurationManager {
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class)).map(Config.DefaultString::value).orElse((String)field.get(null));
                 val pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class)).map(Config.Pattern::value).map(Pattern::compile).orElse(null);
                 field.set(null, rawConfig.getString(name, category, defaultValue, comment, langKey, pattern));
+            } else if (field.isEnumConstant()) {
+                val enumClass = field.getType();
+                val enumValues = Arrays.stream((Object[])enumClass.getDeclaredMethod("values").invoke(null)).map((obj) -> (Enum<?>)obj).collect(Collectors.toList());
+                val defaultValue = (Enum<?>)
+                        Optional.ofNullable(field.getAnnotation(Config.DefaultEnum.class))
+                                .map(Config.DefaultEnum::value)
+                                .map((defName) -> extractField(enumClass, defName))
+                                .map(ConfigurationManager::extractValue)
+                                .orElse(field.get(null));
+                val possibleValues = enumValues.stream().map(Enum::name).toArray(String[]::new);
+                field.set(null, enumClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)));
+            } else {
+                throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + field.getType().getName() + "! Did you forget an @Ignore annotation?");
             }
             if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
                 cat.setRequiresMcRestart(true);
@@ -113,5 +134,15 @@ public class ConfigurationManager {
             }
         }
         rawConfig.save();
+    }
+
+    @SneakyThrows
+    private static Field extractField(Class<?> clazz, String field) {
+        return clazz.getDeclaredField(field);
+    }
+
+    @SneakyThrows
+    private static Object extractValue(Field field) {
+        return field.get(null);
     }
 }
