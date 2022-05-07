@@ -88,39 +88,39 @@ public class ConfigurationManager {
             val comment = Optional.ofNullable(field.getAnnotation(Config.Comment.class)).map(Config.Comment::value).map((lines) -> String.join("\n", lines)).orElse("");
             val name = Optional.ofNullable(field.getAnnotation(Config.Name.class)).map(Config.Name::value).orElse(field.getName());
             val langKey = Optional.ofNullable(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
+            val fieldClass = field.getType();
             var boxed = false;
-            if ((boxed = field.getType().equals(Boolean.class)) || field.getType().equals(boolean.class)) {
+            if ((boxed = fieldClass.equals(Boolean.class)) || fieldClass.equals(boolean.class)) {
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class)).map(Config.DefaultBoolean::value).orElse(boxed ? (Boolean) field.get(null) : field.getBoolean(null));
                 field.setBoolean(null, rawConfig.getBoolean(name, category, defaultValue, comment, langKey));
-            } else if ((boxed = field.getType().equals(Integer.class)) || field.getType().equals(int.class)) {
+            } else if ((boxed = fieldClass.equals(Integer.class)) || fieldClass.equals(int.class)) {
                 val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
                 val min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
                 val max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class)).map(Config.DefaultInt::value).orElse(boxed ? (Integer)field.get(null) : field.getInt(null));
                 field.setInt(null, rawConfig.getInt(name, category, defaultValue, min, max, comment, langKey));
-            } else if ((boxed = field.getType().equals(Float.class)) || field.getType().equals(float.class)) {
+            } else if ((boxed = fieldClass.equals(Float.class)) || fieldClass.equals(float.class)) {
                 val range = Optional.ofNullable(field.getAnnotation(Config.RangeFloat.class));
                 val min = range.map(Config.RangeFloat::min).orElse(Float.MIN_VALUE);
                 val max = range.map(Config.RangeFloat::max).orElse(Float.MAX_VALUE);
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultFloat.class)).map(Config.DefaultFloat::value).orElse(boxed ? (Float) field.get(null) : field.getFloat(null));
                 field.setDouble(null, rawConfig.getFloat(name, category, defaultValue, min, max, comment, langKey));
-            } else if (field.getType().equals(String.class)) {
+            } else if (fieldClass.equals(String.class)) {
                 val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class)).map(Config.DefaultString::value).orElse((String)field.get(null));
                 val pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class)).map(Config.Pattern::value).map(Pattern::compile).orElse(null);
                 field.set(null, rawConfig.getString(name, category, defaultValue, comment, langKey, pattern));
-            } else if (field.isEnumConstant()) {
-                val enumClass = field.getType();
-                val enumValues = Arrays.stream((Object[])enumClass.getDeclaredMethod("values").invoke(null)).map((obj) -> (Enum<?>)obj).collect(Collectors.toList());
+            } else if (fieldClass.isEnum()) {
+                val enumValues = Arrays.stream((Object[])fieldClass.getDeclaredMethod("values").invoke(null)).map((obj) -> (Enum<?>)obj).collect(Collectors.toList());
                 val defaultValue = (Enum<?>)
                         Optional.ofNullable(field.getAnnotation(Config.DefaultEnum.class))
                                 .map(Config.DefaultEnum::value)
-                                .map((defName) -> extractField(enumClass, defName))
+                                .map((defName) -> extractField(fieldClass, defName))
                                 .map(ConfigurationManager::extractValue)
                                 .orElse(field.get(null));
                 val possibleValues = enumValues.stream().map(Enum::name).toArray(String[]::new);
-                field.set(null, enumClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)));
+                field.set(null, fieldClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)));
             } else {
-                throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + field.getType().getName() + "! Did you forget an @Ignore annotation?");
+                throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + fieldClass.getName() + "! Did you forget an @Ignore annotation?");
             }
             if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
                 cat.setRequiresMcRestart(true);
