@@ -2,6 +2,7 @@ package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.FalsePatternLib;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lombok.*;
@@ -118,7 +119,21 @@ public class ConfigurationManager {
                                 .map(ConfigurationManager::extractValue)
                                 .orElse(field.get(null));
                 val possibleValues = enumValues.stream().map(Enum::name).toArray(String[]::new);
-                field.set(null, fieldClass.getDeclaredField(rawConfig.getString(name, category, defaultValue.name(), comment, possibleValues, langKey)).get(null));
+                var value = rawConfig.getString(name, category, defaultValue.name(), comment + "\nPossible values: " + Arrays.toString(possibleValues) + "\n", possibleValues, langKey);
+
+                try {
+                    if (!Arrays.asList(possibleValues).contains(value)) {
+                        throw new NoSuchFieldException();
+                    }
+                    val enumField = fieldClass.getDeclaredField(value);
+                    if (!enumField.isEnumConstant()) {
+                        throw new NoSuchFieldException();
+                    }
+                    field.set(null, enumField.get(null));
+                } catch (NoSuchFieldException e) {
+                    FalsePatternLib.getLog().warn("Invalid value " + value + " for enum configuration field " + field.getName() + " of type " + fieldClass.getName() + " in config class " + configClass.getName() + "! Using default value of " + defaultValue + "!");
+                    field.set(null, defaultValue);
+                }
             } else {
                 throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + fieldClass.getName() + "! Did you forget an @Ignore annotation?");
             }
