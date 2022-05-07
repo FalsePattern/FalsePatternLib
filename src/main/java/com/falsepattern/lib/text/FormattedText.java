@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import lombok.NonNull;
 import lombok.val;
+import lombok.var;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -16,10 +17,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Universal escape sequence-based text rendering and chat messages.
@@ -131,11 +134,28 @@ public final class FormattedText {
     }
 
     /**
-     * Converts this text structure into a chat component that can be sent to clients.
+     * Converts this text structure into chat components that can be sent to the client. This is a list, because chat components can't have newlines.
      * @return The chat component.
      */
-    public ChatComponentText toChatText() {
-        val result = new ChatComponentText(endLine ? text + "\n" : "");
+    public List<ChatComponentText> toChatText() {
+        var thisComponent = toChatTextSingle();
+        val result = new ArrayList<ChatComponentText>();
+        result.add(thisComponent);
+        FormattedText prevSibling = this;
+        for (val sibling: siblings) {
+            val siblingResult = sibling.toChatTextSingle();
+            if (prevSibling.endLine) {
+                result.add(thisComponent = siblingResult);
+            } else {
+                thisComponent.appendSibling(siblingResult);
+            }
+            prevSibling = sibling;
+        }
+        return result;
+    }
+
+    private ChatComponentText toChatTextSingle() {
+        val thisComponent = new ChatComponentText(text);
         val style = new ChatStyle();
         if (colorStyle != null) {
             style.setColor(colorStyle);
@@ -159,41 +179,44 @@ public final class FormattedText {
                     break;
             }
         }
-        result.setChatStyle(style);
-        for (val sibling: siblings) {
-            result.appendSibling(sibling.toChatText());
+        thisComponent.setChatStyle(style);
+        return thisComponent;
+    }
+
+    private void addChatMessage(Consumer<IChatComponent> consumer) {
+        for (val line: toChatText()) {
+            consumer.accept(line);
         }
-        return result;
     }
 
     public void addChatMessage(ICommandSender target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
     
     @SideOnly(Side.CLIENT)
     public void addChatMessage(EntityOtherPlayerMP target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     @SideOnly(Side.CLIENT)
     public void addChatMessage(EntityPlayerSP target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     public void addChatMessage(CommandBlockLogic target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     public void addChatMessage(EntityPlayerMP target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     public void addChatMessage(RConConsoleSource target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     public void addChatMessage(MinecraftServer target) {
-        target.addChatMessage(this.toChatText());
+        addChatMessage(target::addChatMessage);
     }
 
     /**
