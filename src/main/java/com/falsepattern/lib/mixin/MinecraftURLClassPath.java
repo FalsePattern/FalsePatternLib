@@ -2,24 +2,28 @@ package com.falsepattern.lib.mixin;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModClassLoader;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import sun.misc.URLClassPath;
 
 import java.io.File;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URL;
 
 /**
  * Backport from spongemixins 1.3 for compat with the curseforge 1.2.0 version.
  *
  * Also added Grimoire protection.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MinecraftURLClassPath {
     /**
      *  Utility to manipulate the minecraft URL ClassPath
      */
 
-    private static final URLClassPath ucp;
+    private static final Object ucp;
+    private static final Method addURL;
     private static final boolean GRIMOIRE;
 
     static {
@@ -48,12 +52,14 @@ public final class MinecraftURLClassPath {
                 Object loader = loaderinstanceField.get(null);
                 val modClassLoader = (ModClassLoader) modClassLoaderField.get(loader);
                 val mainClassLoader = (LaunchClassLoader) mainClassLoaderField.get(modClassLoader);
-                ucp = (URLClassPath) ucpField.get(mainClassLoader);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+                ucp = ucpField.get(mainClassLoader);
+                addURL = ucp.getClass().getDeclaredMethod("addURL", URL.class);
+            } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
                 throw new RuntimeException(e.getMessage());
             }
         } else {
             ucp = null;
+            addURL = null;
             System.err.println("Grimoire detected, disabling jar loading utility");
         }
     }
@@ -64,11 +70,6 @@ public final class MinecraftURLClassPath {
      */
     public static void addJar(File pathToJar) throws Exception {
         if (!GRIMOIRE)
-            ucp.addURL(pathToJar.toURI().toURL());
+            addURL.invoke(ucp, pathToJar.toURI().toURL());
     }
-
-    private MinecraftURLClassPath() {
-    }
-
-
 }
