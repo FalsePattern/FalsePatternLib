@@ -1,11 +1,23 @@
-A library used by some of my other mods.
-
 CurseForge: https://www.curseforge.com/minecraft/mc-mods/falsepatternlib
 
-The primary feature of this mod is version-safe dependency handling of non-mod libraries. FalsePatternLib can dynamically load dependencies from a specific maven repository, which lets mods that use external dependencies to share said dependency, instead of shadowing it in for each individual mod. This leads to way smaller jar files, and an extremely low chance of dependency conflicts.
+A library mod for 1.7.10 with lots of useful stuff. See the table below for more information.
 
-Dependencies:
+| Package                                                         | Stuff it has                                                    |
+|-----------------------------------------------------------------|-----------------------------------------------------------------|
+| [compat](src/main/java/com/falsepattern/lib/compat)             | Code backported from vanilla 1.12.2.                            |
+| [config](src/main/java/com/falsepattern/lib/config)             | 1.12.2-style annotation-based config library                    |
+| [dependencies](src/main/java/com/falsepattern/lib/dependencies) | Runtime dependency loader. Uses Maven.                          |
+| [mixin](src/main/java/com/falsepattern/lib/mixin)               | Mixin loader plugin boilerplate code                            |
+| [text](src/main/java/com/falsepattern/lib/text)                 | Better Chat and GUI text processing                             |
+| [util](src/main/java/com/falsepattern/lib/util)                 | Additional stuff that don't fit the above categories. See below |
 
-None
+The contents of the [util](src/main/java/com/falsepattern/lib/util) package so far:
+
+| Class        | What it does                                                                                                   |
+|--------------|----------------------------------------------------------------------------------------------------------------|
+| ResourceUtil | Provides methods for efficiently retrieving resources from SPECIFIC jar files, instead of the entire classpath |
+
+
+Anything annotated with [@StableAPI](src/main/java/com/falsepattern/lib/StableAPI.java) is guaranteed to not change in patch versions.
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
