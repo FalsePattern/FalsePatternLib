@@ -1,3 +1,4 @@
+Modrinth: https://modrinth.com/mod/fplib
 CurseForge: https://www.curseforge.com/minecraft/mc-mods/falsepatternlib
 
 A library mod for 1.7.10 with lots of useful stuff. See the table below for more information.
