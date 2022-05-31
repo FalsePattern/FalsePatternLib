@@ -13,6 +13,9 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * A functional equivalent to GuiLabel present in Minecraft 1.12
+ */
 @SideOnly(Side.CLIENT)
 public class GuiLabel extends Gui {
     private final List<String> lines = new ArrayList<>();
@@ -20,11 +23,29 @@ public class GuiLabel extends Gui {
     private final int textColor;
 
     private boolean centered = false;
+    /**
+     * The label width.
+     */
     protected int width;
+    /**
+     * The label height.
+     */
     protected int height;
+    /**
+     * The id of the label.
+     */
     public int id;
+    /**
+     * The x position of the label.
+     */
     public int x;
+    /**
+     * The y position of the label.
+     */
     public int y;
+    /**
+     * The visibility of the label.
+     */
     public boolean visible = true;
 
     /**
@@ -51,7 +72,7 @@ public class GuiLabel extends Gui {
     /**
      * Add a line of text to the GuiLabel.
      *
-     * @param text string to add.
+     * @param text string to add
      */
     public void addLine(@NonNull String text) {
         lines.add(I18n.format(text));
@@ -60,7 +81,7 @@ public class GuiLabel extends Gui {
     /**
      * Sets the label text to render centred with respect to the x and y.
      *
-     * @return the GuiLabel.
+     * @return the GuiLabel itself
      */
     public GuiLabel setCentered() {
         centered = true;
