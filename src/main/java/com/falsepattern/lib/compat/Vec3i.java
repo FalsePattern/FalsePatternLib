@@ -7,7 +7,7 @@ import net.minecraft.util.MathHelper;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * A functional equivalent to Vec3i present in Minecraft 1.12
+ * A functional equivalent to Vec3i present in Minecraft 1.12.
  */
 @Getter
 @Immutable

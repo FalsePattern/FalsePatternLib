@@ -14,7 +14,7 @@ import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 
 /**
- * A functional equivalent to GuiLabel present in Minecraft 1.12
+ * A functional equivalent to GuiLabel present in Minecraft 1.12.
  */
 @SideOnly(Side.CLIENT)
 public class GuiLabel extends Gui {
