@@ -1,6 +1,7 @@
 package com.falsepattern.lib.compat;
 
 import com.google.common.collect.Lists;
+
 import java.util.List;
 
 import cpw.mods.fml.relauncher.Side;
@@ -13,8 +14,7 @@ import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiLabel extends Gui
-{
+public class GuiLabel extends Gui {
     protected int width;
     protected int height;
     public int x;
@@ -31,8 +31,7 @@ public class GuiLabel extends Gui
     private final FontRenderer fontRenderer;
     private final int border;
 
-    public GuiLabel(FontRenderer fontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_)
-    {
+    public GuiLabel(FontRenderer fontRendererObj, int p_i45540_2_, int p_i45540_3_, int p_i45540_4_, int p_i45540_5_, int p_i45540_6_, int p_i45540_7_) {
         this.fontRenderer = fontRendererObj;
         this.id = p_i45540_2_;
         this.x = p_i45540_3_;
@@ -49,24 +48,20 @@ public class GuiLabel extends Gui
         this.border = 0;
     }
 
-    public void addLine(String p_175202_1_)
-    {
+    public void addLine(String p_175202_1_) {
         this.labels.add(I18n.format(p_175202_1_));
     }
 
     /**
      * Sets the Label to be centered
      */
-    public GuiLabel setCentered()
-    {
+    public GuiLabel setCentered() {
         this.centered = true;
         return this;
     }
 
-    public void drawLabel(Minecraft mc, int mouseX, int mouseY)
-    {
-        if (this.visible)
-        {
+    public void drawLabel(Minecraft mc, int mouseX, int mouseY) {
+        if (this.visible) {
             GL11.glEnable(GL11.GL_BLEND);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -74,24 +69,18 @@ public class GuiLabel extends Gui
             int i = this.y + this.height / 2 + this.border / 2;
             int j = i - this.labels.size() * 10 / 2;
 
-            for (int k = 0; k < this.labels.size(); ++k)
-            {
-                if (this.centered)
-                {
+            for (int k = 0; k < this.labels.size(); ++k) {
+                if (this.centered) {
                     this.drawCenteredString(this.fontRenderer, this.labels.get(k), this.x + this.width / 2, j + k * 10, this.textColor);
-                }
-                else
-                {
+                } else {
                     this.drawString(this.fontRenderer, this.labels.get(k), this.x, j + k * 10, this.textColor);
                 }
             }
         }
     }
 
-    protected void drawLabelBackground(Minecraft mcIn, int mouseX, int mouseY)
-    {
-        if (this.labelBgEnabled)
-        {
+    protected void drawLabelBackground(Minecraft mcIn, int mouseX, int mouseY) {
+        if (this.labelBgEnabled) {
             int i = this.width + this.border * 2;
             int j = this.height + this.border * 2;
             int k = this.x - this.border;
