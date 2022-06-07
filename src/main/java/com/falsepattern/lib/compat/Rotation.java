@@ -1,32 +1,16 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.*;
 import net.minecraft.util.EnumFacing;
+
+import java.util.Arrays;
 
 @StableAPI(since = "0.6.0")
 public enum Rotation {
-    NONE("rotate_0"),
-    CLOCKWISE_90("rotate_90"),
-    CLOCKWISE_180("rotate_180"),
-    COUNTERCLOCKWISE_90("rotate_270");
+    NONE, CLOCKWISE_90, CLOCKWISE_180, COUNTERCLOCKWISE_90;
 
-    private static final String[] rotationNames = new String[values().length];
-
-    static {
-        int i = 0;
-
-        for (Rotation rotation : values()) {
-            rotationNames[i++] = rotation.name;
-        }
-    }
-
-    private final String name;
-
-    Rotation(String nameIn) {
-        this.name = nameIn;
-    }
-
-    public Rotation add(Rotation rotation) {
+    public Rotation add(@NonNull Rotation rotation) {
         switch (rotation) {
             case CLOCKWISE_180:
                 switch (this) {
@@ -66,7 +50,7 @@ public enum Rotation {
         }
     }
 
-    public EnumFacing rotate(EnumFacing facing) {
+    public EnumFacing rotate(@NonNull EnumFacing facing) {
         if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
             return facing;
         }
