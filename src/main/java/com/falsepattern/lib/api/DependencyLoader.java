@@ -11,7 +11,7 @@ import lombok.NonNull;
 @Deprecated
 public class DependencyLoader {
     @Builder
-    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
+    public static void loadLibrary(String loadingModId, String groupId, String artifactId, @NonNull com.falsepattern.lib.dependencies.Version minVersion, com.falsepattern.lib.dependencies.Version maxVersion, @NonNull com.falsepattern.lib.dependencies.Version preferredVersion, String regularSuffix, String devSuffix) {
         com.falsepattern.lib.dependencies.DependencyLoader.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion, regularSuffix, devSuffix);
         Deprecation.warn();
     }
