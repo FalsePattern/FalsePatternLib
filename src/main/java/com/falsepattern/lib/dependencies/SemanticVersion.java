@@ -1,25 +1,23 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.StableAPI;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
 
-import java.util.Objects;
-
 @StableAPI(since = "0.6.0")
 public class SemanticVersion extends Version {
-    @Getter
-    private final int majorVersion;
-    @Getter
-    private final int minorVersion;
-    @Getter
-    private final int patchVersion;
-    @Getter
-    private final String preRelease;
-    @Getter
-    private final String build;
+    @Getter private final int majorVersion;
+    @Getter private final int minorVersion;
+    @Getter private final int patchVersion;
+    @Getter private final String preRelease;
+    @Getter private final String build;
+
+    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
+        this(majorVersion, minorVersion, patchVersion, preRelease, null);
+    }
 
     @Builder
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease, String build) {
@@ -32,10 +30,6 @@ public class SemanticVersion extends Version {
         this.build = "".equals(build) ? null : build;
     }
 
-    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
-        this(majorVersion, minorVersion, patchVersion, preRelease, null);
-    }
-
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion) {
         this(majorVersion, minorVersion, patchVersion, null, null);
     }
@@ -43,7 +37,7 @@ public class SemanticVersion extends Version {
     @Override
     public int compareTo(@NonNull Version o) {
         if (o instanceof ComplexVersion) {
-            val result = this.compareTo(((ComplexVersion)o).versions[0]);
+            val result = this.compareTo(((ComplexVersion) o).versions[0]);
             if (result != 0) {
                 return result;
             } else if (((ComplexVersion) o).versions.length > 1) {
@@ -52,7 +46,7 @@ public class SemanticVersion extends Version {
                 return 0;
             }
         } else if (o instanceof SemanticVersion) {
-            val other = (SemanticVersion)o;
+            val other = (SemanticVersion) o;
             if (majorVersion != other.majorVersion) {
                 return majorVersion - other.majorVersion;
             } else if (minorVersion != other.minorVersion) {
@@ -75,6 +69,7 @@ public class SemanticVersion extends Version {
 
     @Override
     public String toString() {
-        return majorVersion + "." + minorVersion + "." + patchVersion + (preRelease == null ? "" : "-" + preRelease) + (build == null ? "" : "+" + build);
+        return majorVersion + "." + minorVersion + "." + patchVersion + (preRelease == null ? "" : "-" + preRelease) +
+               (build == null ? "" : "+" + build);
     }
 }

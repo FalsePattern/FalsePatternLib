@@ -7,13 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Anything annotated with this annotation will be considered stable, and the class/method/field will not get breaking
  * changes without a full deprecation cycle.
- *
- * If a class or method is NOT annotated with this annotation, it will be considered unstable, and the package/method arguments/etc.
- * can freely change between patch releases without notice.
- *
+ * <p>
+ * If a class or method is NOT annotated with this annotation, it will be considered unstable, and the package/method
+ * arguments/etc. can freely change between patch releases without notice.
+ * <p>
  * If a class is annotated with this annotation, all currently existing public and protected members in the class will
  * be considered stable.
- *
+ * <p>
  * Private members will never be considered stable, and can be removed without notice.
  */
 @Documented

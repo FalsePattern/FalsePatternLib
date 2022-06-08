@@ -14,17 +14,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Utility class used by FalsePatternLib's internal code. This can change between versions without notice, so do not use this in your code!
+ * Utility class used by FalsePatternLib's internal code. This can change between versions without notice, so do not use
+ * this in your code!
  */
 public class FalsePatternLib extends DummyModContainer {
-    @Getter
-    private static final Logger log = LogManager.getLogger(Tags.MODNAME);
+    @Getter private static final Logger log = LogManager.getLogger(Tags.MODNAME);
 
-    @Getter
-    private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    @Getter private static final boolean developerEnvironment =
+            (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     public FalsePatternLib() {
-        super(MetadataCollection.from(ResourceUtil.getResourceFromJar("/mcmod.info", FalsePatternLib.class), Tags.MODID).getMetadataForId(Tags.MODID, null));
+        super(MetadataCollection.from(ResourceUtil.getResourceFromJar("/mcmod.info", FalsePatternLib.class), Tags.MODID)
+                                .getMetadataForId(Tags.MODID, null));
         log.info("Version " + Tags.VERSION + " initialized!");
     }
 

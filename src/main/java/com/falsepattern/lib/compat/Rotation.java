@@ -1,14 +1,15 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.*;
+import lombok.NonNull;
 import net.minecraft.util.EnumFacing;
-
-import java.util.Arrays;
 
 @StableAPI(since = "0.6.0")
 public enum Rotation {
-    NONE, CLOCKWISE_90, CLOCKWISE_180, COUNTERCLOCKWISE_90;
+    NONE,
+    CLOCKWISE_90,
+    CLOCKWISE_180,
+    COUNTERCLOCKWISE_90;
 
     public Rotation add(@NonNull Rotation rotation) {
         switch (rotation) {

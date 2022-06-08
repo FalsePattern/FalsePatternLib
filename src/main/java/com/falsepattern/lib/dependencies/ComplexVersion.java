@@ -1,15 +1,15 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.NonNull;
-import lombok.val;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import lombok.NonNull;
+import lombok.val;
 
 @StableAPI(since = "0.6.0")
 public class ComplexVersion extends Version {
     final Version[] versions;
+
     public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {
         this.versions = new Version[subVersions.length + 1];
         this.versions[0] = mainVersion;
@@ -23,7 +23,9 @@ public class ComplexVersion extends Version {
             int count = Math.min(versions.length, other.versions.length);
             for (int i = 0; i < count; i++) {
                 val result = versions[i].compareTo(other.versions[i]);
-                if (result != 0) return result;
+                if (result != 0) {
+                    return result;
+                }
             }
             if (versions.length != other.versions.length) {
                 return versions.length - other.versions.length;

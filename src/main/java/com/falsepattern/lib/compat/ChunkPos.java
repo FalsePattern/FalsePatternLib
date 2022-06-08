@@ -1,10 +1,12 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.*;
-import net.minecraft.entity.Entity;
-
 import javax.annotation.concurrent.Immutable;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.val;
+import net.minecraft.entity.Entity;
 
 /**
  * A functional equivalent to ChunkPos present in Minecraft 1.12.
@@ -38,6 +40,7 @@ public class ChunkPos {
      *
      * @param x the chunk x
      * @param z the chunk x
+     *
      * @return the unique chunk long
      */
     public static long asLong(int x, int z) {
@@ -48,6 +51,7 @@ public class ChunkPos {
      * Gets distance sq.
      *
      * @param entity the entity
+     *
      * @return the distance sq
      */
     public double getDistanceSq(@NonNull Entity entity) {
@@ -98,6 +102,7 @@ public class ChunkPos {
      * @param x the x pos
      * @param y the y pos
      * @param z the z pos
+     *
      * @return the relative block position
      */
     public BlockPos getBlock(int x, int y, int z) {

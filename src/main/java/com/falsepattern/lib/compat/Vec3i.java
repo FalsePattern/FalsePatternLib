@@ -1,10 +1,13 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.*;
-import net.minecraft.util.MathHelper;
-
 import javax.annotation.concurrent.Immutable;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.val;
+import net.minecraft.util.MathHelper;
 
 /**
  * A functional equivalent to Vec3i present in Minecraft 1.12.
@@ -43,14 +46,13 @@ public class Vec3i implements Comparable<Vec3i> {
      * Cross product between two vectors.
      *
      * @param vec the other vector
+     *
      * @return the new resulting vector
      */
     public Vec3i crossProduct(@NonNull Vec3i vec) {
-        return new Vec3i(
-                y * vec.getZ() - z * vec.getY(),
-                z * vec.getX() - x * vec.getZ(),
-                x * vec.getY() - y * vec.getX()
-        );
+        return new Vec3i(y * vec.getZ() - z * vec.getY(),
+                         z * vec.getX() - x * vec.getZ(),
+                         x * vec.getY() - y * vec.getX());
     }
 
     /**
@@ -59,20 +61,11 @@ public class Vec3i implements Comparable<Vec3i> {
      * @param x the other x
      * @param y the other y
      * @param z the other z
+     *
      * @return the distance
      */
     public double getDistance(int x, int y, int z) {
         return Math.sqrt(distanceSq(x, y, z));
-    }
-
-    /**
-     * Square distance between vectors.
-     *
-     * @param vec the other vector
-     * @return the square distance
-     */
-    public double distanceSq(@NonNull Vec3i vec) {
-        return distanceSq(vec.getX(), vec.getY(), vec.getZ());
     }
 
     /**
@@ -81,6 +74,7 @@ public class Vec3i implements Comparable<Vec3i> {
      * @param x the other x
      * @param y the other y
      * @param z the other z
+     *
      * @return the square distance
      */
     public double distanceSq(int x, int y, int z) {
@@ -91,11 +85,23 @@ public class Vec3i implements Comparable<Vec3i> {
     }
 
     /**
+     * Square distance between vectors.
+     *
+     * @param vec the other vector
+     *
+     * @return the square distance
+     */
+    public double distanceSq(@NonNull Vec3i vec) {
+        return distanceSq(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    /**
      * Square distance between point to center of this Block.
      *
      * @param x the other x
      * @param y the other y
      * @param z the other z
+     *
      * @return the square distance to center
      */
     public double distanceSqToCenter(double x, double y, double z) {

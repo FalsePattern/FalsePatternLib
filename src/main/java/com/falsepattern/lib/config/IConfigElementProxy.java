@@ -4,13 +4,13 @@ import cpw.mods.fml.client.config.ConfigGuiType;
 import cpw.mods.fml.client.config.GuiConfigEntries;
 import cpw.mods.fml.client.config.GuiEditArrayEntries;
 import cpw.mods.fml.client.config.IConfigElement;
-
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class IConfigElementProxy<T> implements IConfigElement<T> {
     private final IConfigElement<T> proxied;
     private final Runnable onUpdate;
+
     public IConfigElementProxy(IConfigElement<T> proxied, Runnable onUpdate) {
         this.proxied = proxied;
         this.onUpdate = onUpdate;

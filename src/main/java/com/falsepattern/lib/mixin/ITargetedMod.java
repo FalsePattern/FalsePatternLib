@@ -1,14 +1,13 @@
 package com.falsepattern.lib.mixin;
 
 import com.google.common.io.Files;
-
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
 public interface ITargetedMod {
 
     String getModName();
-    Predicate<String> getCondition();
+
     boolean isLoadInDevelopment();
 
     default boolean isMatchingJar(Path path) {
@@ -18,6 +17,8 @@ public interface ITargetedMod {
 
         return "jar".equals(fileExtension) && getCondition().test(nameLowerCase);
     }
+
+    Predicate<String> getCondition();
 
     final class PredicateHelpers {
         public static Predicate<String> startsWith(String subString) {

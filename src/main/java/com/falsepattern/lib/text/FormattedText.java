@@ -3,6 +3,15 @@ package com.falsepattern.lib.text;
 import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import java.awt.Color;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;
@@ -19,11 +28,6 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
-import java.awt.Color;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Consumer;
-
 /**
  * Universal escape sequence-based text rendering and chat messages.
  */
@@ -33,35 +37,69 @@ public final class FormattedText {
     private static final Map<EnumChatFormatting, Color> colorMap = new HashMap<>();
 
     private static final char ESCAPE = '\u00a7';
+
     static {
-        for (val value: EnumChatFormatting.values()) {
+        for (val value : EnumChatFormatting.values()) {
             reverseMap.put(value.getFormattingCode(), value);
             if (value.isColor()) {
                 final int rgb;
                 switch (value.getFormattingCode()) {
-                    default:  rgb = 0x000000; break;
-                    case '1': rgb = 0x0000AA; break;
-                    case '2': rgb = 0x00AA00; break;
-                    case '3': rgb = 0x00AAAA; break;
-                    case '4': rgb = 0xAA0000; break;
-                    case '5': rgb = 0xAA00AA; break;
-                    case '6': rgb = 0xFFAA00; break;
-                    case '7': rgb = 0xAAAAAA; break;
-                    case '8': rgb = 0x555555; break;
-                    case '9': rgb = 0x5555FF; break;
-                    case 'a': rgb = 0x55FF55; break;
-                    case 'b': rgb = 0x55FFFF; break;
-                    case 'c': rgb = 0xFF5555; break;
-                    case 'd': rgb = 0xFF55FF; break;
-                    case 'e': rgb = 0xFFFF55; break;
-                    case 'f': rgb = 0xFFFFFF; break;
+                    default:
+                        rgb = 0x000000;
+                        break;
+                    case '1':
+                        rgb = 0x0000AA;
+                        break;
+                    case '2':
+                        rgb = 0x00AA00;
+                        break;
+                    case '3':
+                        rgb = 0x00AAAA;
+                        break;
+                    case '4':
+                        rgb = 0xAA0000;
+                        break;
+                    case '5':
+                        rgb = 0xAA00AA;
+                        break;
+                    case '6':
+                        rgb = 0xFFAA00;
+                        break;
+                    case '7':
+                        rgb = 0xAAAAAA;
+                        break;
+                    case '8':
+                        rgb = 0x555555;
+                        break;
+                    case '9':
+                        rgb = 0x5555FF;
+                        break;
+                    case 'a':
+                        rgb = 0x55FF55;
+                        break;
+                    case 'b':
+                        rgb = 0x55FFFF;
+                        break;
+                    case 'c':
+                        rgb = 0xFF5555;
+                        break;
+                    case 'd':
+                        rgb = 0xFF55FF;
+                        break;
+                    case 'e':
+                        rgb = 0xFFFF55;
+                        break;
+                    case 'f':
+                        rgb = 0xFFFFFF;
+                        break;
                 }
                 colorMap.put(value, new Color(rgb));
             }
             try {
                 Field colorF = Color.class.getDeclaredField(value.getFriendlyName());
-                colorMap.put(value, (Color)colorF.get(null));
-            } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+                colorMap.put(value, (Color) colorF.get(null));
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
         }
     }
 
@@ -74,7 +112,10 @@ public final class FormattedText {
 
     private final boolean endLine;
 
-    private FormattedText(@NonNull String text, @NonNull EnumChatFormatting colorStyle, @NonNull Set<EnumChatFormatting> fancyStyles, boolean endLine) {
+    private FormattedText(@NonNull String text,
+                          @NonNull EnumChatFormatting colorStyle,
+                          @NonNull Set<EnumChatFormatting> fancyStyles,
+                          boolean endLine) {
         this.text = text;
         this.fancyStyles.addAll(fancyStyles);
         this.colorStyle = colorStyle;
@@ -84,7 +125,9 @@ public final class FormattedText {
     /**
      * Parse a string with minecraft style escapes (\u00a7X) into a {@link FormattedText} instance, which can then be
      * used to generate chat or render-able text.
+     *
      * @param text The string to parse
+     *
      * @return The parsed text structure
      */
     public static FormattedText parse(String text) {
@@ -98,8 +141,9 @@ public final class FormattedText {
             char c = text.charAt(i);
             if (format) {
                 val f = reverseMap.get(c);
-                if (f == null)
+                if (f == null) {
                     continue;
+                }
                 if (f == EnumChatFormatting.RESET) {
                     currentColorStyle = EnumChatFormatting.WHITE;
                     currentFancyStyle.clear();
@@ -114,10 +158,11 @@ public final class FormattedText {
             if (c == ESCAPE || c == '\n') {
                 format = c == ESCAPE;
                 val txt = new FormattedText(accumulator.toString(), currentColorStyle, currentFancyStyle, c == '\n');
-                if (result == null)
+                if (result == null) {
                     result = txt;
-                else
+                } else {
                     result.siblings.add(txt);
+                }
                 accumulator.setLength(0);
                 continue;
             }
@@ -125,16 +170,29 @@ public final class FormattedText {
         }
         if (accumulator.length() > 0) {
             val txt = new FormattedText(accumulator.toString(), currentColorStyle, currentFancyStyle, true);
-            if (result == null)
+            if (result == null) {
                 result = txt;
-            else
+            } else {
                 result.siblings.add(txt);
+            }
         }
         return result;
     }
 
+    public void addChatMessage(ICommandSender target) {
+        addChatMessage(target::addChatMessage);
+    }
+
+    private void addChatMessage(Consumer<IChatComponent> consumer) {
+        for (val line : toChatText()) {
+            consumer.accept(line);
+        }
+    }
+
     /**
-     * Converts this text structure into chat components that can be sent to the client. This is a list, because chat components can't have newlines.
+     * Converts this text structure into chat components that can be sent to the client. This is a list, because chat
+     * components can't have newlines.
+     *
      * @return The chat component.
      */
     public List<ChatComponentText> toChatText() {
@@ -142,7 +200,7 @@ public final class FormattedText {
         val result = new ArrayList<ChatComponentText>();
         result.add(thisComponent);
         FormattedText prevSibling = this;
-        for (val sibling: siblings) {
+        for (val sibling : siblings) {
             val siblingResult = sibling.toChatTextSingle();
             if (prevSibling.endLine) {
                 result.add(thisComponent = siblingResult);
@@ -160,7 +218,7 @@ public final class FormattedText {
         if (colorStyle != null) {
             style.setColor(colorStyle);
         }
-        for (val fancyStyle: fancyStyles) {
+        for (val fancyStyle : fancyStyles) {
             switch (fancyStyle) {
                 case OBFUSCATED:
                     style.setObfuscated(true);
@@ -183,16 +241,6 @@ public final class FormattedText {
         return thisComponent;
     }
 
-    private void addChatMessage(Consumer<IChatComponent> consumer) {
-        for (val line: toChatText()) {
-            consumer.accept(line);
-        }
-    }
-
-    public void addChatMessage(ICommandSender target) {
-        addChatMessage(target::addChatMessage);
-    }
-    
     @SideOnly(Side.CLIENT)
     public void addChatMessage(EntityOtherPlayerMP target) {
         addChatMessage(target::addChatMessage);
@@ -221,33 +269,23 @@ public final class FormattedText {
 
     /**
      * {@link #draw(FontRenderer, int, int, boolean)} without drop shadows.
+     *
      * @param renderer The font renderer to use
-     * @param x Left side
-     * @param y Top side
+     * @param x        Left side
+     * @param y        Top side
      */
     @SideOnly(Side.CLIENT)
     public void draw(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, false);
     }
 
-
-    /**
-     * {@link #draw(FontRenderer, int, int, boolean)} with drop shadows.
-     * @param renderer The font renderer to use
-     * @param x Left side
-     * @param y Top side
-     */
-    @SideOnly(Side.CLIENT)
-    public void drawWithShadow(FontRenderer renderer, int x, int y) {
-        draw(renderer, x, y, true);
-    }
-
     /**
      * Renders this structure as GUI text.
+     *
      * @param renderer The font renderer to use
-     * @param x Left side
-     * @param y Top side
-     * @param shadow Whether to have drop shadow under the text
+     * @param x        Left side
+     * @param y        Top side
+     * @param shadow   Whether to have drop shadow under the text
      */
     @SideOnly(Side.CLIENT)
     public void draw(FontRenderer renderer, int x, int y, boolean shadow) {
@@ -257,12 +295,24 @@ public final class FormattedText {
             y += renderer.FONT_HEIGHT;
             x = startX;
         }
-        for (val sibling: siblings) {
+        for (val sibling : siblings) {
             x = renderer.drawString(sibling.text, x, y, colorMap.get(sibling.colorStyle).getRGB(), shadow);
             if (sibling.endLine) {
                 y += renderer.FONT_HEIGHT;
                 x = startX;
             }
         }
+    }
+
+    /**
+     * {@link #draw(FontRenderer, int, int, boolean)} with drop shadows.
+     *
+     * @param renderer The font renderer to use
+     * @param x        Left side
+     * @param y        Top side
+     */
+    @SideOnly(Side.CLIENT)
+    public void drawWithShadow(FontRenderer renderer, int x, int y) {
+        draw(renderer, x, y, true);
     }
 }

@@ -2,24 +2,23 @@ package com.falsepattern.lib.mixin;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModClassLoader;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-
 /**
  * Backport from spongemixins 1.3 for compat with the curseforge 1.2.0 version.
- *
+ * <p>
  * Also added Grimoire protection.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MinecraftURLClassPath {
     /**
-     *  Utility to manipulate the minecraft URL ClassPath
+     * Utility to manipulate the minecraft URL ClassPath
      */
 
     private static final Object ucp;
@@ -65,11 +64,12 @@ public final class MinecraftURLClassPath {
     }
 
     /**
-     * Adds a Jar to the Minecraft URL ClassPath
-     *  - Needed when using mixins on classes outside of Minecraft or other coremods
+     * Adds a Jar to the Minecraft URL ClassPath - Needed when using mixins on classes outside of Minecraft or other
+     * coremods
      */
     public static void addJar(File pathToJar) throws Exception {
-        if (!GRIMOIRE)
+        if (!GRIMOIRE) {
             addURL.invoke(ucp, pathToJar.toURI().toURL());
+        }
     }
 }

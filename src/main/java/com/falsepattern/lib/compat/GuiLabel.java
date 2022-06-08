@@ -1,11 +1,12 @@
 package com.falsepattern.lib.compat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.NonNull;
+import lombok.val;
+import lombok.var;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -21,16 +22,6 @@ public class GuiLabel extends Gui {
     private final List<String> lines = new ArrayList<>();
     private final FontRenderer fontRenderer;
     private final int textColor;
-
-    private boolean centered = false;
-    /**
-     * The label width.
-     */
-    protected int width;
-    /**
-     * The label height.
-     */
-    protected int height;
     /**
      * The id of the label.
      */
@@ -47,6 +38,15 @@ public class GuiLabel extends Gui {
      * The visibility of the label.
      */
     public boolean visible = true;
+    /**
+     * The label width.
+     */
+    protected int width;
+    /**
+     * The label height.
+     */
+    protected int height;
+    private boolean centered = false;
 
     /**
      * Instantiates a new Gui label.
@@ -97,8 +97,9 @@ public class GuiLabel extends Gui {
      * @param mouseY    the mouse y
      */
     public void drawLabel(@NonNull Minecraft minecraft, int mouseX, int mouseY) {
-        if (!visible)
+        if (!visible) {
             return;
+        }
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 

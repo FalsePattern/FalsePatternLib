@@ -1,24 +1,29 @@
 package com.falsepattern.lib.mixin;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import lombok.val;
-
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import lombok.val;
 
 public interface IMixin {
 
-    Side getSide();
     String getMixin();
-    Predicate<List<ITargetedMod>> getFilter();
 
     default boolean shouldLoad(List<ITargetedMod> loadedMods) {
         val side = getSide();
-        return (side == Side.COMMON
-                || side == Side.SERVER && FMLLaunchHandler.side().isServer()
-                || side == Side.CLIENT && FMLLaunchHandler.side().isClient())
-               && getFilter().test(loadedMods);
+        return (side == Side.COMMON || side == Side.SERVER && FMLLaunchHandler.side().isServer() ||
+                side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
+    }
+
+    Side getSide();
+
+    Predicate<List<ITargetedMod>> getFilter();
+
+    enum Side {
+        COMMON,
+        CLIENT,
+        SERVER
     }
 
     final class PredicateHelpers {
@@ -41,11 +46,5 @@ public interface IMixin {
         public static Predicate<List<ITargetedMod>> avoid(ITargetedMod mod) {
             return (list) -> !list.contains(mod);
         }
-    }
-
-    enum Side {
-        COMMON,
-        CLIENT,
-        SERVER
     }
 }
