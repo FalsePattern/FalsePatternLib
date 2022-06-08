@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;
@@ -32,6 +33,7 @@ public class DependencyLoader {
         mavenRepositories.add(url);
     }
 
+    @Builder
     public static void loadLibrary(String loadingModId,
                                    String groupId,
                                    String artifactId,
