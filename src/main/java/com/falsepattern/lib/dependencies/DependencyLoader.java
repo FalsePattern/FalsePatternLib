@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -94,7 +95,10 @@ public class DependencyLoader {
         val jarName = groupId + "-" + mavenJarName;
         val libDir = new File(modsDir, "falsepattern");
         if (!libDir.exists()) {
-            libDir.mkdirs();
+            if (!libDir.mkdirs()) {
+                FalsePatternLib.getLog().fatal("Failed to create directory {}", libDir);
+                throw new RuntimeException("Failed to create directory " + libDir);
+            }
         }
         val file = new File(libDir, jarName);
         if (file.exists()) {
@@ -115,7 +119,10 @@ public class DependencyLoader {
                                      artifactId,
                                      preferredVersion,
                                      (suffix != null) ? ":" + suffix : "");
-                file.delete();
+                if (!file.delete()) {
+                    FalsePatternLib.getLog().fatal("Failed to delete file {}", file);
+                    throw new RuntimeException("Failed to delete file " + file);
+                }
             }
         }
         for (var repo : mavenRepositories) {
@@ -190,7 +197,7 @@ public class DependencyLoader {
 
         var bytesRead = 0;
 
-        val fileOutput = new BufferedOutputStream(new FileOutputStream(target));
+        val fileOutput = new BufferedOutputStream(Files.newOutputStream(target.toPath()));
         byte[] smallBuffer = new byte[4096];
         while ((bytesRead = is.read(smallBuffer)) >= 0) {
             fileOutput.write(smallBuffer, 0, bytesRead);

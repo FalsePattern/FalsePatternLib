@@ -10,6 +10,7 @@ public interface ITargetedMod {
 
     boolean isLoadInDevelopment();
 
+    @SuppressWarnings("UnstableApiUsage")
     default boolean isMatchingJar(Path path) {
         String pathString = path.toString();
         String nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();

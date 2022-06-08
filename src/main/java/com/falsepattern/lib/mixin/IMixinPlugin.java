@@ -102,8 +102,8 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     IMixin[] getMixinEnumValues();
 
     static File findJarOf(final ITargetedMod mod) {
-        try {
-            return walk(MODS_DIRECTORY_PATH).filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
+        try (val stream = walk(MODS_DIRECTORY_PATH)) {
+            return stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

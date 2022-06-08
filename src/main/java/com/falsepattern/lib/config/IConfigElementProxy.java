@@ -21,6 +21,7 @@ public class IConfigElementProxy<T> implements IConfigElement<T> {
         return proxied.isProperty();
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Class<? extends GuiConfigEntries.IConfigEntry> getConfigEntryClass() {
         return proxied.getConfigEntryClass();
