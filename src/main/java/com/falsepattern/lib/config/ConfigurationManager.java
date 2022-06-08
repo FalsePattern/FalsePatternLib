@@ -172,6 +172,10 @@ public class ConfigurationManager {
                     FalsePatternLib.getLog().warn("Invalid value " + value + " for enum configuration field " + field.getName() + " of type " + fieldClass.getName() + " in config class " + configClass.getName() + "! Using default value of " + defaultValue + "!");
                     field.set(null, defaultValue);
                 }
+            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(String.class)) {
+                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class)).map(Config.DefaultStringList::value).orElse((String[])field.get(null));
+                var value = rawConfig.getStringList(name, category, defaultValue, comment, null, langKey);
+                field.set(null, value);
             } else {
                 throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() + ": Unsupported type " + fieldClass.getName() + "! Did you forget an @Ignore annotation?");
             }
