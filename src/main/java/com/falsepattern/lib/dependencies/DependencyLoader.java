@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
+
+import com.falsepattern.lib.internal.LibraryConfig;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
@@ -126,6 +128,14 @@ public class DependencyLoader {
                     throw new RuntimeException("Failed to delete file " + file);
                 }
             }
+        }
+        if (!LibraryConfig.ENABLE_LIBRARY_DOWNLOADS) {
+            val errorMessage = "Failed to load library " + groupId + ":" + artifactId + ":" + preferredVersion +
+                               ((suffix != null) ? ":" + suffix : "") + ": FalsePatternLib library downloading has " +
+                               "been disabled in the config, and the library is not present on disk! Requested by mod: " +
+                               loadingModId;
+            FalsePatternLib.getLog().fatal(errorMessage);
+            throw new IllegalStateException(errorMessage);
         }
         for (var repo : mavenRepositories) {
             try {
