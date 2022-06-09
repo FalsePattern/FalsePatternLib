@@ -1,11 +1,10 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -14,13 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.net.ssl.HttpsURLConnection;
 
-import com.falsepattern.lib.internal.LibraryConfig;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.val;
-import lombok.var;
+import lombok.*;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 
@@ -36,21 +30,18 @@ public class DependencyLoader {
     }
 
     @Builder
-    public static void loadLibrary(String loadingModId,
-                                   String groupId,
-                                   String artifactId,
+    public static void loadLibrary(@NonNull String loadingModId,
+                                   @NonNull String groupId,
+                                   @NonNull String artifactId,
                                    @NonNull Version minVersion,
                                    Version maxVersion,
                                    @NonNull Version preferredVersion,
                                    String regularSuffix,
                                    String devSuffix) {
         val suffix = FalsePatternLib.isDeveloperEnvironment() ? devSuffix : regularSuffix;
+        val artifactLogName = String.format("%s:%s:%s%s", groupId, artifactId, preferredVersion, suffix != null ? "-" + suffix : "");
         FalsePatternLib.getLog()
-                       .info("Adding library {}:{}:{}{}, requested by mod {}",
-                             groupId,
-                             artifactId,
-                             preferredVersion,
-                             suffix != null ? "-" + suffix : "",
+                       .info("Adding library {}, requested by mod {}", artifactLogName,
                              loadingModId);
         var artifact = groupId + ":" + artifactId + ":" + suffix;
         if (loadedLibraries.containsKey(artifact)) {
@@ -110,19 +101,11 @@ public class DependencyLoader {
                 addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
                 FalsePatternLib.getLog()
-                               .info("Library {}:{}:{}{} successfully loaded from disk!",
-                                     groupId,
-                                     artifactId,
-                                     preferredVersion,
-                                     (suffix != null) ? ":" + suffix : "");
+                               .info("Library {} successfully loaded from disk!", artifactLogName);
                 return;
             } catch (RuntimeException e) {
                 FalsePatternLib.getLog()
-                               .warn("Failed to load library {}:{}:{}{} from file! Redownloading...",
-                                     groupId,
-                                     artifactId,
-                                     preferredVersion,
-                                     (suffix != null) ? ":" + suffix : "");
+                               .warn("Failed to load library {} from file! Redownloading...", artifactLogName);
                 if (!file.delete()) {
                     FalsePatternLib.getLog().fatal("Failed to delete file {}", file);
                     throw new RuntimeException("Failed to delete file " + file);
@@ -131,9 +114,9 @@ public class DependencyLoader {
         }
         if (!LibraryConfig.ENABLE_LIBRARY_DOWNLOADS) {
             val errorMessage = "Failed to load library " + groupId + ":" + artifactId + ":" + preferredVersion +
-                               ((suffix != null) ? ":" + suffix : "") + ": FalsePatternLib library downloading has " +
-                               "been disabled in the config, and the library is not present on disk! Requested by mod: " +
-                               loadingModId;
+                               ((suffix != null) ? ":" + suffix : "") + ": " + Tags.MODNAME +
+                               " library downloading has been disabled in the config, and the library is not present " +
+                               "on disk! Requested by mod: " + loadingModId;
             FalsePatternLib.getLog().fatal(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
@@ -148,39 +131,24 @@ public class DependencyLoader {
                                                 artifactId,
                                                 preferredVersion,
                                                 mavenJarName));
-
-                val connection = (HttpsURLConnection) url.openConnection();
-                connection.setConnectTimeout(1500);
-                connection.setReadTimeout(1500);
-                connection.setRequestProperty("User-Agent", "FalsePatternLib Downloader");
-                if (connection.getResponseCode() != 200) {
+                String finalRepo = repo;
+                Internet.connect(url, (ex) -> {
                     FalsePatternLib.getLog()
-                                   .info("Artifact {}:{}:{}{} was not found on repo {}",
-                                         groupId,
-                                         artifactId,
-                                         preferredVersion,
-                                         (suffix != null) ? ":" + suffix : "",
-                                         repo);
-                    connection.disconnect();
-                    continue;
-                }
-                FalsePatternLib.getLog()
-                               .info("Downloading {}:{}:{}{} from {}",
-                                     groupId,
-                                     artifactId,
-                                     preferredVersion,
-                                     (suffix != null) ? ":" + suffix : "",
-                                     repo);
-                download(connection.getInputStream(), file);
-                FalsePatternLib.getLog()
-                               .info("Downloaded {}:{}:{}{}",
-                                     groupId,
-                                     artifactId,
-                                     preferredVersion,
-                                     (suffix != null) ? ":" + suffix : "");
-                loadedLibraries.put(artifact, preferredVersion);
-                loadedLibraryMods.put(artifact, loadingModId);
-                addToClasspath(file);
+                                   .info("Artifact {} could not be downloaded from repo {}: {}",
+                                           artifactLogName,
+                                           finalRepo,
+                                           ex.getMessage());
+                }, (input) -> {
+                    FalsePatternLib.getLog()
+                                   .info("Downloading {} from {}",
+                                           artifactLogName,
+                                           finalRepo);
+                    download(input, file);
+                    FalsePatternLib.getLog().info("Downloaded {}", artifactLogName);
+                    loadedLibraries.put(artifact, preferredVersion);
+                    loadedLibraryMods.put(artifact, loadingModId);
+                    addToClasspath(file);
+                });
                 return;
             } catch (IOException ignored) {
             }
@@ -202,19 +170,11 @@ public class DependencyLoader {
         }
     }
 
-    private static void download(InputStream is, File target) throws IOException {
+    @SneakyThrows
+    private static void download(InputStream is, File target) {
         if (target.exists()) {
             return;
         }
-
-        var bytesRead = 0;
-
-        val fileOutput = new BufferedOutputStream(Files.newOutputStream(target.toPath()));
-        byte[] smallBuffer = new byte[4096];
-        while ((bytesRead = is.read(smallBuffer)) >= 0) {
-            fileOutput.write(smallBuffer, 0, bytesRead);
-        }
-        fileOutput.close();
-        is.close();
+        Internet.transferAndClose(is, new BufferedOutputStream(Files.newOutputStream(target.toPath())));
     }
 }

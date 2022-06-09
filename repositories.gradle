@@ -3,4 +3,8 @@ repositories {
         name = "sponge"
         url = "https://sponge.falsepattern.com/"
     }
+    maven {
+        name = "mavenpattern"
+        url = "https://maven.falsepattern.com/"
+    }
 }

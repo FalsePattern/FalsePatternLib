@@ -1,27 +1,30 @@
 package com.falsepattern.lib.updates;
 
+import com.falsepattern.json.node.JsonNode;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
+import cpw.mods.fml.common.Loader;
 import lombok.val;
-import lombok.var;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UpdateChecker {
-    private static AtomicBoolean jsonLibraryLoaded = new AtomicBoolean(false);
+    private static AtomicInteger jsonLibraryLoaded = new AtomicInteger(0);
     private static final ExecutorService asyncExecutor = Executors.newSingleThreadExecutor((runnable) -> {
         Thread thread = new Thread(runnable);
         thread.setDaemon(true);
@@ -64,22 +67,82 @@ public class UpdateChecker {
         if (!LibraryConfig.ENABLE_UPDATE_CHECKER) {
             return null;
         }
-        if (!jsonLibraryLoaded.get()) {
-            DependencyLoader.addMavenRepo("https://maven.falsepattern.com/");
-            try {
-                DependencyLoader.builder()
-                                .groupId("com.falsepattern")
-                                .artifactId("json")
-                        .minVersion(new SemanticVersion(0, 4, 0))
-                        .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE, Integer.MAX_VALUE))
-                        .build();
-            } catch (Exception e) {
-                FalsePatternLib.getLog().error("Failed to load json library for update checker!", e);
-                return null;
-            }
-            jsonLibraryLoaded.set(true);
+        URL URL;
+        try {
+            URL = new URL(url);
+        } catch (MalformedURLException e) {
+            FalsePatternLib.getLog().error("Invalid URL: {}", url, e);
+            return null;
         }
-        //TODO
-        return null;
+        switch (jsonLibraryLoaded.get()) {
+            case 0:
+                DependencyLoader.addMavenRepo("https://maven.falsepattern.com/");
+                try {
+                    DependencyLoader.builder()
+                                    .loadingModId(Tags.MODID)
+                                    .groupId("com.falsepattern")
+                                    .artifactId("json")
+                                    .minVersion(new SemanticVersion(0, 4, 0))
+                                    .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE, Integer.MAX_VALUE))
+                                    .preferredVersion(new SemanticVersion(0, 4, 1))
+                                    .build();
+                } catch (Exception e) {
+                    FalsePatternLib.getLog().error("Failed to load json library for update checker!", e);
+                    jsonLibraryLoaded.set(-1);
+                    return null;
+                }
+                jsonLibraryLoaded.set(1);
+                break;
+            case -1:
+                return null;
+        }
+        AtomicReference<String> loadedData = new AtomicReference<>(null);
+        Internet.connect(URL, (ex) -> {
+            FalsePatternLib.getLog().warn("Failed to check for updates from URL {}", url, ex);
+        }, (input) -> {
+            val data = new ByteArrayOutputStream();
+            try {
+                Internet.transferAndClose(input, data);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            loadedData.set(data.toString());
+        });
+        if (loadedData.get() == null) return null;
+        val result = new ArrayList<ModUpdateInfo>();
+        val parsed = JsonNode.parse(loadedData.get());
+        List<JsonNode> modList;
+        if (parsed.isList()) {
+            modList = parsed.getJavaList();
+        } else {
+            modList = Collections.singletonList(parsed);
+        }
+        val installedMods = Loader.instance().getIndexedModList();
+        for (val node: modList) {
+            if (!node.isObject()) continue;
+            if (!node.containsKey("modid")) continue;
+            if (!node.containsKey("latestVersion")) continue;
+            val modid = node.getString("modid");
+            if (!installedMods.containsKey(modid)) continue;
+            val mod = installedMods.get(modid);
+            val latestVersionsNode = node.get("latestVersion");
+            List<String> latestVersions;
+            if (latestVersionsNode.isString()) {
+                latestVersions = Collections.singletonList(latestVersionsNode.stringValue());
+            } else if (latestVersionsNode.isList()) {
+                latestVersions = new ArrayList<>();
+                for (val version: latestVersionsNode.getJavaList()) {
+                    if (!version.isString()) continue;
+                    latestVersions.add(version.stringValue());
+                }
+            } else {
+                continue;
+            }
+            val currentVersion = mod.getVersion();
+            if (latestVersions.contains(currentVersion)) continue;
+            val updateURL = node.containsKey("updateURL") && node.get("updateURL").isString() ? node.getString("updateURL") : "";
+            result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
+        }
+        return result;
     }
 }
