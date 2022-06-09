@@ -1,0 +1,4 @@
+config.falsepatternlib.updatecheck=Enable update checks
+config.falsepatternlib.updatecheck.tooltip=Used to control whether FalsePatternLib should check for outdated mods.
+config.falsepatternlib.disableinternet=FalsePatternLib Offline Mode
+config.falsepatternlib.disableinternet.tooltip=Used to control whether FalsePatternLib should be allowed to use the internet. If this is enabled, update checks and library downloads will be completely blocked.
