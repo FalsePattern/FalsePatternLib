@@ -1,10 +1,12 @@
 package com.falsepattern.lib.updates;
 
+import com.falsepattern.lib.StableAPI;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.logging.log4j.Logger;
 
 @Data
+@StableAPI(since = "0.8.0")
 public class ModUpdateInfo {
     @NonNull public final String modID;
     @NonNull public final String currentVersion;

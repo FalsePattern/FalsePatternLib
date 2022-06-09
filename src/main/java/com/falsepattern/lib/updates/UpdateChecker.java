@@ -1,6 +1,7 @@
 package com.falsepattern.lib.updates;
 
 import com.falsepattern.json.node.JsonNode;
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.FalsePatternLib;
@@ -23,8 +24,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+@StableAPI(since = "0.8.0")
 public class UpdateChecker {
-    private static AtomicInteger jsonLibraryLoaded = new AtomicInteger(0);
+    private static final AtomicInteger jsonLibraryLoaded = new AtomicInteger(0);
     private static final ExecutorService asyncExecutor = Executors.newSingleThreadExecutor((runnable) -> {
         Thread thread = new Thread(runnable);
         thread.setDaemon(true);
@@ -97,9 +99,7 @@ public class UpdateChecker {
                 return null;
         }
         AtomicReference<String> loadedData = new AtomicReference<>(null);
-        Internet.connect(URL, (ex) -> {
-            FalsePatternLib.getLog().warn("Failed to check for updates from URL {}", url, ex);
-        }, (input) -> {
+        Internet.connect(URL, (ex) -> FalsePatternLib.getLog().warn("Failed to check for updates from URL {}", url, ex), (input) -> {
             val data = new ByteArrayOutputStream();
             try {
                 Internet.transferAndClose(input, data);
