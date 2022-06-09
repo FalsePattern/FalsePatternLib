@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern16
+//version: 1641429628falsepattern18
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -95,6 +95,7 @@ checkPropertyExists("repositoryName")
 checkPropertyExists("mavenGroupId")
 checkPropertyExists("mavenArtifactId")
 checkPropertyExists("hasMixinDeps")
+checkPropertyExists("mixinPreinitConfig")
 
 
 String javaSourceDir = "src/main/java/"
@@ -441,7 +442,7 @@ def getManifestAttributes() {
     if(usesMixins.toBoolean()) {
         manifestAttributes += [
                 "TweakClass" : "org.spongepowered.asm.launch.MixinTweaker",
-                "MixinConfigs" : "mixins." + modId + ".json",
+                "MixinConfigs" : "mixins." + modId + ".json" + (mixinPreinitConfig ? "," + mixinPreinitConfig : ""),
                 "ForceLoadAsMod" : containsMixinsAndOrCoreModOnly.toBoolean() == false
         ]
     }
