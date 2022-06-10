@@ -52,14 +52,6 @@ public class FalsePatternLib {
     @Getter private static final boolean developerEnvironment =
             (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-    @Getter
-    private static final ExecutorService asyncWorker = Executors.newSingleThreadExecutor((runnable) -> {
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        thread.setName(Tags.MODNAME + " Async Worker");
-        return thread;
-    });
-
     @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy", serverSide = Tags.GROUPNAME + ".internal.proxy.CommonProxy")
     private static CommonProxy proxy;
 

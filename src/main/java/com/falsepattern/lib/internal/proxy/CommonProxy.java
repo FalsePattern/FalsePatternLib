@@ -7,6 +7,7 @@ import com.falsepattern.lib.internal.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
+import com.falsepattern.lib.util.Async;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -35,7 +36,7 @@ public class CommonProxy {
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");
             val updateCheckFuture = UpdateChecker.fetchUpdatesAsync("https://falsepattern.com/mc/versions.json");
-            updatesFuture = FalsePatternLib.getAsyncWorker().submit(() -> {
+            updatesFuture = Async.asyncWorker.submit(() -> {
                 if (!updateCheckFuture.isCancelled()) {
                     try {
                         var updates = updateCheckFuture.get();

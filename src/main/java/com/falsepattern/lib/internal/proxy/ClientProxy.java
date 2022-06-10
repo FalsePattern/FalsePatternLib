@@ -2,6 +2,7 @@ package com.falsepattern.lib.internal.proxy;
 
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.text.FormattedText;
+import com.falsepattern.lib.util.Async;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -33,7 +34,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
-        chatFuture = FalsePatternLib.getAsyncWorker().submit(() -> {
+        chatFuture = Async.asyncWorker.submit(() -> {
             long start = System.nanoTime();
             val updates = updatesFuture.get();
             if (updates == null || updates.size() == 0) return null;

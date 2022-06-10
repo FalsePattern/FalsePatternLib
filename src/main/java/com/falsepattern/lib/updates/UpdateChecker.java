@@ -8,6 +8,7 @@ import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.util.Async;
 import cpw.mods.fml.common.Loader;
 import lombok.val;
 
@@ -18,8 +19,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,7 +33,7 @@ public class UpdateChecker {
      * @return A future that will contain the update info about mods that were both available on the URL and installed
      */
     public static Future<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        return FalsePatternLib.getAsyncWorker().submit(() -> fetchUpdates(url));
+        return Async.asyncWorker.submit(() -> fetchUpdates(url));
     }
 
     /**
