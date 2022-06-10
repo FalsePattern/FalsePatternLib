@@ -35,7 +35,6 @@ public class ClientProxy extends CommonProxy {
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
         chatFuture = Async.asyncWorker.submit(() -> {
-            long start = System.nanoTime();
             val updates = updatesFuture.get();
             if (updates == null || updates.size() == 0) return null;
             val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable")).toChatText());
@@ -61,8 +60,6 @@ public class ClientProxy extends CommonProxy {
                     updateText.addAll(post);
                 }
             }
-            long end = System.nanoTime();
-            FalsePatternLib.getLog().info("Constructed in {} ms", (end - start) / 1000000L);
             return updateText;
         });
     }
