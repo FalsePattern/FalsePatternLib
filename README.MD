@@ -15,6 +15,7 @@ The contents of the [util](src/main/java/com/falsepattern/lib/util) package so f
 | Class                                                                     | Purpose                                                                                                       |
 |---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
 | [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java) | Provides methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath |
+| [Async](src/main/java/com/falsepattern/lib/util/Async.java)               | Provides asynchronous execution utilities.                                                                    |
 
 
 Anything annotated with [@StableAPI](src/main/java/com/falsepattern/lib/StableAPI.java) is guaranteed to not change in patch versions.
