@@ -27,12 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @StableAPI(since = "0.8.0")
 public class UpdateChecker {
     private static final AtomicInteger jsonLibraryLoaded = new AtomicInteger(0);
-    private static final ExecutorService asyncExecutor = Executors.newSingleThreadExecutor((runnable) -> {
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        thread.setName(Tags.MODNAME + " Asynchronous Update Check Thread");
-        return thread;
-    });
     /**
      * Same this as {@link #fetchUpdates(String)}, but defers the check to a different thread. Useful for asynchronous
      * update checks, if you don't want to block loading.
@@ -40,7 +34,7 @@ public class UpdateChecker {
      * @return A future that will contain the update info about mods that were both available on the URL and installed
      */
     public static Future<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        return asyncExecutor.submit(() -> fetchUpdates(url));
+        return FalsePatternLib.getAsyncWorker().submit(() -> fetchUpdates(url));
     }
 
     /**
