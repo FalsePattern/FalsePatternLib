@@ -19,7 +19,9 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
@@ -34,33 +36,46 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
-        chatFuture = Async.asyncWorker.submit(() -> {
-            val updates = updatesFuture.get();
-            if (updates == null || updates.size() == 0) return null;
-            val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable")).toChatText());
-            val mods = Loader.instance().getIndexedModList();
-            for (val update : updates) {
-                val mod = mods.get(update.modID);
-                updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
-                updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion)).toChatText());
-                updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion)).toChatText());
-                if (!update.updateURL.isEmpty()) {
-                    val pre = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpre")).toChatText();
-                    val link = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurl")).toChatText();
-                    val post = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpost")).toChatText();
-                    pre.get(pre.size() - 1).appendSibling(link.get(0));
-                    link.get(link.size() - 1).appendSibling(post.get(0));
-                    for (val l: link) {
-                        l.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, update.updateURL));
-                    }
-                    link.remove(0);
-                    post.remove(0);
-                    updateText.addAll(pre);
-                    updateText.addAll(link);
-                    updateText.addAll(post);
+        chatFuture = Async.asyncWorker.submit(new Callable<List<IChatComponent>>() {
+            @Override
+            public List<IChatComponent> call() throws Exception {
+                //Deadlock avoidance
+                if (updatesFuture == null || updatesFuture.isCancelled()) {
+                    chatFuture = null;
+                    return null;
                 }
+                if (!updatesFuture.isDone()) {
+                    chatFuture = Async.asyncWorker.submit(this);
+                    return null;
+                }
+                val updates = updatesFuture.get();
+                if (updates == null || updates.size() == 0)
+                    return null;
+                val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable")).toChatText());
+                val mods = Loader.instance().getIndexedModList();
+                for (val update : updates) {
+                    val mod = mods.get(update.modID);
+                    updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
+                    updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion)).toChatText());
+                    updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion)).toChatText());
+                    if (!update.updateURL.isEmpty()) {
+                        val pre = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpre")).toChatText();
+                        val link = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurl")).toChatText();
+                        val post = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpost")).toChatText();
+                        pre.get(pre.size() - 1).appendSibling(link.get(0));
+                        link.get(link.size() - 1).appendSibling(post.get(0));
+                        for (val l : link) {
+                            l.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, update.updateURL));
+                        }
+                        link.remove(0);
+                        post.remove(0);
+                        updateText.addAll(pre);
+                        updateText.addAll(link);
+                        updateText.addAll(post);
+                    }
+                }
+                return updateText;
             }
-            return updateText;
         });
     }
 
@@ -70,7 +85,7 @@ public class ClientProxy extends CommonProxy {
             !(e.entity instanceof EntityPlayerSP)) return;
         val player = (EntityPlayerSP) e.entity;
         try {
-            for (val line: chatFuture.get()) {
+            for (val line: chatFuture.get(1, TimeUnit.SECONDS)) {
                 player.addChatMessage(line);
             }
             chatFuture = null;

@@ -16,6 +16,7 @@ import lombok.var;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -36,12 +37,22 @@ public class CommonProxy {
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");
             val updateCheckFuture = UpdateChecker.fetchUpdatesAsync("https://falsepattern.com/mc/versions.json");
-            updatesFuture = Async.asyncWorker.submit(() -> {
-                if (!updateCheckFuture.isCancelled()) {
+            updatesFuture = Async.asyncWorker.submit(new Callable<List<ModUpdateInfo>>() {
+                @Override
+                public List<ModUpdateInfo> call() {
+                    //Deadlock avoidance
+                    if (updateCheckFuture.isCancelled()) {
+                        updatesFuture = null;
+                        return null;
+                    }
+                    if (!updateCheckFuture.isDone()) {
+                        updatesFuture = Async.asyncWorker.submit(this);
+                        return null;
+                    }
                     try {
                         var updates = updateCheckFuture.get();
                         if (updates != null && updates.size() > 0) {
-                            for (val update:updates) {
+                            for (val update : updates) {
                                 update.log(FalsePatternLib.getLog());
                             }
                         } else if (updates == null) {
@@ -54,8 +65,8 @@ public class CommonProxy {
                     } catch (InterruptedException | ExecutionException ex) {
                         FalsePatternLib.getLog().warn("Error while checking updates", ex);
                     }
+                    return null;
                 }
-                return null;
             });
         }
     }
