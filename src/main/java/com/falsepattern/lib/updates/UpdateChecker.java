@@ -8,9 +8,13 @@ import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.util.Async;
 import cpw.mods.fml.common.Loader;
 import lombok.val;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.util.IChatComponent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -137,5 +141,40 @@ public class UpdateChecker {
             result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
         }
         return result;
+    }
+
+    /**
+     * Formats the raw list of updates into lines of chat messages you can send to players.
+     * @param initiator Who/what/which mod did this update check
+     * @param updates The list of updates to convert
+     * @return A list of chat messages that can be sent to players
+     */
+    public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
+        if (updates == null || updates.size() == 0)
+            return null;
+        val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable", initiator)).toChatText());
+        val mods = Loader.instance().getIndexedModList();
+        for (val update : updates) {
+            val mod = mods.get(update.modID);
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion)).toChatText());
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion)).toChatText());
+            if (!update.updateURL.isEmpty()) {
+                val pre = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpre")).toChatText();
+                val link = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurl")).toChatText();
+                val post = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpost")).toChatText();
+                pre.get(pre.size() - 1).appendSibling(link.get(0));
+                link.get(link.size() - 1).appendSibling(post.get(0));
+                for (val l : link) {
+                    l.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, update.updateURL));
+                }
+                link.remove(0);
+                post.remove(0);
+                updateText.addAll(pre);
+                updateText.addAll(link);
+                updateText.addAll(post);
+            }
+        }
+        return updateText;
     }
 }

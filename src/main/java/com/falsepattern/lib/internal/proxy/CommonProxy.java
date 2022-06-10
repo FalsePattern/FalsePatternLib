@@ -32,11 +32,11 @@ public class CommonProxy {
         try {
             ConfigurationManager.registerConfig(LibraryConfig.class);
         } catch (ConfigException ex) {
-            FalsePatternLib.getLog().error("Failed to register " + Tags.MODNAME + " config!", ex);
+            FalsePatternLib.getLog().error("Failed to register config!", ex);
         }
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");
-            val updateCheckFuture = UpdateChecker.fetchUpdatesAsync("https://falsepattern.com/mc/versions.json");
+            val updateCheckFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL);
             updatesFuture = Async.asyncWorker.submit(new Callable<List<ModUpdateInfo>>() {
                 @Override
                 public List<ModUpdateInfo> call() {
@@ -56,9 +56,9 @@ public class CommonProxy {
                                 update.log(FalsePatternLib.getLog());
                             }
                         } else if (updates == null) {
-                            FalsePatternLib.getLog().warn("Unknown error while checking updates");
+                            FalsePatternLib.getLog().warn("Unknown error while checking updates.");
                         } else {
-                            FalsePatternLib.getLog().info("All FalsePattern mods up to date!");
+                            FalsePatternLib.getLog().info("All checked mods up to date!");
                             updates = null;
                         }
                         return updates;
