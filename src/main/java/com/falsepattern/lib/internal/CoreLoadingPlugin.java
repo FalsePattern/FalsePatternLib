@@ -20,7 +20,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return Tags.GROUPNAME + ".internal.FalsePatternLib";
+        return null;
     }
 
     @Override
