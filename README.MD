@@ -15,15 +15,15 @@ The contents of the [util](src/main/java/com/falsepattern/lib/util) package so f
 | Class                                                                     | Purpose                                                                                                       |
 |---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
 | [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java) | Provides methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath |
-| [Async](src/main/java/com/falsepattern/lib/util/Async.java)               | Provides asynchronous execution utilities.                                                                    |
+| [Async](src/main/java/com/falsepattern/lib/util/Async.java)               | Provides asynchronous execution utilities                                                                     |
 
 
 Anything annotated with [@StableAPI](src/main/java/com/falsepattern/lib/StableAPI.java) is guaranteed to not change in patch versions.
 
-The update checker module and the library checker module can be toggled with the `ENABLE_UPDATE_CHECKER` and 
+The update checker module and the library downloader module can be toggled with the `ENABLE_UPDATE_CHECKER` and 
 `ENABLE_LIBRARY_DOWNLOADS` booleans in the `falsepatternlib.cfg` config file respectively. Note that the update checker
 depends on the module downloader to grab [FJson](https://github.com/FalsePattern/FJson), so if it's not already present
-on disk, disabling the library loader breaks the update checker. This is only required the first time though.
+on disk, disabling the library loader breaks the update checker. This is only required the first time download, though.
 
 ### This project WILL NOT be ported to any version beyond 1.7.10, don't even ask
 
