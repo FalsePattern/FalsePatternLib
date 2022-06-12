@@ -1,5 +1,6 @@
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.lwjgl.opengl.GL11;
  * A functional equivalent to GuiLabel present in Minecraft 1.12.
  */
 @SideOnly(Side.CLIENT)
+@StableAPI(since = "0.8.0")
 public class GuiLabel extends Gui {
     private final List<String> lines = new ArrayList<>();
     private final FontRenderer fontRenderer;

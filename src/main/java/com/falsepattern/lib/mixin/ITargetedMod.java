@@ -1,9 +1,11 @@
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.StableAPI;
 import com.google.common.io.Files;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
+@StableAPI(since = "0.8.0")
 public interface ITargetedMod {
 
     String getModName();

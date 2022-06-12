@@ -1,5 +1,6 @@
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import static java.nio.file.Files.walk;
 
+@StableAPI(since = "0.8.0")
 public interface IMixinPlugin extends IMixinConfigPlugin {
     Path MODS_DIRECTORY_PATH = CoreLoadingPlugin.mcDir.toPath().resolve("mods");
 

@@ -1,5 +1,6 @@
 package com.falsepattern.lib.util;
 
+import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.SideOnly;
 import lombok.*;
@@ -12,6 +13,7 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 
 @SideOnly(CLIENT)
 @NoArgsConstructor(access = PRIVATE)
+@StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private final static Timer MINECRAFT_TIMER = getMinecraftTimer();
 

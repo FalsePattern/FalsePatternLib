@@ -1,11 +1,13 @@
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.StableAPI;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.val;
 
+@StableAPI(since = "0.8.0")
 public interface IMixin {
 
     String getMixin();
