@@ -2,10 +2,8 @@ package com.falsepattern.lib.internal.proxy;
 
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.updates.UpdateChecker;
-import com.falsepattern.lib.util.Async;
-import cpw.mods.fml.common.Loader;
+import com.falsepattern.lib.util.AsyncUtil;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -13,13 +11,10 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import lombok.val;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.event.ClickEvent;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -38,7 +33,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
-        chatFuture = Async.asyncWorker.submit(new Callable<List<IChatComponent>>() {
+        chatFuture = AsyncUtil.asyncWorker.submit(new Callable<List<IChatComponent>>() {
             @Override
             public List<IChatComponent> call() throws Exception {
                 //Deadlock avoidance
@@ -47,7 +42,7 @@ public class ClientProxy extends CommonProxy {
                     return null;
                 }
                 if (!updatesFuture.isDone()) {
-                    chatFuture = Async.asyncWorker.submit(this);
+                    chatFuture = AsyncUtil.asyncWorker.submit(this);
                     return null;
                 }
                 val updates = updatesFuture.get();

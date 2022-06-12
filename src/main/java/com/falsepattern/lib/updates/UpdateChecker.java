@@ -9,7 +9,7 @@ import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.text.FormattedText;
-import com.falsepattern.lib.util.Async;
+import com.falsepattern.lib.util.AsyncUtil;
 import cpw.mods.fml.common.Loader;
 import lombok.val;
 import net.minecraft.client.resources.I18n;
@@ -37,7 +37,7 @@ public class UpdateChecker {
      * @return A future that will contain the update info about mods that were both available on the URL and installed
      */
     public static Future<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        return Async.asyncWorker.submit(() -> fetchUpdates(url));
+        return AsyncUtil.asyncWorker.submit(() -> fetchUpdates(url));
     }
 
     /**

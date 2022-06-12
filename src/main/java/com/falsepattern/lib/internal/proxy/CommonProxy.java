@@ -4,16 +4,14 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.LibraryConfig;
-import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
-import com.falsepattern.lib.util.Async;
+import com.falsepattern.lib.util.AsyncUtil;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import lombok.val;
 import lombok.var;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -37,7 +35,7 @@ public class CommonProxy {
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");
             val updateCheckFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL);
-            updatesFuture = Async.asyncWorker.submit(new Callable<List<ModUpdateInfo>>() {
+            updatesFuture = AsyncUtil.asyncWorker.submit(new Callable<List<ModUpdateInfo>>() {
                 @Override
                 public List<ModUpdateInfo> call() {
                     //Deadlock avoidance
@@ -46,7 +44,7 @@ public class CommonProxy {
                         return null;
                     }
                     if (!updateCheckFuture.isDone()) {
-                        updatesFuture = Async.asyncWorker.submit(this);
+                        updatesFuture = AsyncUtil.asyncWorker.submit(this);
                         return null;
                     }
                     try {

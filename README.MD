@@ -12,11 +12,12 @@ A library mod for 1.7.10 with lots of useful stuff. See the table below for more
 
 The contents of the [util](src/main/java/com/falsepattern/lib/util) package so far:
 
-| Class                                                                     | Purpose                                                                                                       |
-|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java) | Provides methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath |
-| [Async](src/main/java/com/falsepattern/lib/util/Async.java)               | Provides asynchronous execution utilities                                                                     |
-
+| Class                                                                     | Purpose                                                                                                                           |
+|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| [AsyncUtil](src/main/java/com/falsepattern/lib/util/AsyncUtil.java)       | Asynchronous execution utilities                                                                                                  |
+| [LangUtil](src/main/java/com/falsepattern/lib/util/LangUtil.java)         | Utility for having default language values defined inside code instead of lang files                                              |
+| [RenderUtil](src/main/java/com/falsepattern/lib/util/RenderUtil.java)     | Rendering tools. Currently, the only thing implemented is a way to grab the current partial tick time from the minecraft instance |
+| [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java) | Methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath                              |
 
 Anything annotated with [@StableAPI](src/main/java/com/falsepattern/lib/StableAPI.java) is guaranteed to not change in patch versions.
 
