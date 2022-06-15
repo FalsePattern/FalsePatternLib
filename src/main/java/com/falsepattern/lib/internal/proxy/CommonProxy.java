@@ -23,6 +23,7 @@ public class CommonProxy {
     protected Future<List<ModUpdateInfo>> updatesFuture;
 
     public void preInit(FMLPreInitializationEvent e) {
+        ConfigurationManager.registerBus();
         try {
             ConfigurationManager.registerConfig(LibraryConfig.class);
         } catch (ConfigException ex) {

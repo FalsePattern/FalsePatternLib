@@ -226,8 +226,14 @@ public class ConfigurationManager {
             return;
         }
         configDir = FileUtil.getMinecraftHome().toPath().resolve("config");
-        FMLCommonHandler.instance().bus().register(instance);
         initialized = true;
+    }
+
+    /**
+     * Internal, do not use.
+     */
+    public static void registerBus() {
+        FMLCommonHandler.instance().bus().register(instance);
     }
 
     /**
