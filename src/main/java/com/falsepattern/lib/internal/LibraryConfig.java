@@ -11,7 +11,7 @@ public class LibraryConfig {
     public static boolean ENABLE_UPDATE_CHECKER = true;
 
     @Config.Comment({"Used to control whether FalsePatternLib should be allowed to use the internet.",
-                    "If this is enabled, library downloads will be blocked.",
+                    "If this is disabled, library downloads will be blocked.",
                     "Note that if a mod tries to download a library that is not downloaded yet, the game will crash."})
     @Config.LangKey("config.falsepatternlib.disableinternet")
     public static boolean ENABLE_LIBRARY_DOWNLOADS = true;
