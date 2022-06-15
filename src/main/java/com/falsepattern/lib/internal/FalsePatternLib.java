@@ -62,11 +62,6 @@ public class FalsePatternLib {
     }
 
     @Mod.EventHandler
-    public void construct(FMLConstructionEvent e) {
-        proxy.construct(e);
-    }
-
-    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         proxy.preInit(e);
     }

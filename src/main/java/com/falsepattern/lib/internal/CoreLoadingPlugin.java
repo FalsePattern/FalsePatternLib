@@ -1,5 +1,6 @@
 package com.falsepattern.lib.internal;
 
+import com.falsepattern.lib.config.ConfigurationManager;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
@@ -31,6 +32,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public void injectData(Map<String, Object> data) {
         mcDir = (File) data.get("mcLocation");
+        ConfigurationManager.init();
     }
 
     @Override

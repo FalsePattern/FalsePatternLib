@@ -22,10 +22,6 @@ public class CommonProxy {
 
     protected Future<List<ModUpdateInfo>> updatesFuture;
 
-    public void construct(FMLConstructionEvent e) {
-        ConfigurationManager.init();
-    }
-
     public void preInit(FMLPreInitializationEvent e) {
         try {
             ConfigurationManager.registerConfig(LibraryConfig.class);
