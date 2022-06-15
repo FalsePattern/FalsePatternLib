@@ -12,7 +12,6 @@ import java.util.Map;
 @Name(Tags.MODID)
 @SortingIndex(500)
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
-    public static File mcDir;
 
     @Override
     public String[] getASMTransformerClass() {
@@ -31,8 +30,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        mcDir = (File) data.get("mcLocation");
-        ConfigurationManager.init();
     }
 
     @Override

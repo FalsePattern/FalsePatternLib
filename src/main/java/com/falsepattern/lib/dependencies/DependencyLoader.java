@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.falsepattern.lib.util.FileUtil;
 import lombok.*;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
@@ -84,7 +85,7 @@ public class DependencyLoader {
             }
             return;
         }
-        val modsDir = new File(CoreLoadingPlugin.mcDir, "mods");
+        val modsDir = new File(FileUtil.getMinecraftHome(), "mods");
         val mavenJarName =
                 String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
         val jarName = groupId + "-" + mavenJarName;

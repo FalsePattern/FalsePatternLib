@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +25,7 @@ import static java.nio.file.Files.walk;
 
 @StableAPI(since = "0.8.0")
 public interface IMixinPlugin extends IMixinConfigPlugin {
-    Path MODS_DIRECTORY_PATH = CoreLoadingPlugin.mcDir.toPath().resolve("mods");
+    Path MODS_DIRECTORY_PATH = FileUtil.getMinecraftHome().toPath().resolve("mods");
 
     static Logger createLogger(String modName) {
         return LogManager.getLogger(modName + " Mixin Loader");

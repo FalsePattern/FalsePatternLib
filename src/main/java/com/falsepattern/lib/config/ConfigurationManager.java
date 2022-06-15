@@ -3,10 +3,13 @@ package com.falsepattern.lib.config;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.util.FileUtil;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
@@ -24,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
@@ -49,6 +53,7 @@ public class ConfigurationManager {
      * @param configClass The class to register.
      */
     public static void registerConfig(Class<?> configClass) throws ConfigException {
+        init();
         val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
                           .orElseThrow(() -> new ConfigException(
                                   "Class " + configClass.getName() + " does not have a @Config annotation!"));
@@ -192,6 +197,7 @@ public class ConfigurationManager {
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
+        init();
         val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
                           .orElseThrow(() -> new ConfigException(
                                   "Class " + configClass.getName() + " does not have a @Config annotation!"));
@@ -217,14 +223,11 @@ public class ConfigurationManager {
         })).collect(Collectors.toList());
     }
 
-    /**
-     * Internal, do not use.
-     */
-    public static void init() {
+    private static void init() {
         if (initialized) {
             return;
         }
-        configDir = CoreLoadingPlugin.mcDir.toPath().resolve("config");
+        configDir = FileUtil.getMinecraftHome().toPath().resolve("config");
         FMLCommonHandler.instance().bus().register(instance);
         initialized = true;
     }
@@ -236,6 +239,7 @@ public class ConfigurationManager {
      */
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        init();
         val config = configs.get(event.modID);
         if (config == null) {
             return;
