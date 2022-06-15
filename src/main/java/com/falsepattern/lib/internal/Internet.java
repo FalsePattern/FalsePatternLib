@@ -14,7 +14,8 @@ public class Internet {
             val connection = (HttpURLConnection) URL.openConnection();
             connection.setConnectTimeout(3500);
             connection.setReadTimeout(5000);
-            connection.setRequestProperty("User-Agent", "FalsePatternLib Internet Connector");
+            connection.setRequestProperty("User-Agent", Tags.MODNAME + " " + Tags.VERSION + " Internet Connector" +
+                                                        " (https://github.com/FalsePattern/FalsePatternLib)");
             if (connection.getResponseCode() != 200) {
                 onError.accept(new Exception("HTTP response code " + connection.getResponseCode()));
             } else {
