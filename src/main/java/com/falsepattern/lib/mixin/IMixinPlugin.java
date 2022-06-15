@@ -1,7 +1,6 @@
 package com.falsepattern.lib.mixin;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

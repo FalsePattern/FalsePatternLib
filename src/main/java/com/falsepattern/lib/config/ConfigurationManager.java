@@ -1,7 +1,6 @@
 package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.util.FileUtil;
 import cpw.mods.fml.client.config.IConfigElement;
@@ -27,7 +26,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
