@@ -204,7 +204,7 @@ public class ConfigurationManager {
                                                        .map((l) -> l.contains(configClass))
                                                        .orElse(false) ? conf : null)
                                 .orElseThrow(() -> new ConfigException(
-                                        "Tried to get config elements for non-registed config class!"));
+                                        "Tried to get config elements for non-registered config class!"));
         val category = cfg.category();
         val elements = new ConfigElement<>(rawConfig.getCategory(category)).getChildElements();
         return elements.stream().map((element) -> new IConfigElementProxy(element, () -> {
