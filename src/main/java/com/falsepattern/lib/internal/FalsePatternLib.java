@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
      name = Tags.MODNAME,
      version = Tags.VERSION,
      acceptedMinecraftVersions = "[1.7.10]",
+     guiFactory = Tags.GROUPNAME + ".internal.LibraryGuiFactory",
      acceptableRemoteVersions = "*")
 public class FalsePatternLib {
     public static final String UPDATE_URL = "https://falsepattern.com/mc/versions.json";
