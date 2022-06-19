@@ -3,7 +3,7 @@ package com.falsepattern.lib.internal.proxy;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.updates.UpdateChecker;
-import com.falsepattern.lib.util.AsyncUtil;
+import cpw.mods.fml.client.IModGuiFactory;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,14 +15,13 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
-    private Future<List<IChatComponent>> chatFuture;
+    private CompletableFuture<List<IChatComponent>> chatFuture;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -33,21 +32,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
-        chatFuture = AsyncUtil.asyncWorker.submit(new Callable<List<IChatComponent>>() {
-            @Override
-            public List<IChatComponent> call() throws Exception {
-                //Deadlock avoidance
-                if (updatesFuture == null || updatesFuture.isCancelled()) {
-                    chatFuture = null;
-                    return null;
-                }
-                if (!updatesFuture.isDone()) {
-                    chatFuture = AsyncUtil.asyncWorker.submit(this);
-                    return null;
-                }
-                val updates = updatesFuture.get();
-                return UpdateChecker.updateListToChatMessages(Tags.MODNAME, updates);
+        chatFuture = updatesFuture.handleAsync((updates, exception) -> {
+            if (exception != null || updates.isEmpty()) {
+                return Collections.emptyList();
             }
+            return UpdateChecker.updateListToChatMessages(Tags.MODNAME, updates);
         });
     }
 
@@ -57,7 +46,7 @@ public class ClientProxy extends CommonProxy {
             !(e.entity instanceof EntityPlayerSP)) return;
         val player = (EntityPlayerSP) e.entity;
         try {
-            for (val line: chatFuture.get(1, TimeUnit.SECONDS)) {
+            for (val line: chatFuture.get()) {
                 player.addChatMessage(line);
             }
             chatFuture = null;

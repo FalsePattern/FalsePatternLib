@@ -6,6 +6,9 @@ import lombok.var;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class Internet {
@@ -25,6 +28,21 @@ public class Internet {
         } catch (Exception e) {
             onError.accept(e);
         }
+    }
+
+    public static CompletableFuture<byte[]> download(URL URL) {
+        return CompletableFuture.supplyAsync(() -> {
+            val result = new ByteArrayOutputStream();
+            AtomicReference<Exception> caught = new AtomicReference<>();
+            connect(URL, caught::set, (input) -> {
+                try {
+                    transferAndClose(input, result);
+                } catch (IOException e) {
+                    throw new CompletionException(e);
+                }
+            });
+            return result.toByteArray();
+        });
     }
 
 
