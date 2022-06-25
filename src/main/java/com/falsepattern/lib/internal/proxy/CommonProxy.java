@@ -44,6 +44,8 @@ public class CommonProxy {
                 FalsePatternLib.getLog().error("Failed to check for updates!", ex);
                 return Collections.emptyList();
             });
+        } else {
+            updatesFuture = CompletableFuture.completedFuture(Collections.emptyList());
         }
     }
 
