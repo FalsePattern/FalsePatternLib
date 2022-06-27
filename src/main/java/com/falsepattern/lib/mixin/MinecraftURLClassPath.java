@@ -26,12 +26,17 @@ public final class MinecraftURLClassPath {
     private static final boolean GRIMOIRE;
 
     static {
-        boolean grimoire;
-        try {
-            Class.forName("io.github.crucible.grimoire.common.GrimoireCore", false, MinecraftURLClassPath.class.getClassLoader());
-            grimoire = true;
-        } catch (ClassNotFoundException ignored) {
-            grimoire = false;
+        boolean grimoire = false;
+        String[] knownGrimoireClassNames = new String[]{
+                "io.github.crucible.grimoire.Grimoire",
+                "io.github.crucible.grimoire.common.GrimoireCore"
+        };
+        for (val className: knownGrimoireClassNames) {
+            try {
+                Class.forName(className, false, MinecraftURLClassPath.class.getClassLoader());
+                grimoire = true;
+                break;
+            } catch (ClassNotFoundException ignored) {}
         }
         GRIMOIRE = grimoire;
         if (!GRIMOIRE) {
