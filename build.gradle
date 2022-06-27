@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern18
+//version: 1641429628falsepattern21
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -30,9 +30,14 @@ buildscript {
             name = "jitpack"
             url = "https://jitpack.falsepattern.com/"
         }
+        maven {
+            name = "mavenpattern"
+            url = "https://maven.falsepattern.com/"
+        }
     }
     dependencies {
         classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
+        classpath 'com.falsepattern:jtweaker:0.2.1'
     }
 }
 
@@ -44,7 +49,7 @@ plugins {
     id("com.palantir.git-version") version("0.12.3")
     id("maven-publish")
 }
-
+apply plugin: 'com.falsepattern.jtweaker'
 apply plugin: 'forge'
 
 def projectJavaVersion = JavaLanguageVersion.of(8)
@@ -96,6 +101,7 @@ checkPropertyExists("mavenGroupId")
 checkPropertyExists("mavenArtifactId")
 checkPropertyExists("hasMixinDeps")
 checkPropertyExists("mixinPreinitConfig")
+checkPropertyExists("remapStubs")
 
 
 String javaSourceDir = "src/main/java/"
@@ -284,6 +290,9 @@ task relocateShadowJar(type: ConfigureShadowRelocation) {
 }
 
 shadowJar {
+    if (remapStubs.toBoolean()) {
+        dependsOn(removeStub)
+    }
     project.configurations.shadeCompile.each { dep ->
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
@@ -300,6 +309,9 @@ shadowJar {
 }
 
 jar {
+    if (remapStubs.toBoolean()) {
+        dependsOn(removeStub)
+    }
     project.configurations.shadeCompile.each { dep ->
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
@@ -456,6 +468,9 @@ task sourcesJar(type: Jar) {
 }
 
 task shadowDevJar(type: ShadowJar) {
+    if (remapStubs.toBoolean()) {
+        dependsOn(removeStub)
+    }
     project.configurations.shadeCompile.each { dep ->
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
@@ -485,6 +500,9 @@ task circularResolverJar(type: Jar) {
 }
 
 task devJar(type: Jar) {
+    if (remapStubs.toBoolean()) {
+        dependsOn(removeStub)
+    }
     project.configurations.shadeCompile.each { dep ->
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
