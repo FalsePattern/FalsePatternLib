@@ -28,7 +28,7 @@ public final class MinecraftURLClassPath {
     static {
         boolean grimoire;
         try {
-            Class.forName("io.github.crucible.grimoire.Grimoire", false, MinecraftURLClassPath.class.getClassLoader());
+            Class.forName("io.github.crucible.grimoire.common.GrimoireCore", false, MinecraftURLClassPath.class.getClassLoader());
             grimoire = true;
         } catch (ClassNotFoundException ignored) {
             grimoire = false;
