@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
-import net.minecraft.util.MathHelper;
 
 /**
  * A functional equivalent to Vec3i present in Minecraft 1.12.
