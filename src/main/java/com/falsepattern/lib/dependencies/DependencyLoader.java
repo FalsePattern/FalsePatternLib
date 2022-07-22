@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.falsepattern.lib.util.FileUtil;
 import lombok.*;
@@ -133,6 +134,7 @@ public class DependencyLoader {
                                                 preferredVersion,
                                                 mavenJarName));
                 String finalRepo = repo;
+                val success = new AtomicBoolean(false);
                 Internet.connect(url, (ex) -> {
                     FalsePatternLib.getLog()
                                    .info("Artifact {} could not be downloaded from repo {}: {}",
@@ -149,8 +151,11 @@ public class DependencyLoader {
                     loadedLibraries.put(artifact, preferredVersion);
                     loadedLibraryMods.put(artifact, loadingModId);
                     addToClasspath(file);
+                    success.set(true);
                 });
-                return;
+                if (success.get()) {
+                    return;
+                }
             } catch (IOException ignored) {
             }
         }
