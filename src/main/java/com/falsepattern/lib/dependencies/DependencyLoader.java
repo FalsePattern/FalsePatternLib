@@ -117,7 +117,7 @@ public class DependencyLoader {
             try {
                 addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
-                log.info("Library {} successfully loaded from disk!", artifactLogName);
+                log.debug("Library {} successfully loaded from disk!", artifactLogName);
                 return;
             } catch (RuntimeException e) {
                 log.warn("Failed to load library {} from file! Re-downloading...", artifactLogName);
@@ -151,29 +151,29 @@ public class DependencyLoader {
                         }
                         val success = new AtomicBoolean(false);
                         Internet.connect(new URL(url),
-                                         (ex) -> log.info("Artifact {} could not be downloaded from repo {}: {}", artifactLogName,
+                                         (ex) -> log.debug("Artifact {} could not be downloaded from repo {}: {}", artifactLogName,
                                                           finalRepo, ex.getMessage()),
                                          (input) -> {
-                            log.info("Downloading {} from {}", artifactLogName, finalRepo);
+                            log.debug("Downloading {} from {}", artifactLogName, finalRepo);
                             download(input, file);
-                            log.info("Downloaded {}", artifactLogName);
+                            log.debug("Downloaded {} from {}", artifactLogName, finalRepo);
                             success.set(true);
                         });
                         if (success.get()) {
-                            log.info("Validating checksum for {}", artifactLogName);
+                            log.debug("Validating checksum for {}", artifactLogName);
                             boolean hadChecksum = false;
                             for (val checksumType : CHECKSUM_TYPES) {
                                 val checksumURL = url + "." + checksumType;
                                 val checksumFile = new File(libDir, jarName + "." + checksumType);
-                                log.info("Attempting to get {} checksum...", checksumType);
+                                log.debug("Attempting to get {} checksum...", checksumType);
                                 success.set(false);
                                 Internet.connect(new URL(checksumURL),
-                                                 (ex) -> log.info("Could not get {} checksum for {}: {}", checksumType,
+                                                 (ex) -> log.debug("Could not get {} checksum for {}: {}", checksumType,
                                                                   artifactLogName, ex.getMessage()),
                                                  (input) -> {
-                                    log.info("Downloading {} checksum for {}", checksumType, artifactLogName);
+                                    log.debug("Downloading {} checksum for {}", checksumType, artifactLogName);
                                     download(input, checksumFile);
-                                    log.info("Downloaded {} checksum for {}", checksumType, artifactLogName);
+                                    log.debug("Downloaded {} checksum for {}", checksumType, artifactLogName);
                                     success.set(true);
                                 });
                                 if (success.get()) {
@@ -187,7 +187,7 @@ public class DependencyLoader {
                                         retry = true;
                                         continue redownload;
                                     }
-                                    log.info("Successfully validated {} checksum for {}", checksumType,
+                                    log.debug("Successfully validated {} checksum for {}", checksumType,
                                              artifactLogName);
                                     hadChecksum = true;
                                     break;
@@ -261,7 +261,7 @@ public class DependencyLoader {
         try {
             val cl = (LaunchClassLoader) DependencyLoader.class.getClassLoader();
             cl.addURL(file.toURI().toURL());
-            log.info("Injected file {} into classpath!", file.getPath());
+            log.debug("Injected file {} into classpath!", file.getPath());
         } catch (Exception e) {
             throw new RuntimeException("Failed to add library to classpath: " + file.getAbsolutePath(), e);
         }
