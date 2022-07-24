@@ -4,6 +4,7 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.LibraryConfig;
+import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -19,7 +20,7 @@ public class CommonProxy {
     protected CompletableFuture<List<ModUpdateInfo>> updatesFuture;
 
     public void preInit(FMLPreInitializationEvent e) {
-        ConfigurationManager.registerBus();
+        ConfigurationManagerImpl.registerBus();
         try {
             ConfigurationManager.registerConfig(LibraryConfig.class);
         } catch (ConfigException ex) {
