@@ -185,4 +185,31 @@ public @interface Config {
     @Target({ElementType.FIELD, ElementType.TYPE})
     @interface RequiresWorldRestart {
     }
+
+    /**
+     * Signals that this configuration entry/class should be synchronized between the client and the server when
+     * joining a multiplayer instance.
+     *
+     * Note that synchronization ALWAYS happens FROM the server TO the client. The server should NEVER attempt to get
+     * configuration values from a client. This is to avoid malicious clients manipulating the server configs.
+     */
+    @StableAPI(since = "0.10.0")
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD, ElementType.TYPE})
+    @interface Synchronize {
+        /**
+         * This is a limit on how many bytes the client will accept from the server. If this limit is exceeded,
+         * the client shall refuse to connect to the server. For String[]-s, the amount of bytes is the sum of all
+         * strings inside the array.<br><br>
+         *
+         * This limitation option exists to avoid malicious servers flooding clients with data.<br><br>
+         *
+         * By default, the client will accept any amount of bytes.<br><br>
+         *
+         * This only applies for String and String[] configurations, and is ignored on the other config types.
+         * For enums, this value is computed automatically.
+         */
+        int maxLength();
+    }
 }
