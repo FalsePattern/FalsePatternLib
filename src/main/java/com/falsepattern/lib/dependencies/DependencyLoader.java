@@ -19,6 +19,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.falsepattern.lib.util.FileUtil;
 import lombok.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 
@@ -33,6 +36,8 @@ public class DependencyLoader {
     private static final Map<String, Version> loadedLibraries = new HashMap<>();
     private static final Map<String, String> loadedLibraryMods = new HashMap<>();
     private static final Set<String> mavenRepositories = new HashSet<>();
+    
+    private static final Logger log = LogManager.getLogger(Tags.MODNAME + " Dependency Downloader");
 
     public static void addMavenRepo(String url) {
         mavenRepositories.add(url);
@@ -49,9 +54,7 @@ public class DependencyLoader {
                                    String devSuffix) {
         val suffix = FalsePatternLib.isDeveloperEnvironment() ? devSuffix : regularSuffix;
         val artifactLogName = String.format("%s:%s:%s%s", groupId, artifactId, preferredVersion, suffix != null ? "-" + suffix : "");
-        FalsePatternLib.getLog()
-                       .info("Adding library {}, requested by mod {}", artifactLogName,
-                             loadingModId);
+        log.info("Adding library {}, requested by mod {}", artifactLogName, loadingModId);
         var artifact = groupId + ":" + artifactId + ":" + suffix;
         if (loadedLibraries.containsKey(artifact)) {
             val currentVer = loadedLibraries.get(artifact);
@@ -61,35 +64,33 @@ public class DependencyLoader {
             val rangeString = "(minimum: " + minVersion + (maxVersion == null ? "" : ", maximum: " + maxVersion) + ")";
             if (minVersion.compareTo(currentVer) > 0 || (maxVersion != null && maxVersion.compareTo(currentVer) < 0)) {
                 for (int i = 0; i < 16; i++) {
-                    FalsePatternLib.getLog().fatal("ALERT VVVVVVVVVVVV ALERT");
+                    log.fatal("ALERT VVVVVVVVVVVV ALERT");
                 }
-                FalsePatternLib.getLog()
-                               .fatal("Library {}:{}{} already loaded with version {}, " +
-                                      "but a version in the range {} was requested! Thing may go horribly wrong! " +
-                                      "Requested by mod: {}, previously loaded by mod: {}",
-                                      groupId,
-                                      artifactId,
-                                      suffix != null ? ":" + suffix : "",
-                                      currentVer,
-                                      rangeString,
-                                      loadingModId,
-                                      loadedLibraryMods.get(artifact));
+                log.fatal("Library {}:{}{} already loaded with version {}, " +
+                          "but a version in the range {} was requested! Thing may go horribly wrong! " +
+                          "Requested by mod: {}, previously loaded by mod: {}",
+                          groupId,
+                          artifactId,
+                          suffix != null ? ":" + suffix : "",
+                          currentVer,
+                          rangeString,
+                          loadingModId,
+                          loadedLibraryMods.get(artifact));
                 for (int i = 0; i < 16; i++) {
-                    FalsePatternLib.getLog().fatal("ALERT ^^^^^^^^^^^^ ALERT");
+                    log.fatal("ALERT ^^^^^^^^^^^^ ALERT");
                 }
             } else {
-                FalsePatternLib.getLog()
-                               .info("Attempted loading of library {}:{}{} with preferred version {}, " +
-                                     "but version {} was already loaded, which matched the range {}. This is not an " +
-                                     "error. " + "Requested by mod: {}, previously loaded by mod: {}",
-                                     groupId,
-                                     artifactId,
-                                     suffix != null ? ":" + suffix : "",
-                                     preferredVersion,
-                                     currentVer,
-                                     rangeString,
-                                     loadingModId,
-                                     loadedLibraryMods.get(artifact));
+                log.info("Attempted loading of library {}:{}{} with preferred version {}, " +
+                         "but version {} was already loaded, which matched the range {}. This is not an " +
+                         "error. " + "Requested by mod: {}, previously loaded by mod: {}",
+                         groupId,
+                         artifactId,
+                         suffix != null ? ":" + suffix : "",
+                         preferredVersion,
+                         currentVer,
+                         rangeString,
+                         loadingModId,
+                         loadedLibraryMods.get(artifact));
             }
             return;
         }
@@ -107,7 +108,7 @@ public class DependencyLoader {
         val libDir = new File(modsDir, "falsepattern");
         if (!libDir.exists()) {
             if (!libDir.mkdirs()) {
-                FalsePatternLib.getLog().fatal("Failed to create directory {}", libDir);
+                log.fatal("Failed to create directory {}", libDir);
                 throw new RuntimeException("Failed to create directory " + libDir);
             }
         }
@@ -116,14 +117,12 @@ public class DependencyLoader {
             try {
                 addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
-                FalsePatternLib.getLog()
-                               .info("Library {} successfully loaded from disk!", artifactLogName);
+                log.info("Library {} successfully loaded from disk!", artifactLogName);
                 return;
             } catch (RuntimeException e) {
-                FalsePatternLib.getLog()
-                               .warn("Failed to load library {} from file! Redownloading...", artifactLogName);
+                log.warn("Failed to load library {} from file! Re-downloading...", artifactLogName);
                 if (!file.delete()) {
-                    FalsePatternLib.getLog().fatal("Failed to delete file {}", file);
+                    log.fatal("Failed to delete file {}", file);
                     throw new RuntimeException("Failed to delete file " + file);
                 }
             }
@@ -133,7 +132,7 @@ public class DependencyLoader {
                                ((suffix != null) ? ":" + suffix : "") + ": " + Tags.MODNAME +
                                " library downloading has been disabled in the config, and the library is not present " +
                                "on disk! Requested by mod: " + loadingModId;
-            FalsePatternLib.getLog().fatal(errorMessage);
+            log.fatal(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
             for (var repo : mavenRepositories) {
@@ -154,59 +153,52 @@ public class DependencyLoader {
                             break;
                         }
                         val success = new AtomicBoolean(false);
-                        Internet.connect(new URL(url), (ex) -> {
-                            FalsePatternLib.getLog()
-                                           .info("Artifact {} could not be downloaded from repo {}: {}", artifactLogName,
-                                                 finalRepo, ex.getMessage());
-                        }, (input) -> {
-                            FalsePatternLib.getLog().info("Downloading {} from {}", artifactLogName, finalRepo);
+                        Internet.connect(new URL(url),
+                                         (ex) -> log.info("Artifact {} could not be downloaded from repo {}: {}", artifactLogName,
+                                                          finalRepo, ex.getMessage()),
+                                         (input) -> {
+                            log.info("Downloading {} from {}", artifactLogName, finalRepo);
                             download(input, file);
-                            FalsePatternLib.getLog().info("Downloaded {}", artifactLogName);
+                            log.info("Downloaded {}", artifactLogName);
                             success.set(true);
                         });
                         if (success.get()) {
-                            FalsePatternLib.getLog().info("Validating checksum for {}", artifactLogName);
+                            log.info("Validating checksum for {}", artifactLogName);
                             boolean hadChecksum = false;
                             for (val checksumType : CHECKSUM_TYPES) {
                                 val checksumURL = url + "." + checksumType;
                                 val checksumFile = new File(libDir, jarName + "." + checksumType);
-                                FalsePatternLib.getLog().info("Attempting to get {} checksum...", checksumType);
+                                log.info("Attempting to get {} checksum...", checksumType);
                                 success.set(false);
-                                Internet.connect(new URL(checksumURL), (ex) -> {
-                                    FalsePatternLib.getLog()
-                                                   .info("Could not get {} checksum for {}: {}", checksumType,
-                                                         artifactLogName, ex.getMessage());
-                                }, (input) -> {
-                                    FalsePatternLib.getLog()
-                                                   .info("Downloading {} checksum for {}", checksumType, artifactLogName);
+                                Internet.connect(new URL(checksumURL),
+                                                 (ex) -> log.info("Could not get {} checksum for {}: {}", checksumType,
+                                                                  artifactLogName, ex.getMessage()),
+                                                 (input) -> {
+                                    log.info("Downloading {} checksum for {}", checksumType, artifactLogName);
                                     download(input, checksumFile);
-                                    FalsePatternLib.getLog()
-                                                   .info("Downloaded {} checksum for {}", checksumType, artifactLogName);
+                                    log.info("Downloaded {} checksum for {}", checksumType, artifactLogName);
                                     success.set(true);
                                 });
                                 if (success.get()) {
                                     val fileHash = hash(checksumType, file);
                                     val referenceHash = new String(Files.readAllBytes(checksumFile.toPath()));
                                     if (!fileHash.equals(referenceHash)) {
-                                        FalsePatternLib.getLog()
-                                                       .error("Failed {} checksum validation for {}. Retrying download...",
-                                                              checksumType, artifactLogName);
+                                        log.error("Failed {} checksum validation for {}. Retrying download...",
+                                                  checksumType, artifactLogName);
                                         file.delete();
                                         retry = true;
                                         continue redownload;
                                     }
-                                    FalsePatternLib.getLog()
-                                                   .info("Successfully validated {} checksum for {}", checksumType,
-                                                         artifactLogName);
+                                    log.info("Successfully validated {} checksum for {}", checksumType,
+                                             artifactLogName);
                                     hadChecksum = true;
                                     break;
                                 }
                             }
                             if (!hadChecksum) {
-                                FalsePatternLib.getLog()
-                                               .warn("The library {} had no checksum available on the repository.\n" +
-                                                     "There's a chance it might have gotten corrupted during download,\n" +
-                                                     "but we're loading it anyways.", artifactLogName);
+                                log.warn("The library {} had no checksum available on the repository.\n" +
+                                         "There's a chance it might have gotten corrupted during download,\n" +
+                                         "but we're loading it anyways.", artifactLogName);
                             }
                             loadedLibraries.put(artifact, preferredVersion);
                             loadedLibraryMods.put(artifact, loadingModId);
@@ -219,7 +211,7 @@ public class DependencyLoader {
         }
         val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + ((suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " +
                            loadingModId;
-        FalsePatternLib.getLog().fatal(errorMessage);
+        log.fatal(errorMessage);
         throw new IllegalStateException(errorMessage);
     }
 
@@ -264,7 +256,7 @@ public class DependencyLoader {
         try {
             val cl = (LaunchClassLoader) DependencyLoader.class.getClassLoader();
             cl.addURL(file.toURI().toURL());
-            FalsePatternLib.getLog().info("Injected file {} into classpath!", file.getPath());
+            log.info("Injected file {} into classpath!", file.getPath());
         } catch (Exception e) {
             throw new RuntimeException("Failed to add library to classpath: " + file.getAbsolutePath(), e);
         }
