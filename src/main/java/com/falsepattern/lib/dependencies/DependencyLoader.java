@@ -199,6 +199,7 @@ public class DependencyLoader {
                                                    .info("Successfully validated {} checksum for {}", checksumType,
                                                          artifactLogName);
                                     hadChecksum = true;
+                                    break;
                                 }
                             }
                             if (!hadChecksum) {
