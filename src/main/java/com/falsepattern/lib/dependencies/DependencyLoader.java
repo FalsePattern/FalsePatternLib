@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,6 +24,11 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 @StableAPI(since = "0.6.0")
 public class DependencyLoader {
+
+    /**
+     * Dependency checksum formats in a decreasing order of quality.
+     */
+    private static final String[] CHECKSUM_TYPES = new String[]{"sha512", "sha256", "sha1", "md5"};
 
     private static final Map<String, Version> loadedLibraries = new HashMap<>();
     private static final Map<String, String> loadedLibraryMods = new HashMap<>();
@@ -130,48 +136,127 @@ public class DependencyLoader {
             FalsePatternLib.getLog().fatal(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
-        for (var repo : mavenRepositories) {
-            try {
-                if (!repo.endsWith("/")) {
-                    repo = repo + "/";
+            for (var repo : mavenRepositories) {
+                try {
+                    if (!repo.endsWith("/")) {
+                        repo = repo + "/";
+                    }
+                    val url = String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId,
+                                            preferredVersion, mavenJarName);
+                    String finalRepo = repo;
+                    boolean retry = true;
+                    int retryCount = 0;
+                    redownload:
+                    while (retry) {
+                        retry = false;
+                        retryCount++;
+                        if (retryCount >= 3) {
+                            break;
+                        }
+                        val success = new AtomicBoolean(false);
+                        Internet.connect(new URL(url), (ex) -> {
+                            FalsePatternLib.getLog()
+                                           .info("Artifact {} could not be downloaded from repo {}: {}", artifactLogName,
+                                                 finalRepo, ex.getMessage());
+                        }, (input) -> {
+                            FalsePatternLib.getLog().info("Downloading {} from {}", artifactLogName, finalRepo);
+                            download(input, file);
+                            FalsePatternLib.getLog().info("Downloaded {}", artifactLogName);
+                            success.set(true);
+                        });
+                        if (success.get()) {
+                            FalsePatternLib.getLog().info("Validating checksum for {}", artifactLogName);
+                            boolean hadChecksum = false;
+                            for (val checksumType : CHECKSUM_TYPES) {
+                                val checksumURL = url + "." + checksumType;
+                                val checksumFile = new File(libDir, jarName + "." + checksumType);
+                                FalsePatternLib.getLog().info("Attempting to get {} checksum...", checksumType);
+                                success.set(false);
+                                Internet.connect(new URL(checksumURL), (ex) -> {
+                                    FalsePatternLib.getLog()
+                                                   .info("Could not get {} checksum for {}: {}", checksumType,
+                                                         artifactLogName, ex.getMessage());
+                                }, (input) -> {
+                                    FalsePatternLib.getLog()
+                                                   .info("Downloading {} checksum for {}", checksumType, artifactLogName);
+                                    download(input, checksumFile);
+                                    FalsePatternLib.getLog()
+                                                   .info("Downloaded {} checksum for {}", checksumType, artifactLogName);
+                                    success.set(true);
+                                });
+                                if (success.get()) {
+                                    val fileHash = hash(checksumType, file);
+                                    val referenceHash = new String(Files.readAllBytes(checksumFile.toPath()));
+                                    if (!fileHash.equals(referenceHash)) {
+                                        FalsePatternLib.getLog()
+                                                       .error("Failed {} checksum validation for {}. Retrying download...",
+                                                              checksumType, artifactLogName);
+                                        file.delete();
+                                        retry = true;
+                                        continue redownload;
+                                    }
+                                    FalsePatternLib.getLog()
+                                                   .info("Successfully validated {} checksum for {}", checksumType,
+                                                         artifactLogName);
+                                    hadChecksum = true;
+                                }
+                            }
+                            if (!hadChecksum) {
+                                FalsePatternLib.getLog()
+                                               .warn("The library {} had no checksum available on the repository.\n" +
+                                                     "There's a chance it might have gotten corrupted during download,\n" +
+                                                     "but we're loading it anyways.", artifactLogName);
+                            }
+                            loadedLibraries.put(artifact, preferredVersion);
+                            loadedLibraryMods.put(artifact, loadingModId);
+                            addToClasspath(file);
+                            return;
+                        }
+                    }
+                } catch (IOException ignored) {
                 }
-                val url = new URL(String.format("%s%s/%s/%s/%s",
-                                                repo,
-                                                groupId.replace('.', '/'),
-                                                artifactId,
-                                                preferredVersion,
-                                                mavenJarName));
-                String finalRepo = repo;
-                val success = new AtomicBoolean(false);
-                Internet.connect(url, (ex) -> {
-                    FalsePatternLib.getLog()
-                                   .info("Artifact {} could not be downloaded from repo {}: {}",
-                                           artifactLogName,
-                                           finalRepo,
-                                           ex.getMessage());
-                }, (input) -> {
-                    FalsePatternLib.getLog()
-                                   .info("Downloading {} from {}",
-                                           artifactLogName,
-                                           finalRepo);
-                    download(input, file);
-                    FalsePatternLib.getLog().info("Downloaded {}", artifactLogName);
-                    loadedLibraries.put(artifact, preferredVersion);
-                    loadedLibraryMods.put(artifact, loadingModId);
-                    addToClasspath(file);
-                    success.set(true);
-                });
-                if (success.get()) {
-                    return;
-                }
-            } catch (IOException ignored) {
-            }
         }
-        val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion +
-                           ((suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " +
+        val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + ((suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " +
                            loadingModId;
         FalsePatternLib.getLog().fatal(errorMessage);
         throw new IllegalStateException(errorMessage);
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    @SneakyThrows
+    private static String digest(String algo, byte[] data) {
+        return bytesToHex(MessageDigest.getInstance(algo).digest(data));
+    }
+
+    @SneakyThrows
+    private static String hash(String algo, File file) {
+        byte[] data = Files.readAllBytes(file.toPath());
+        switch (algo) {
+            case "md5":
+                algo = "MD5";
+                break;
+            case "sha1":
+                algo = "SHA-1";
+                break;
+            case "sha256":
+                algo = "SHA-256";
+                break;
+            case "sha512":
+                algo = "SHA-512";
+                break;
+        }
+        return digest(algo, data);
     }
 
     private static void addToClasspath(File file) {
