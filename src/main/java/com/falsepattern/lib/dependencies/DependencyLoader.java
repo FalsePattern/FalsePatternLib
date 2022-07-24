@@ -121,10 +121,7 @@ public class DependencyLoader {
                 return;
             } catch (RuntimeException e) {
                 log.warn("Failed to load library {} from file! Re-downloading...", artifactLogName);
-                if (!file.delete()) {
-                    log.fatal("Failed to delete file {}", file);
-                    throw new RuntimeException("Failed to delete file " + file);
-                }
+                checkedDelete(file);
             }
         }
         if (!LibraryConfig.ENABLE_LIBRARY_DOWNLOADS) {
@@ -185,7 +182,8 @@ public class DependencyLoader {
                                     if (!fileHash.equals(referenceHash)) {
                                         log.error("Failed {} checksum validation for {}. Retrying download...",
                                                   checksumType, artifactLogName);
-                                        file.delete();
+                                        checkedDelete(file);
+                                        checkedDelete(checksumFile);
                                         retry = true;
                                         continue redownload;
                                     }
@@ -250,6 +248,13 @@ public class DependencyLoader {
                 break;
         }
         return digest(algo, data);
+    }
+
+    private static void checkedDelete(File file) {
+        if (!file.delete()) {
+            log.fatal("Failed to delete file {}", file);
+            throw new RuntimeException("Failed to delete file " + file);
+        }
     }
 
     private static void addToClasspath(File file) {
