@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 /**
  * The actual implementation of ConfigurationManager. Migrated stuff here so that we don't unnecessarily expose
  * internal-use functionality.
+ *
+ * Do not read if you value your sanity.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfigurationManagerImpl {
@@ -95,6 +97,12 @@ public class ConfigurationManagerImpl {
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException,
             ConfigException {
         val cat = rawConfig.getCategory(category);
+        if (configClass.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
+            cat.setRequiresWorldRestart(true);
+        }
+        if (configClass.isAssignableFrom(Config.RequiresMcRestart.class)) {
+            cat.setRequiresMcRestart(true);
+        }
         for (val field : configClass.getDeclaredFields()) {
             if (field.getAnnotation(Config.Ignore.class) != null) {
                 continue;
