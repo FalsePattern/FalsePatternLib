@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -86,7 +87,14 @@ public class DependencyLoader {
             }
             return;
         }
-        val modsDir = new File(FileUtil.getMinecraftHome(), "mods");
+        String homeDir = System.getProperty("minecraft.sharedDataDir");
+        if (homeDir == null) {
+            homeDir = System.getenv("MINECRAFT_SHARED_DATA_DIR");
+            if (homeDir == null) {
+                homeDir = FileUtil.getMinecraftHome().getAbsolutePath();
+            }
+        }
+        val modsDir = Paths.get(homeDir, "mods").toFile();
         val mavenJarName =
                 String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
         val jarName = groupId + "-" + mavenJarName;
