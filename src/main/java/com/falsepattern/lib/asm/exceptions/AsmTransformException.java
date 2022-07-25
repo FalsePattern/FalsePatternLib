@@ -1,4 +1,4 @@
-package com.falsepattern.lib.asm;
+package com.falsepattern.lib.asm.exceptions;
 
 public class AsmTransformException extends RuntimeException {
     public AsmTransformException(final String message) {

@@ -1,5 +1,8 @@
 package com.falsepattern.lib.asm;
 
+import com.falsepattern.lib.asm.exceptions.AsmClassNotFoundException;
+import com.falsepattern.lib.asm.exceptions.AsmFieldNotFoundException;
+import com.falsepattern.lib.asm.exceptions.AsmMethodNotFoundException;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.MappingManager;
 import com.falsepattern.lib.mapping.types.MappingType;
@@ -9,9 +12,15 @@ import com.falsepattern.lib.mapping.types.UniversalField;
 import com.falsepattern.lib.mapping.types.UniversalMethod;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -131,6 +140,18 @@ public class ASMUtil {
                 }
             }
         }
+    }
+
+    public static ClassNode parseClass(byte[] bytes, int readerFlags) {
+        val cn = new ClassNode(Opcodes.ASM5);
+        val reader = new ClassReader(bytes);
+        reader.accept(cn, readerFlags);
+        return cn;
+    }
+
+    public static byte[] serializeClass(ClassNode cn, int writerFlags) {
+        val writer = new ClassWriter(writerFlags);
+        return writer.toByteArray();
     }
 
     public static boolean anyEquals(String str, String... options) {

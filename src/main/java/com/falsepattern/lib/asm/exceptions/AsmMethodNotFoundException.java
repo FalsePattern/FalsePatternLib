@@ -1,4 +1,4 @@
-package com.falsepattern.lib.asm;
+package com.falsepattern.lib.asm.exceptions;
 
 public class AsmMethodNotFoundException extends AsmTransformException {
     public AsmMethodNotFoundException(final String method) {

@@ -1,4 +1,4 @@
-package com.falsepattern.lib.asm;
+package com.falsepattern.lib.asm.exceptions;
 
 public class AsmClassNotFoundException extends AsmTransformException {
     public AsmClassNotFoundException(final String clazz) {

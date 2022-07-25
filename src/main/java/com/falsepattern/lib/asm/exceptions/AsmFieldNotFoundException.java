@@ -1,4 +1,4 @@
-package com.falsepattern.lib.asm;
+package com.falsepattern.lib.asm.exceptions;
 
 public class AsmFieldNotFoundException extends AsmTransformException {
     public AsmFieldNotFoundException(final String field) {
