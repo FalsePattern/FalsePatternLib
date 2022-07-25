@@ -1,7 +1,7 @@
-package com.falsepattern.lib.reflection.types;
+package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.reflection.ReflectionUtil;
-import com.falsepattern.lib.reflection.storage.MappedString;
+import com.falsepattern.lib.util.ReflectionUtil;
+import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,10 +35,10 @@ public class UniversalMethod {
 
     public UniversalMethod(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
         this.parent = parent;
-        parent.addMethod(this);
         name = new MappedString(names, 0, 2, (str) -> str.substring(str.lastIndexOf('/') + 1), stringPool);
         descriptor = new MappedString(names, 1, 2, (str) -> str, stringPool);
         fusedNameDescriptor = MappedString.fuse(name, descriptor, "", stringPool);
+        parent.addMethod(this);
     }
 
     public String getName(MappingType mappingType) {

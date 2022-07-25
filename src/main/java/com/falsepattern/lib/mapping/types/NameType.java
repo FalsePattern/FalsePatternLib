@@ -1,4 +1,4 @@
-package com.falsepattern.lib.reflection.types;
+package com.falsepattern.lib.mapping.types;
 
 public enum NameType {
     Internal,

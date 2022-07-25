@@ -1,8 +1,8 @@
-package com.falsepattern.lib.reflection.types;
+package com.falsepattern.lib.mapping.types;
 
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
-import com.falsepattern.lib.reflection.storage.Lookup;
-import com.falsepattern.lib.reflection.storage.MappedString;
+import com.falsepattern.lib.mapping.storage.Lookup;
+import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -82,6 +82,10 @@ public class UniversalClass {
             default:
                 throw new IllegalArgumentException("Invalid enum value " + nameType);
         }
+    }
+
+    public String getNameAsDescriptor(MappingType mappingType) {
+        return "L" + getName(NameType.Internal, mappingType) + ";";
     }
 
     public UniversalField getField(MappingType mappingType, String fieldName) throws NoSuchFieldException {

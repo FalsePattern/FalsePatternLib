@@ -1,6 +1,6 @@
-package com.falsepattern.lib.reflection.storage;
+package com.falsepattern.lib.mapping.storage;
 
-import com.falsepattern.lib.reflection.types.MappingType;
+import com.falsepattern.lib.mapping.types.MappingType;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.Accessors;

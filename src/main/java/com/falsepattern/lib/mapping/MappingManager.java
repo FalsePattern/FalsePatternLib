@@ -1,13 +1,13 @@
-package com.falsepattern.lib.reflection;
+package com.falsepattern.lib.mapping;
 
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.reflection.storage.Lookup;
-import com.falsepattern.lib.reflection.types.MappingType;
-import com.falsepattern.lib.reflection.types.NameType;
-import com.falsepattern.lib.reflection.types.UniversalClass;
-import com.falsepattern.lib.reflection.types.UniversalField;
-import com.falsepattern.lib.reflection.types.UniversalMethod;
+import com.falsepattern.lib.mapping.storage.Lookup;
+import com.falsepattern.lib.mapping.types.MappingType;
+import com.falsepattern.lib.mapping.types.NameType;
+import com.falsepattern.lib.mapping.types.UniversalClass;
+import com.falsepattern.lib.mapping.types.UniversalField;
+import com.falsepattern.lib.mapping.types.UniversalMethod;
 import com.falsepattern.lib.util.ResourceUtil;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -27,6 +27,7 @@ public class MappingManager {
     private static synchronized void initialize() {
         if (initialized) return;
         initialized = true;
+        long start = System.nanoTime();
         val stringPool = new HashMap<String, String>();
         {
             val classMappings = ResourceUtil.getResourceStringFromJar("/classes.csv", FalsePatternLib.class).split("\n");
@@ -53,6 +54,8 @@ public class MappingManager {
                 new UniversalMethod(clazz, line, stringPool);
             }
         }
+        long end = System.nanoTime();
+        System.out.println("Parsed in " + (end - start) / 1000000 + "ms");
     }
 
     public static UniversalClass classForName(NameType nameType, MappingType mappingType, String className) throws ClassNotFoundException {

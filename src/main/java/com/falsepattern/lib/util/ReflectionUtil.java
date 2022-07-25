@@ -1,4 +1,4 @@
-package com.falsepattern.lib.reflection;
+package com.falsepattern.lib.util;
 
 import lombok.SneakyThrows;
 

@@ -1,7 +1,7 @@
-package com.falsepattern.lib.reflection.types;
+package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.reflection.ReflectionUtil;
-import com.falsepattern.lib.reflection.storage.MappedString;
+import com.falsepattern.lib.util.ReflectionUtil;
+import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,8 +29,8 @@ public class UniversalField {
 
     public UniversalField(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
         this.parent = parent;
-        parent.addField(this);
         name = new MappedString(names, 0, 1, (str) -> str.substring(str.lastIndexOf('/') + 1), stringPool);
+        parent.addField(this);
     }
 
     public String getName(MappingType mappingType) {
