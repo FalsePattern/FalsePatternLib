@@ -25,11 +25,11 @@ public interface ITargetedMod {
 
     final class PredicateHelpers {
         public static Predicate<String> startsWith(String subString) {
-            return (name) -> name.startsWith(subString);
+            return (name) -> name.startsWith(subString.toLowerCase());
         }
 
         public static Predicate<String> contains(String subString) {
-            return (name) -> name.contains(subString);
+            return (name) -> name.contains(subString.toLowerCase());
         }
 
         public static Predicate<String> matches(String regex) {
