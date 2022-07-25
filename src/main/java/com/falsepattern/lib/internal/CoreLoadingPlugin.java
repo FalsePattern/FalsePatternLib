@@ -1,5 +1,6 @@
 package com.falsepattern.lib.internal;
 
+import lombok.Getter;
 import lombok.val;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -15,6 +16,8 @@ import java.util.Map;
 @Name(Tags.MODID)
 @SortingIndex(500)
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
+    @Getter
+    private static boolean obfuscated;
     static {
         try {
             Class.forName("thermos.Thermos");
@@ -46,6 +49,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
     }
 
     @Override
