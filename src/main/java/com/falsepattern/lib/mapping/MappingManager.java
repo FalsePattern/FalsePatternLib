@@ -74,6 +74,17 @@ public class MappingManager {
         }
     }
 
+    public static boolean containsClass(NameType nameType, MappingType mappingType, String className) {
+        switch (nameType) {
+            case Internal:
+                return internalLookup.containsKey(mappingType, className);
+            case Regular:
+                return regularLookup.containsKey(mappingType, className);
+            default:
+                throw new IllegalArgumentException("Invalid enum value " + nameType);
+        }
+    }
+
     public static UniversalField getField(FieldInsnNode instruction) throws ClassNotFoundException,
             NoSuchFieldException {
         if (!CoreLoadingPlugin.isObfuscated()) {

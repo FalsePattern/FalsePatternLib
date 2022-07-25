@@ -24,6 +24,19 @@ public class Lookup<T> {
         return values.contains(value);
     }
 
+    public boolean containsKey(MappingType mappingType, String key) {
+        switch (mappingType) {
+            case Notch:
+                return notch.containsKey(key);
+            case SRG:
+                return srg.containsKey(key);
+            case MCP:
+                return mcp.containsKey(key);
+            default:
+                throw new IllegalArgumentException("Invalid enum value " + mappingType);
+        }
+    }
+
     public void unwrap(@NonNull MappedString mappedString, @NonNull T value) {
         if (contains(value)) {
             //Collision avoidance.
