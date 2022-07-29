@@ -1,4 +1,4 @@
-A library mod for 1.7.10 with lots of useful stuff. See the table below for more information.
+A library for 1.7.10 with lots of useful stuff, licensed under the LGPL3.0+SNEED license.
 
 | Package                                                         | Contents / Purpose                                                                        |
 |-----------------------------------------------------------------|-------------------------------------------------------------------------------------------|
