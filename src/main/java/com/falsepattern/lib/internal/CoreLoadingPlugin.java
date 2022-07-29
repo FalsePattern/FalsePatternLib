@@ -18,18 +18,61 @@ import java.util.Map;
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
+
+    private static Error skillIssue(String message) {
+        int width = message.length();
+        String shutup = "Any bug reports concerning this message will be silently deleted.";
+        int suWidth = shutup.length();
+        int padding = width - suWidth;
+        boolean padMSG = padding < 0;
+        if (padMSG) {
+            padding = -padding;
+        }
+        int padLeft = padding / 2;
+        int padRight = padding - padLeft;
+        int maxWidth = Math.max(width, suWidth);
+        StringBuilder bld = new StringBuilder("\n\n");
+        for (int i = 0; i < maxWidth + 2; i++) {
+            bld.append('-');
+        }
+        bld.append("\n|");
+        if (padMSG) {
+            for (int i = 0; i < padLeft; i++) {
+                bld.append(' ');
+            }
+            bld.append(message);
+            for (int i = 0; i < padRight; i++) {
+                bld.append(' ');
+            }
+        } else {
+            bld.append(message);
+        }
+        bld.append("|\n|");
+        if (!padMSG) {
+            for (int i = 0; i < padLeft; i++) {
+                bld.append(' ');
+            }
+            bld.append(shutup);
+            for (int i = 0; i < padRight; i++) {
+                bld.append(' ');
+            }
+        } else {
+            bld.append(shutup);
+        }
+        bld.append("|\n");
+        for (int i = 0; i < maxWidth + 2; i++) {
+            bld.append('-');
+        }
+        val skillIssue = new Error(bld.toString());
+        skillIssue.setStackTrace(new StackTraceElement[0]);
+        return skillIssue;
+    }
     static {
         try {
             Class.forName("thermos.Thermos");
-            val iAmNotFixingThisDontEvenAskPlusSkillIssue =
-                    new Error("\n\n" +
-                              "--------------------------------------------------------------------------------\n" +
-                              "|Thermos is not supported by FalsePatternLib, please use a normal forge server.|\n" +
-                              "|       Any bug reports concerning this message will be silently deleted.      |\n" +
-                              "--------------------------------------------------------------------------------\n");
-            iAmNotFixingThisDontEvenAskPlusSkillIssue.setStackTrace(new StackTraceElement[0]);
-            throw iAmNotFixingThisDontEvenAskPlusSkillIssue;
+            throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
         } catch (ClassNotFoundException ignored) {}
+
     }
 
     @Override
