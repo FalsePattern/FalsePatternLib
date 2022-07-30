@@ -24,9 +24,12 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.val;
 
 import cpw.mods.fml.client.config.IConfigElement;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,5 +58,27 @@ public class ConfigurationManager {
     @SuppressWarnings("rawtypes")
     public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
         return ConfigurationManagerImpl.getConfigElements(configClass);
+    }
+
+    /**
+     * Same as {@link #getConfigElements(Class)}, but for multiple config classes at once.
+     *
+     * @param configClasses The classes to process.
+     *
+     * @return The configuration elements.
+     */
+    @SuppressWarnings("rawtypes")
+    @StableAPI(since = "0.10.0")
+    public static List<IConfigElement> getConfigElementsMulti(Class<?>... configClasses) throws ConfigException {
+        switch (configClasses.length) {
+            case 0: return Collections.emptyList();
+            case 1: return getConfigElements(configClasses[0]);
+            default:
+                val result = new ArrayList<IConfigElement>();
+                for (val configClass: configClasses) {
+                    result.addAll(getConfigElements(configClass));
+                }
+                return result;
+        }
     }
 }
