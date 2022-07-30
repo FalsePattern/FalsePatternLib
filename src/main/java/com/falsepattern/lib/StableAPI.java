@@ -31,14 +31,18 @@ import java.lang.annotation.RetentionPolicy;
  * If a class or method is NOT annotated with this annotation, it will be considered unstable, and the package/method
  * arguments/etc. can freely change between patch releases without notice.
  * <p>
- * If a class is annotated with this annotation, all currently existing public and protected members in the class will
- * be considered stable.
+ * NOTICE: You should no longer use this annotation exclusively on classes themselves, and instead, annotate every single
+ * public or protected member you want to expose as a public API!
  * <p>
  * Private members will never be considered stable, and can be removed without notice.
  */
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @StableAPI(since = "0.6.0")
 public @interface StableAPI {
+    /**
+     * The version this API was introduced/stabilized in. Used for library version tracking.
+     */
+    @StableAPI(since = "0.6.0")
     String since();
 }
