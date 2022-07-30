@@ -20,12 +20,16 @@
  */
 package com.falsepattern.lib.compat;
 
+import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.lib.util.MathUtil;
+
 import java.util.Random;
 
 /**
- * This is here because the real MathHelper has some of its methods only present in clientside, some of which we
- * actually DO need in serverside.
+ * Alert: This class will be removed in 0.11, migrate to {@link MathUtil}!
  */
+@Deprecated
+@DeprecationDetails(deprecatedSince = "0.10.0")
 public class MathHelper {
     /**
      * Though it looks like an array, this is really more like a mapping.  Key (index of this array) is the upper 5 bits
