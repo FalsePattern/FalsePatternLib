@@ -22,6 +22,8 @@ package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
 import javax.annotation.concurrent.Immutable;
+
+import com.falsepattern.lib.util.MathUtil;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -54,7 +56,7 @@ public class Vec3i implements Comparable<Vec3i> {
      * @param z the z
      */
     public Vec3i(double x, double y, double z) {
-        this(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
+        this(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
     }
 
     public int compareTo(@NonNull Vec3i vec) {

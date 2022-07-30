@@ -21,6 +21,7 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.util.MathUtil;
 import com.google.common.collect.AbstractIterator;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -52,7 +53,7 @@ public class BlockPos extends Vec3i {
      */
     public static final BlockPos ORIGIN = new BlockPos(0, 0, 0);
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final int NUM_X_BITS = 1 + MathHelper.calculateLogBaseTwo(MathHelper.roundUpToPowerOfTwo(30000000));
+    private static final int NUM_X_BITS = 1 + MathUtil.log2(MathUtil.smallestEncompassingPowerOfTwo(30000000));
     private static final int NUM_Z_BITS = NUM_X_BITS;
     private static final int NUM_Y_BITS = 64 - NUM_X_BITS - NUM_Z_BITS;
     private static final long Y_MASK = (1L << NUM_Y_BITS) - 1L;
@@ -431,7 +432,7 @@ public class BlockPos extends Vec3i {
         }
 
         public BlockPos.MutableBlockPos setPos(double x, double y, double z) {
-            return setPos(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
+            return setPos(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
         }
 
         public BlockPos.MutableBlockPos setPos(int x, int y, int z) {
@@ -483,7 +484,7 @@ public class BlockPos extends Vec3i {
         }
 
         public static BlockPos.PooledMutableBlockPos retain(double x, double y, double z) {
-            return retain(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
+            return retain(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
         }
 
         @SideOnly(Side.CLIENT)
