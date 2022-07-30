@@ -18,10 +18,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal;
+package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
+import com.falsepattern.lib.internal.Tags;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
@@ -29,6 +31,6 @@ import net.minecraft.client.gui.GuiScreen;
 @SideOnly(Side.CLIENT)
 public class LibraryGuiConfig extends SimpleGuiConfig {
     public LibraryGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, LibraryConfig.class, Tags.MODID, Tags.MODNAME);
+        super(parent, new Class[]{LibraryConfig.class, ToastConfig.class}, Tags.MODID, Tags.MODNAME);
     }
 }

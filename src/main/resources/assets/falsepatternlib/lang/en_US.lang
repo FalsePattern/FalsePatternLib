@@ -1,3 +1,9 @@
+config.falsepatternlib.maxtoasts=Max Toasts
+config.falsepatternlib.maxtoasts.tooltip=The maximum amount of toasts to show on the screen
+config.falsepatternlib.toastoffset=Toast Y Offset
+config.falsepatternlib.toastoffset.tooltip=The amount of empty space from the top of the screen in pixels
+config.falsepatternlib.toastalign=Toast Alignment
+config.falsepatternlib.toastalign.tooltip=Which side of the screen should toasts show up on
 config.falsepatternlib.updatecheck=Enable update checks
 config.falsepatternlib.updatecheck.tooltip=Used to control whether FalsePatternLib should check for outdated mods.
 config.falsepatternlib.disableinternet=FalsePatternLib Offline Mode

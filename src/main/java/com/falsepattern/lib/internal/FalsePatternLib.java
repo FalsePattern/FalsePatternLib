@@ -23,6 +23,7 @@ package com.falsepattern.lib.internal;
 import com.falsepattern.lib.internal.proxy.CommonProxy;
 
 import cpw.mods.fml.common.*;
+import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
@@ -41,7 +42,7 @@ import org.apache.logging.log4j.Logger;
      name = Tags.MODNAME,
      version = Tags.VERSION,
      acceptedMinecraftVersions = "[1.7.10]",
-     guiFactory = Tags.GROUPNAME + ".internal.LibraryGuiFactory",
+     guiFactory = Tags.GROUPNAME + ".internal.config.LibraryGuiFactory",
      acceptableRemoteVersions = "*")
 public class FalsePatternLib {
     public static final String UPDATE_URL = "https://falsepattern.com/mc/versions.json";
@@ -56,6 +57,11 @@ public class FalsePatternLib {
 
     public FalsePatternLib() {
         log.info("Version " + Tags.VERSION + " initialized!");
+    }
+
+    @Mod.EventHandler
+    public void construct(FMLConstructionEvent e) {
+        proxy.construct(e);
     }
 
     @Mod.EventHandler

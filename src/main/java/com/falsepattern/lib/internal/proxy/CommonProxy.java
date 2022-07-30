@@ -23,10 +23,13 @@ package com.falsepattern.lib.internal.proxy;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.LibraryConfig;
+import com.falsepattern.lib.internal.config.LibraryConfig;
+import com.falsepattern.lib.internal.config.ToastConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
+
+import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import lombok.val;
@@ -39,10 +42,14 @@ public class CommonProxy {
 
     protected CompletableFuture<List<ModUpdateInfo>> updatesFuture;
 
+    public void construct(FMLConstructionEvent e) {
+    }
+
     public void preInit(FMLPreInitializationEvent e) {
         ConfigurationManagerImpl.registerBus();
         try {
             ConfigurationManager.registerConfig(LibraryConfig.class);
+            ConfigurationManager.registerConfig(ToastConfig.class);
         } catch (ConfigException ex) {
             FalsePatternLib.getLog().error("Failed to register config!", ex);
         }

@@ -24,7 +24,7 @@ import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Version;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Internet;
-import com.falsepattern.lib.internal.LibraryConfig;
+import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.NonNull;

@@ -25,7 +25,7 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.Internet;
-import com.falsepattern.lib.internal.LibraryConfig;
+import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.text.FormattedText;
 import cpw.mods.fml.common.Loader;

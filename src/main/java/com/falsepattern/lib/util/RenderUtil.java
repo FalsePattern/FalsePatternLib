@@ -21,11 +21,15 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.val;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.Timer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.SideOnly;
-import lombok.*;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Timer;
 
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static lombok.AccessLevel.PRIVATE;
@@ -42,6 +46,56 @@ public final class RenderUtil {
         val timerField = ReflectionHelper.findField(Minecraft.class, "timer", "field_71428_T");
         timerField.setAccessible(true);
         return (Timer) timerField.get(getMinecraft());
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static IIcon getFullTextureIcon(String iconName, int width, int height) {
+        return new IIcon() {
+            @Override
+            public int getIconWidth() {
+                return width;
+            }
+
+            @Override
+            public int getIconHeight() {
+                return height;
+            }
+
+            @Override
+            public float getMinU() {
+                return 0;
+            }
+
+            @Override
+            public float getMaxU() {
+                return 1;
+            }
+
+            @Override
+            public float getInterpolatedU(double u) {
+                return (float) (u / 16D);
+            }
+
+            @Override
+            public float getMinV() {
+                return 0;
+            }
+
+            @Override
+            public float getMaxV() {
+                return 1;
+            }
+
+            @Override
+            public float getInterpolatedV(double v) {
+                return (float) (v / 16D);
+            }
+
+            @Override
+            public String getIconName() {
+                return iconName;
+            }
+        };
     }
 
     public static float partialTick() {
