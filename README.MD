@@ -16,6 +16,7 @@ The contents of the [util](src/main/java/com/falsepattern/lib/util) package so f
 |---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | [FileUtil](src/main/java/com/falsepattern/lib/util/FileUtil.java)         | Directory and file utilities.                                                                                                     |
 | [LangUtil](src/main/java/com/falsepattern/lib/util/LangUtil.java)         | Utility for having default language values defined inside code instead of lang files                                              |
+| [MathUtil](src/main/java/com/falsepattern/lib/util/MathUtil.java)         | Miscellaneous math helper code                                                                                                    |
 | [RenderUtil](src/main/java/com/falsepattern/lib/util/RenderUtil.java)     | Rendering tools. Currently, the only thing implemented is a way to grab the current partial tick time from the minecraft instance |
 | [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java) | Methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath                              |
 
