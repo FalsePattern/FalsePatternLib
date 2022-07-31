@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -24,7 +24,9 @@ import org.objectweb.asm.tree.ClassNode;
 
 public interface IClassNodeTransformer {
     String getName();
+
     boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated);
+
     default int internalSortingOrder() {
         return 0;
     }

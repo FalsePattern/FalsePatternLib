@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,10 +21,11 @@
 package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
+
+import net.minecraft.client.Minecraft;
 import cpw.mods.fml.client.IModGuiFactory;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
 
 import java.util.Set;
 

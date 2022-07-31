@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,14 +21,14 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import javax.annotation.concurrent.Immutable;
-
 import com.falsepattern.lib.util.MathUtil;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
+
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A functional equivalent to Vec3i present in Minecraft 1.12.
@@ -71,8 +71,7 @@ public class Vec3i implements Comparable<Vec3i> {
      * @return the new resulting vector
      */
     public Vec3i crossProduct(@NonNull Vec3i vec) {
-        return new Vec3i(y * vec.getZ() - z * vec.getY(),
-                         z * vec.getX() - x * vec.getZ(),
+        return new Vec3i(y * vec.getZ() - z * vec.getY(), z * vec.getX() - x * vec.getZ(),
                          x * vec.getY() - y * vec.getX());
     }
 

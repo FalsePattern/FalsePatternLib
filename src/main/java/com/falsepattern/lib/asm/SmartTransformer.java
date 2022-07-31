@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -20,7 +20,6 @@
  */
 package com.falsepattern.lib.asm;
 
-import com.falsepattern.lib.asm.exceptions.AsmTransformException;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import lombok.val;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +37,9 @@ import java.util.List;
  */
 public interface SmartTransformer extends IClassTransformer {
     Logger logger();
+
     List<IClassNodeTransformer> transformers();
+
     @Override
     default byte[] transform(String name, String transformedName, byte[] bytes) {
         if (bytes == null) {
@@ -46,7 +47,7 @@ public interface SmartTransformer extends IClassTransformer {
         }
         val transformers = new ArrayList<IClassNodeTransformer>();
         val cn = ASMUtil.parseClass(bytes, ClassReader.EXPAND_FRAMES);
-        for (val transformer: transformers()) {
+        for (val transformer : transformers()) {
             if (transformer.shouldTransform(cn, transformedName, CoreLoadingPlugin.isObfuscated())) {
                 transformers.add(transformer);
             }
@@ -56,7 +57,7 @@ public interface SmartTransformer extends IClassTransformer {
         }
         transformers.sort(Comparator.comparingInt(IClassNodeTransformer::internalSortingOrder));
         val log = logger();
-        for (val transformer: transformers) {
+        for (val transformer : transformers) {
             log.debug("Patching {} with {}...", transformedName, transformer.getName());
             try {
                 transformer.transform(cn, transformedName, CoreLoadingPlugin.isObfuscated());

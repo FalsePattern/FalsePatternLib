@@ -107,7 +107,8 @@ public class IntListConfigField extends AListConfigField<int[]> {
         for (int j = 0; j < ints.length; j++) {
             int i = ints[j];
             if (i < min || i > max) {
-                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Integer.toString(i), Integer.toString(min), Integer.toString(max));
+                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Integer.toString(i),
+                                                                         Integer.toString(min), Integer.toString(max));
                 valid = false;
             }
         }

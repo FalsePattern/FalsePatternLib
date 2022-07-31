@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -54,6 +54,7 @@ public class ToastConfig {
     }
 
     public enum Side {
-        Left, Right
+        Left,
+        Right
     }
 }

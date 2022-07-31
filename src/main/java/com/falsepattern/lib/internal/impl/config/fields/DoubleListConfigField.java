@@ -107,7 +107,8 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
         for (int j = 0; j < doubles.length; j++) {
             double d = doubles[j];
             if (d < min || d > max) {
-                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Double.toString(d), Double.toString(min), Double.toString(max));
+                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Double.toString(d),
+                                                                         Double.toString(min), Double.toString(max));
                 valid = false;
             }
         }

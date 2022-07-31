@@ -112,7 +112,8 @@ public class DoubleConfigField extends AConfigField<Double> {
         if (value >= min && value <= max) {
             return true;
         }
-        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Double.toString(value), Double.toString(min), Double.toString(max));
+        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Double.toString(value),
+                                                                 Double.toString(min), Double.toString(max));
         return false;
     }
 

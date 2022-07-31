@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,28 +21,25 @@
 package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.val;
 
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.9.0")
 public class SimpleGuiConfig extends GuiConfig {
-    public SimpleGuiConfig(GuiScreen parent, Class<?> configClass, String modID, String modName) throws ConfigException {
+    public SimpleGuiConfig(GuiScreen parent, Class<?> configClass, String modID, String modName)
+            throws ConfigException {
         this(parent, new Class<?>[]{configClass}, modID, modName);
     }
 
     @StableAPI(since = "0.10.0")
-    public SimpleGuiConfig(GuiScreen parent, Class<?>[] configClasses, String modID, String modName) throws ConfigException {
-        super(parent, ConfigurationManager.getConfigElementsMulti(configClasses), modID, false, false, modName + " Configuration", I18n.format("falsepatternlib.gui.config.description"));
+    public SimpleGuiConfig(GuiScreen parent, Class<?>[] configClasses, String modID, String modName)
+            throws ConfigException {
+        super(parent, ConfigurationManager.getConfigElementsMulti(configClasses), modID, false, false,
+              modName + " Configuration", I18n.format("falsepatternlib.gui.config.description"));
     }
 }

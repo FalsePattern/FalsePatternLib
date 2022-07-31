@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -22,6 +22,8 @@ package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
+import lombok.val;
+
 import net.minecraft.util.EnumFacing;
 
 @StableAPI(since = "0.6.0")
@@ -32,43 +34,8 @@ public enum Rotation {
     COUNTERCLOCKWISE_90;
 
     public Rotation add(@NonNull Rotation rotation) {
-        switch (rotation) {
-            case CLOCKWISE_180:
-                switch (this) {
-                    case NONE:
-                        return CLOCKWISE_180;
-                    case CLOCKWISE_90:
-                        return COUNTERCLOCKWISE_90;
-                    case CLOCKWISE_180:
-                        return NONE;
-                    case COUNTERCLOCKWISE_90:
-                        return CLOCKWISE_90;
-                }
-            case COUNTERCLOCKWISE_90:
-                switch (this) {
-                    case NONE:
-                        return COUNTERCLOCKWISE_90;
-                    case CLOCKWISE_90:
-                        return NONE;
-                    case CLOCKWISE_180:
-                        return CLOCKWISE_90;
-                    case COUNTERCLOCKWISE_90:
-                        return CLOCKWISE_180;
-                }
-            case CLOCKWISE_90:
-                switch (this) {
-                    case NONE:
-                        return CLOCKWISE_90;
-                    case CLOCKWISE_90:
-                        return CLOCKWISE_180;
-                    case CLOCKWISE_180:
-                        return COUNTERCLOCKWISE_90;
-                    case COUNTERCLOCKWISE_90:
-                        return NONE;
-                }
-            default:
-                return this;
-        }
+        val values = Rotation.values();
+        return values[(ordinal() + rotation.ordinal()) % values.length];
     }
 
     public EnumFacing rotate(@NonNull EnumFacing facing) {

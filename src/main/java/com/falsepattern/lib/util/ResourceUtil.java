@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,6 +21,8 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.val;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,7 +30,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import lombok.val;
 
 /**
  * A utility class for reading resources in many ways.

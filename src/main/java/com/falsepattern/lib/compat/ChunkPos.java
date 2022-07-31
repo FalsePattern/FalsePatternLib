@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,12 +21,14 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import javax.annotation.concurrent.Immutable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.val;
+
 import net.minecraft.entity.Entity;
+
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A functional equivalent to ChunkPos present in Minecraft 1.12.

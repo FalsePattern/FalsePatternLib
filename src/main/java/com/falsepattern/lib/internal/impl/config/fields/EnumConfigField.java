@@ -57,7 +57,9 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
                                                             .stream()
                                                             .filter((e) -> e.name().equals(defName))
                                                             .findAny()
-                                                            .orElseThrow(() -> new IllegalArgumentException("Default value \"" + defName + "\" was not found in enum " + enumClass.getName())))
+                                                            .orElseThrow(() -> new IllegalArgumentException(
+                                                                    "Default value \"" + defName +
+                                                                    "\" was not found in enum " + enumClass.getName())))
                                .orElseGet(() -> {
                                    FalsePatternLib.getLog()
                                                   .warn("The field " + field.getName() + " in class " +

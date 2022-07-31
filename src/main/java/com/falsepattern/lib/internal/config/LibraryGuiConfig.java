@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -24,9 +24,9 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
 import com.falsepattern.lib.internal.Tags;
 
+import net.minecraft.client.gui.GuiScreen;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 
 @SideOnly(Side.CLIENT)
 public class LibraryGuiConfig extends SimpleGuiConfig {

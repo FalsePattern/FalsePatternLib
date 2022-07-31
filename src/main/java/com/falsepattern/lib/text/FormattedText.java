@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,20 +21,10 @@
 package com.falsepattern.lib.text;
 
 import com.falsepattern.lib.StableAPI;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import java.awt.Color;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;
+
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,6 +37,18 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import java.awt.Color;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Universal escape sequence-based text rendering and chat messages.
@@ -132,10 +134,7 @@ public final class FormattedText {
 
     private final boolean endLine;
 
-    private FormattedText(@NonNull String text,
-                          @NonNull EnumChatFormatting colorStyle,
-                          @NonNull Set<EnumChatFormatting> fancyStyles,
-                          boolean endLine) {
+    private FormattedText(@NonNull String text, @NonNull EnumChatFormatting colorStyle, @NonNull Set<EnumChatFormatting> fancyStyles, boolean endLine) {
         this.text = text;
         this.fancyStyles.addAll(fancyStyles);
         this.colorStyle = colorStyle;

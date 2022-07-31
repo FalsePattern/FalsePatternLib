@@ -118,7 +118,8 @@ public class FloatConfigField extends AConfigField<Float> {
             if (value >= min && value <= max) {
                 return true;
             }
-            ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Float.toString(value), Float.toString(min), Float.toString(max));
+            ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Float.toString(value),
+                                                                     Float.toString(min), Float.toString(max));
             return false;
         } else {
             return true;

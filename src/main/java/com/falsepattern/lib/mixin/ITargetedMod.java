@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -22,6 +22,7 @@ package com.falsepattern.lib.mixin;
 
 import com.falsepattern.lib.StableAPI;
 import com.google.common.io.Files;
+
 import java.nio.file.Path;
 import java.util.function.Predicate;
 

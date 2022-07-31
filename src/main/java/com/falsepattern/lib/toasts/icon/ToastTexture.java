@@ -34,9 +34,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public abstract class ToastTexture {
-    @Getter(onMethod_={@StableAPI(since = "0.10.0")})
+    @Getter(onMethod_ = {@StableAPI(since = "0.10.0")})
     protected final IIcon icon;
-    @Getter(onMethod_={@StableAPI(since = "0.10.0")})
+    @Getter(onMethod_ = {@StableAPI(since = "0.10.0")})
     protected final ResourceLocation texture;
 
     @StableAPI(since = "0.10.0")

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -20,8 +20,8 @@
  */
 package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.util.ReflectionUtil;
 import com.falsepattern.lib.mapping.storage.MappedString;
+import com.falsepattern.lib.util.ReflectionUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

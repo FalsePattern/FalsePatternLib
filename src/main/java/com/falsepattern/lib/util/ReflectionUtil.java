@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -28,6 +28,7 @@ import java.lang.reflect.Modifier;
 
 public class ReflectionUtil {
     private static final Field f_modifiers;
+
     static {
         try {
             f_modifiers = Field.class.getDeclaredField("modifiers");

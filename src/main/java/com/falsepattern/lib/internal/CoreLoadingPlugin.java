@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -27,6 +27,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+
 import java.util.Map;
 
 /**
@@ -39,6 +40,16 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
 
+    static {
+        try {
+            Class.forName("thermos.Thermos");
+            throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
+        } catch (ClassNotFoundException ignored) {
+        }
+
+    }
+
+    @SuppressWarnings("SameParameterValue")
     private static Error skillIssue(String message) {
         int width = message.length();
         String shutup = "Any bug reports concerning this message will be silently deleted.";
@@ -86,13 +97,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         val skillIssue = new Error(bld.toString());
         skillIssue.setStackTrace(new StackTraceElement[0]);
         return skillIssue;
-    }
-    static {
-        try {
-            Class.forName("thermos.Thermos");
-            throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
-        } catch (ClassNotFoundException ignored) {}
-
     }
 
     @Override

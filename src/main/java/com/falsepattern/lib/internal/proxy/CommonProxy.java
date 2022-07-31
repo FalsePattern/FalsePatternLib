@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -24,7 +24,6 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.config.LibraryConfig;
-import com.falsepattern.lib.internal.config.ToastConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
 import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
@@ -34,13 +33,12 @@ import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequestHandler;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
+import lombok.val;
 
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
-
-import lombok.val;
 
 import java.util.Collections;
 import java.util.List;

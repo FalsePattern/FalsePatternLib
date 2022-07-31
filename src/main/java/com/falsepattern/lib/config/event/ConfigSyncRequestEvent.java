@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -36,11 +36,20 @@ import java.util.List;
  * You can use this event to manually trigger a synchronization request. The two different flavors are used on the two
  * different game sides. If you want to trigger this on the server, use {@link #postServer}, and if on the client, use
  * {@link #postClient}
- *
  */
 @StableAPI(since = "0.10.0")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfigSyncRequestEvent extends Event {
+    @StableAPI(since = "0.10.0")
+    public static void postClient() {
+        FMLCommonHandler.instance().bus().post(new Client());
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static void postServer(List<EntityPlayerMP> players) {
+        FMLCommonHandler.instance().bus().post(new Server(new ArrayList<>(players)));
+    }
+
     @StableAPI(since = "0.10.0")
     public static class Client extends ConfigSyncRequestEvent {
 
@@ -54,15 +63,5 @@ public class ConfigSyncRequestEvent extends Event {
         public List<EntityPlayerMP> getPlayers() {
             return Collections.unmodifiableList(players);
         }
-    }
-
-    @StableAPI(since = "0.10.0")
-    public static void postClient() {
-        FMLCommonHandler.instance().bus().post(new Client());
-    }
-
-    @StableAPI(since = "0.10.0")
-    public static void postServer(List<EntityPlayerMP> players) {
-        FMLCommonHandler.instance().bus().post(new Server(new ArrayList<>(players)));
     }
 }

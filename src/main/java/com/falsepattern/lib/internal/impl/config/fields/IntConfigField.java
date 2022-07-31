@@ -112,7 +112,8 @@ public class IntConfigField extends AConfigField<Integer> {
         if (value >= min && value <= max) {
             return true;
         }
-        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Integer.toString(value), Integer.toString(min), Integer.toString(max));
+        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Integer.toString(value),
+                                                                 Integer.toString(min), Integer.toString(max));
         return false;
     }
 

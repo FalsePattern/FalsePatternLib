@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -23,20 +23,22 @@ package com.falsepattern.lib.compat;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.MathUtil;
 import com.google.common.collect.AbstractIterator;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.concurrent.Immutable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.val;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import javax.annotation.concurrent.Immutable;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.minecraft.util.EnumFacing.DOWN;
 import static net.minecraft.util.EnumFacing.EAST;
@@ -105,12 +107,9 @@ public class BlockPos extends Vec3i {
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
     public static Iterable<BlockPos> getAllInBox(@NonNull BlockPos from, @NonNull BlockPos to) {
-        return getAllInBox(Math.min(from.getX(), to.getX()),
-                           Math.min(from.getY(), to.getY()),
-                           Math.min(from.getZ(), to.getZ()),
-                           Math.max(from.getX(), to.getX()),
-                           Math.max(from.getY(), to.getY()),
-                           Math.max(from.getZ(), to.getZ()));
+        return getAllInBox(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
+                           Math.min(from.getZ(), to.getZ()), Math.max(from.getX(), to.getX()),
+                           Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
     }
 
     /**
@@ -130,12 +129,7 @@ public class BlockPos extends Vec3i {
      * @see #getAllInBox(BlockPos, BlockPos)
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
-    public static Iterable<BlockPos> getAllInBox(final int x0,
-                                                 final int y0,
-                                                 final int z0,
-                                                 final int x1,
-                                                 final int y1,
-                                                 final int z1) {
+    public static Iterable<BlockPos> getAllInBox(final int x0, final int y0, final int z0, final int x1, final int y1, final int z1) {
         return () -> new AbstractIterator<BlockPos>() {
             private boolean first = true;
             private int lastX;
@@ -186,12 +180,9 @@ public class BlockPos extends Vec3i {
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
     public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(@NonNull BlockPos from, @NonNull BlockPos to) {
-        return getAllInBoxMutable(Math.min(from.getX(), to.getX()),
-                                  Math.min(from.getY(), to.getY()),
-                                  Math.min(from.getZ(), to.getZ()),
-                                  Math.max(from.getX(), to.getX()),
-                                  Math.max(from.getY(), to.getY()),
-                                  Math.max(from.getZ(), to.getZ()));
+        return getAllInBoxMutable(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
+                                  Math.min(from.getZ(), to.getZ()), Math.max(from.getX(), to.getX()),
+                                  Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
     }
 
     /**
@@ -214,12 +205,7 @@ public class BlockPos extends Vec3i {
      * @see #getAllInBox(int, int, int, int, int, int)
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
-    public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(final int x0,
-                                                                        final int y0,
-                                                                        final int z0,
-                                                                        final int x1,
-                                                                        final int y1,
-                                                                        final int z1) {
+    public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(final int x0, final int y0, final int z0, final int x1, final int y1, final int z1) {
         return () -> new AbstractIterator<MutableBlockPos>() {
             private MutableBlockPos pos;
 
@@ -297,8 +283,7 @@ public class BlockPos extends Vec3i {
         if (blocks == 0) {
             return this;
         }
-        return new BlockPos(x + facing.getFrontOffsetX() * blocks,
-                            y + facing.getFrontOffsetY() * blocks,
+        return new BlockPos(x + facing.getFrontOffsetX() * blocks, y + facing.getFrontOffsetY() * blocks,
                             z + facing.getFrontOffsetZ() * blocks);
     }
 
@@ -362,8 +347,7 @@ public class BlockPos extends Vec3i {
 
     @Override
     public BlockPos crossProduct(@NonNull Vec3i vec) {
-        return new BlockPos(y * vec.getZ() - z * vec.getY(),
-                            z * vec.getX() - x * vec.getZ(),
+        return new BlockPos(y * vec.getZ() - z * vec.getY(), z * vec.getX() - x * vec.getZ(),
                             x * vec.getY() - y * vec.getX());
     }
 
@@ -451,8 +435,7 @@ public class BlockPos extends Vec3i {
         }
 
         public BlockPos.MutableBlockPos move(@NonNull EnumFacing facing, int blocks) {
-            return this.setPos(x + facing.getFrontOffsetX() * blocks,
-                               y + facing.getFrontOffsetY() * blocks,
+            return this.setPos(x + facing.getFrontOffsetX() * blocks, y + facing.getFrontOffsetY() * blocks,
                                z + facing.getFrontOffsetZ() * blocks);
         }
     }

@@ -51,9 +51,9 @@ public class SimpleToast implements IToast {
     private float currentProgress;
 
     @StableAPI(since = "0.10.0")
-    public SimpleToast(@NonNull ToastBG background, @Nullable ToastIcon icon,
-                       IChatComponent titleComponent, @Nullable IChatComponent subtitleComponent,
-                       boolean drawProgressBar, long timeout) {
+    public SimpleToast(@NonNull ToastBG background,
+                       @Nullable ToastIcon icon, IChatComponent titleComponent,
+                       @Nullable IChatComponent subtitleComponent, boolean drawProgressBar, long timeout) {
         this.background = background;
         this.icon = icon;
         this.title = titleComponent.getFormattedText();
@@ -83,7 +83,8 @@ public class SimpleToast implements IToast {
         if (hasProgressBar) {
             val bgWidth = background.getIcon().getIconWidth();
             Gui.drawRect(3, bgHeight - 4, bgWidth - 3, bgHeight - 3, 0xFFFFFFFF);
-            float f = (float) MathUtil.clampedLerp(displayedProgress, currentProgress, (float) (delta - lastDelta) / 100.0F);
+            float f = (float) MathUtil.clampedLerp(displayedProgress, currentProgress,
+                                                   (float) (delta - lastDelta) / 100.0F);
             int i;
 
             if (currentProgress >= displayedProgress) {

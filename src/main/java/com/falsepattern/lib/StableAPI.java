@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -43,6 +43,5 @@ public @interface StableAPI {
     /**
      * The version this API was introduced/stabilized in. Used for library version tracking.
      */
-    @StableAPI(since = "0.6.0")
-    String since();
+    @StableAPI(since = "0.6.0") String since();
 }

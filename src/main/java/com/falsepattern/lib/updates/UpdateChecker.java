@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -25,14 +25,15 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.Internet;
-import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.text.FormattedText;
-import cpw.mods.fml.common.Loader;
 import lombok.val;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.IChatComponent;
+import cpw.mods.fml.common.Loader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,7 +68,9 @@ public class UpdateChecker {
      *      ...etc, one json object per mod.
      *  ]
      * }</pre>
+     *
      * @param url The URL to check
+     *
      * @return A list of mods that were both available on the URL and installed
      */
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
@@ -93,7 +96,8 @@ public class UpdateChecker {
                                     .preferredVersion(new SemanticVersion(0, 4, 1))
                                     .build();
                 } catch (Exception e) {
-                    throw new CompletionException(new UpdateCheckException("Failed to load json library for update checker!", e));
+                    throw new CompletionException(
+                            new UpdateCheckException("Failed to load json library for update checker!", e));
                 }
                 jsonLibraryLoaded.set(true);
             }
@@ -102,7 +106,8 @@ public class UpdateChecker {
             try {
                 parsed = JsonNode.parse(Internet.download(URL).thenApply(String::new).join());
             } catch (CompletionException e) {
-                throw new CompletionException(new UpdateCheckException("Failed to download update checker JSON file!", e.getCause() == null ? e : e.getCause()));
+                throw new CompletionException(new UpdateCheckException("Failed to download update checker JSON file!",
+                                                                       e.getCause() == null ? e : e.getCause()));
             }
             List<JsonNode> modList;
             if (parsed.isList()) {
@@ -111,12 +116,20 @@ public class UpdateChecker {
                 modList = Collections.singletonList(parsed);
             }
             val installedMods = Loader.instance().getIndexedModList();
-            for (val node: modList) {
-                if (!node.isObject()) continue;
-                if (!node.containsKey("modid")) continue;
-                if (!node.containsKey("latestVersion")) continue;
+            for (val node : modList) {
+                if (!node.isObject()) {
+                    continue;
+                }
+                if (!node.containsKey("modid")) {
+                    continue;
+                }
+                if (!node.containsKey("latestVersion")) {
+                    continue;
+                }
                 val modid = node.getString("modid");
-                if (!installedMods.containsKey(modid)) continue;
+                if (!installedMods.containsKey(modid)) {
+                    continue;
+                }
                 val mod = installedMods.get(modid);
                 val latestVersionsNode = node.get("latestVersion");
                 List<String> latestVersions;
@@ -124,16 +137,22 @@ public class UpdateChecker {
                     latestVersions = Collections.singletonList(latestVersionsNode.stringValue());
                 } else if (latestVersionsNode.isList()) {
                     latestVersions = new ArrayList<>();
-                    for (val version: latestVersionsNode.getJavaList()) {
-                        if (!version.isString()) continue;
+                    for (val version : latestVersionsNode.getJavaList()) {
+                        if (!version.isString()) {
+                            continue;
+                        }
                         latestVersions.add(version.stringValue());
                     }
                 } else {
                     continue;
                 }
                 val currentVersion = mod.getVersion();
-                if (latestVersions.contains(currentVersion)) continue;
-                val updateURL = node.containsKey("updateURL") && node.get("updateURL").isString() ? node.getString("updateURL") : "";
+                if (latestVersions.contains(currentVersion)) {
+                    continue;
+                }
+                val updateURL =
+                        node.containsKey("updateURL") && node.get("updateURL").isString() ? node.getString("updateURL")
+                                                                                          : "";
                 result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
             }
             return result;
@@ -142,8 +161,11 @@ public class UpdateChecker {
 
     /**
      * Same this as {@link #fetchUpdatesAsync(String)}, but returns the result in a blocking fashion.
+     *
      * @param url The URL to check
+     *
      * @return A future that will contain the update info about mods that were both available on the URL and installed
+     *
      * @throws UpdateCheckException If the update checker is disabled in config, the URL is invalid, or
      */
     public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
@@ -162,20 +184,29 @@ public class UpdateChecker {
 
     /**
      * Formats the raw list of updates into lines of chat messages you can send to players.
+     *
      * @param initiator Who/what/which mod did this update check
-     * @param updates The list of updates to convert
+     * @param updates   The list of updates to convert
+     *
      * @return A list of chat messages that can be sent to players
      */
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
-        if (updates == null || updates.size() == 0)
+        if (updates == null || updates.size() == 0) {
             return null;
-        val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable", initiator)).toChatText());
+        }
+        val updateText = new ArrayList<IChatComponent>(
+                FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable", initiator)).toChatText());
         val mods = Loader.instance().getIndexedModList();
         for (val update : updates) {
             val mod = mods.get(update.modID);
-            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
-            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion)).toChatText());
-            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion)).toChatText());
+            updateText.addAll(
+                    FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
+            updateText.addAll(
+                    FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion))
+                                 .toChatText());
+            updateText.addAll(
+                    FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion))
+                                 .toChatText());
             if (!update.updateURL.isEmpty()) {
                 val pre = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpre")).toChatText();
                 val link = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurl")).toChatText();

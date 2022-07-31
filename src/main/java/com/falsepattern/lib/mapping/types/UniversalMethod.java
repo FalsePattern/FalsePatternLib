@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -20,8 +20,8 @@
  */
 package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.util.ReflectionUtil;
 import com.falsepattern.lib.mapping.storage.MappedString;
+import com.falsepattern.lib.util.ReflectionUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -61,30 +61,12 @@ public class UniversalMethod {
         parent.addMethod(this);
     }
 
-    public String getName(MappingType mappingType) {
-        return name.get(mappingType);
-    }
-
-    public String getDescriptor(MappingType mappingType) {
-        return descriptor.get(mappingType);
-    }
-
-    public Method asJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
-        if (javaMethodCache != null) {
-            return javaMethodCache;
-        }
-        val parentClass = parent.asJavaClass();
-        javaMethodCache = parentClass.getDeclaredMethod(getName(parent.realClassMapping()), decodeMethodDescriptor(getDescriptor(parent.realClassMapping())));
-        ReflectionUtil.jailBreak(javaMethodCache);
-        return javaMethodCache;
-    }
-
     private static Class<?>[] decodeMethodDescriptor(String desc) throws ClassNotFoundException {
         val result = new ArrayList<Class<?>>();
         val buf = new StringBuilder();
         boolean readingReference = false;
         int arrayDimensions = 0;
-        for (val c: desc.toCharArray()) {
+        for (val c : desc.toCharArray()) {
             Class<?> parsedClass = null;
             if (readingReference) {
                 if (c == ';') {
@@ -95,9 +77,12 @@ public class UniversalMethod {
                     buf.append(c);
                     continue;
                 }
-            } else if (c == '(') continue;
-            else if (c == ')') break;
-            else switch (c) {
+            } else if (c == '(') {
+                continue;
+            } else if (c == ')') {
+                break;
+            } else {
+                switch (c) {
                     case 'B':
                         parsedClass = byte.class;
                         break;
@@ -128,6 +113,7 @@ public class UniversalMethod {
                     case '[':
                         arrayDimensions++;
                         continue;
+                }
             }
             for (int i = 0; i < arrayDimensions; i++) {
                 parsedClass = Array.newInstance(parsedClass, 0).getClass();
@@ -138,15 +124,36 @@ public class UniversalMethod {
         return result.toArray(new Class[0]);
     }
 
+    public String getName(MappingType mappingType) {
+        return name.get(mappingType);
+    }
+
+    public String getDescriptor(MappingType mappingType) {
+        return descriptor.get(mappingType);
+    }
+
+    public Method asJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
+        if (javaMethodCache != null) {
+            return javaMethodCache;
+        }
+        val parentClass = parent.asJavaClass();
+        javaMethodCache = parentClass.getDeclaredMethod(getName(parent.realClassMapping()), decodeMethodDescriptor(
+                getDescriptor(parent.realClassMapping())));
+        ReflectionUtil.jailBreak(javaMethodCache);
+        return javaMethodCache;
+    }
+
     /**
      * This is only here for completeness' sake, given that MethodInsnNode itself also has a deprecated yet functional constructor.
      */
     @Deprecated
     public MethodInsnNode asInstruction(int opcode, MappingType mapping) {
-        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping), getDescriptor(mapping));
+        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
+                                  getDescriptor(mapping));
     }
 
     public MethodInsnNode asInstruction(int opcode, MappingType mapping, boolean itf) {
-        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping), getDescriptor(mapping), itf);
+        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
+                                  getDescriptor(mapping), itf);
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -20,15 +20,17 @@
  */
 package com.falsepattern.lib.mixin;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModClassLoader;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModClassLoader;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
 
 /**
  * Backport from spongemixins 1.3 for compat with the curseforge 1.2.0 version.
@@ -47,16 +49,15 @@ public final class MinecraftURLClassPath {
 
     static {
         boolean grimoire = false;
-        String[] knownGrimoireClassNames = new String[]{
-                "io.github.crucible.grimoire.Grimoire",
-                "io.github.crucible.grimoire.common.GrimoireCore"
-        };
-        for (val className: knownGrimoireClassNames) {
+        String[] knownGrimoireClassNames =
+                new String[]{"io.github.crucible.grimoire.Grimoire", "io.github.crucible.grimoire.common.GrimoireCore"};
+        for (val className : knownGrimoireClassNames) {
             try {
                 Class.forName(className, false, MinecraftURLClassPath.class.getClassLoader());
                 grimoire = true;
                 break;
-            } catch (ClassNotFoundException ignored) {}
+            } catch (ClassNotFoundException ignored) {
+            }
         }
         GRIMOIRE = grimoire;
         if (!GRIMOIRE) {
@@ -64,8 +65,8 @@ public final class MinecraftURLClassPath {
                 val modClassLoaderField = Loader.class.getDeclaredField("modClassLoader");
                 modClassLoaderField.setAccessible(true);
 
-                val loaderinstanceField = Loader.class.getDeclaredField("instance");
-                loaderinstanceField.setAccessible(true);
+                val loaderInstanceField = Loader.class.getDeclaredField("instance");
+                loaderInstanceField.setAccessible(true);
 
                 val mainClassLoaderField = ModClassLoader.class.getDeclaredField("mainClassLoader");
                 mainClassLoaderField.setAccessible(true);
@@ -73,7 +74,7 @@ public final class MinecraftURLClassPath {
                 val ucpField = LaunchClassLoader.class.getSuperclass().getDeclaredField("ucp");
                 ucpField.setAccessible(true);
 
-                Object loader = loaderinstanceField.get(null);
+                Object loader = loaderInstanceField.get(null);
                 val modClassLoader = (ModClassLoader) modClassLoaderField.get(loader);
                 val mainClassLoader = (LaunchClassLoader) mainClassLoaderField.get(modClassLoader);
                 ucp = ucpField.get(mainClassLoader);

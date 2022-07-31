@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,19 +21,21 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.StableAPI;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.NonNull;
 import lombok.val;
 import lombok.var;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
-import org.lwjgl.opengl.GL11;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A functional equivalent to GuiLabel present in Minecraft 1.12.

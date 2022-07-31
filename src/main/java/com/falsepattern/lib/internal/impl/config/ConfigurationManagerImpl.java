@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -73,7 +73,7 @@ import java.util.function.BiConsumer;
 /**
  * The actual implementation of ConfigurationManager. Migrated stuff here so that we don't unnecessarily expose
  * internal-use functionality.
- *
+ * <p>
  * Do not read if you value your sanity.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -116,7 +116,8 @@ public class ConfigurationManagerImpl {
         parsedConfigMap.get(configClass).save();
     }
 
-    public static boolean validateFields(BiConsumer<Class<?>, Field> invalidFieldHandler, Class<?> configClass, boolean resetInvalid) throws ConfigException {
+    public static boolean validateFields(BiConsumer<Class<?>, Field> invalidFieldHandler, Class<?> configClass, boolean resetInvalid)
+            throws ConfigException {
         if (!parsedConfigMap.containsKey(configClass)) {
             throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
         }
@@ -133,13 +134,13 @@ public class ConfigurationManagerImpl {
 
     public static void sendRequest(DataOutput output) throws IOException {
         val synced = new ArrayList<Class<?>>();
-        for (val entry: parsedConfigMap.entrySet()) {
+        for (val entry : parsedConfigMap.entrySet()) {
             if (entry.getValue().sync) {
                 synced.add(entry.getKey());
             }
         }
         output.writeInt(synced.size());
-        for (val clazz: synced) {
+        for (val clazz : synced) {
             output.writeUTF(clazz.getName());
         }
     }
@@ -151,7 +152,7 @@ public class ConfigurationManagerImpl {
         for (int i = 0; i < count; i++) {
             classNames.add(input.readUTF());
         }
-        for (val entry: parsedConfigMap.keySet()) {
+        for (val entry : parsedConfigMap.keySet()) {
             if (classNames.contains(entry.getName())) {
                 result.add(entry);
             }
@@ -161,13 +162,13 @@ public class ConfigurationManagerImpl {
 
     public static void sendReply(DataOutput output, List<Class<?>> requestedClasses) throws IOException {
         val syncEntries = new HashMap<>(parsedConfigMap);
-        for (val entry: parsedConfigMap.entrySet()) {
+        for (val entry : parsedConfigMap.entrySet()) {
             if (!entry.getValue().sync || !requestedClasses.contains(entry.getKey())) {
                 syncEntries.remove(entry.getKey());
             }
         }
         output.writeInt(syncEntries.size());
-        for (val entry: syncEntries.entrySet()) {
+        for (val entry : syncEntries.entrySet()) {
             output.writeUTF(entry.getKey().getName());
             val b = new ByteArrayOutputStream();
             val bo = new DataOutputStream(b);
@@ -187,7 +188,8 @@ public class ConfigurationManagerImpl {
         for (int i = 0; i < count; i++) {
             String className = input.readUTF();
             int dataSize = input.readInt();
-            val opt = parsedConfigMap.keySet().stream().filter((clazz) -> clazz.getName().equals(className)).findFirst();
+            val opt =
+                    parsedConfigMap.keySet().stream().filter((clazz) -> clazz.getName().equals(className)).findFirst();
             if (!opt.isPresent()) {
                 input.skipBytes(dataSize);
                 FalsePatternLib.getLog().warn("Server tried to sync config not registered on our side: " + className);
@@ -197,7 +199,9 @@ public class ConfigurationManagerImpl {
             val config = parsedConfigMap.get(clazz);
             if (!config.sync) {
                 input.skipBytes(dataSize);
-                FalsePatternLib.getLog().warn("Server tried to sync config without @Synchronize annotation on our side: " + className);
+                FalsePatternLib.getLog()
+                               .warn("Server tried to sync config without @Synchronize annotation on our side: " +
+                                     className);
                 continue;
             }
             if (!ConfigSyncEvent.postStart(clazz)) {
@@ -223,11 +227,11 @@ public class ConfigurationManagerImpl {
 
     public static void loadRawConfig(Configuration rawConfig) throws ConfigException {
         rawConfig.load();
-        for (val configClass: configToClassMap.get(rawConfig)) {
+        for (val configClass : configToClassMap.get(rawConfig)) {
             val config = parsedConfigMap.get(configClass);
             try {
                 config.reloadFields();
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (IllegalAccessException e) {
                 throw new ConfigException(e);
             }
         }
@@ -296,7 +300,7 @@ public class ConfigurationManagerImpl {
             return;
         }
         val configClasses = configToClassMap.get(rawConfig);
-        for (val clazz: configClasses) {
+        for (val clazz : configClasses) {
             val config = parsedConfigMap.get(clazz);
             config.configChanged();
         }
@@ -323,12 +327,16 @@ public class ConfigurationManagerImpl {
         val cfg = e.configClass.getAnnotation(Config.class);
         if (e.successful) {
             GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
-                                         FormattedText.parse(EnumChatFormatting.GREEN + "Synced config").toChatText().get(0),
+                                         FormattedText.parse(EnumChatFormatting.GREEN + "Synced config")
+                                                      .toChatText()
+                                                      .get(0),
                                          FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
                                          false, 5000));
         } else {
             GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
-                                         FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config").toChatText().get(0),
+                                         FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config")
+                                                      .toChatText()
+                                                      .get(0),
                                          FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
                                          false, 5000));
         }

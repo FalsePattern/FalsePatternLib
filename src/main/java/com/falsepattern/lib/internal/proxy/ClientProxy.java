@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -25,10 +25,6 @@ import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.config.ToastConfig;
-import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
-import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
-import com.falsepattern.lib.internal.impl.config.net.SyncReply;
-import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
@@ -83,11 +79,12 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onSinglePlayer(EntityJoinWorldEvent e) {
-        if (chatFuture == null ||
-            !(e.entity instanceof EntityPlayerSP)) return;
+        if (chatFuture == null || !(e.entity instanceof EntityPlayerSP)) {
+            return;
+        }
         val player = (EntityPlayerSP) e.entity;
         try {
-            for (val line: chatFuture.get()) {
+            for (val line : chatFuture.get()) {
                 player.addChatMessage(line);
             }
             chatFuture = null;

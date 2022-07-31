@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -38,7 +38,6 @@ import lombok.val;
 
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
-
 import cpw.mods.fml.client.config.IConfigElement;
 
 import java.io.DataInput;
@@ -57,15 +56,6 @@ import java.util.function.BiConsumer;
 public class ParsedConfiguration {
     private static final Field propField;
 
-    public final Class<?> configClass;
-    public final String modid;
-    public final String category;
-    public final Configuration rawConfig;
-    public final boolean sync;
-    private final Map<String, AConfigField<?>> fields = new HashMap<>();
-    private final Map<String, ConfigElement<?>> elements = new HashMap<>();
-    private int maxFieldNameLength;
-
     static {
         try {
             propField = ConfigElement.class.getDeclaredField("prop");
@@ -74,6 +64,15 @@ public class ParsedConfiguration {
         }
         ReflectionUtil.jailBreak(propField);
     }
+
+    public final Class<?> configClass;
+    public final String modid;
+    public final String category;
+    public final Configuration rawConfig;
+    public final boolean sync;
+    private final Map<String, AConfigField<?>> fields = new HashMap<>();
+    private final Map<String, ConfigElement<?>> elements = new HashMap<>();
+    private int maxFieldNameLength;
 
     public static ParsedConfiguration parseConfig(Class<?> configClass) throws ConfigException {
         val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
@@ -84,10 +83,11 @@ public class ParsedConfiguration {
                                .orElseThrow(() -> new ConfigException(
                                        "Config class " + configClass.getName() + " has an empty category!"));
         val rawConfig = ConfigurationManagerImpl.getForgeConfig(cfg.modid());
-        val parsedConfig = new ParsedConfiguration(configClass, cfg.modid(), category, rawConfig, configClass.isAnnotationPresent(Config.Synchronize.class));
+        val parsedConfig = new ParsedConfiguration(configClass, cfg.modid(), category, rawConfig,
+                                                   configClass.isAnnotationPresent(Config.Synchronize.class));
         try {
             parsedConfig.reloadFields();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new ConfigException(e);
         }
         return parsedConfig;
@@ -102,7 +102,7 @@ public class ParsedConfiguration {
 
     //Happens when changed through the gui
     public void configChanged() {
-        for (val field: fields.values()) {
+        for (val field : fields.values()) {
             field.load();
         }
         rawConfig.save();
@@ -110,7 +110,7 @@ public class ParsedConfiguration {
 
     public void load() throws ConfigException {
         ConfigurationManagerImpl.loadRawConfig(rawConfig);
-        for (val field: fields.values()) {
+        for (val field : fields.values()) {
             field.load();
         }
     }
@@ -118,15 +118,17 @@ public class ParsedConfiguration {
     public void receive(DataInput input) throws IOException {
         if (sync) {
             val syncFields = new HashMap<>(fields);
-            for (val key: fields.keySet()) {
+            for (val key : fields.keySet()) {
                 if (syncFields.get(key).noSync) {
                     syncFields.remove(key);
                 }
             }
             while (syncFields.size() > 0) {
-                val fieldName = StringConfigField.receiveString(input, maxFieldNameLength, "field name", configClass.getName());
+                val fieldName =
+                        StringConfigField.receiveString(input, maxFieldNameLength, "field name", configClass.getName());
                 if (!syncFields.containsKey(fieldName)) {
-                    throw new IOException("Invalid sync field name received: " + fieldName + " for config class " + configClass.getName());
+                    throw new IOException("Invalid sync field name received: " + fieldName + " for config class " +
+                                          configClass.getName());
                 }
                 syncFields.remove(fieldName).receive(input);
             }
@@ -136,19 +138,19 @@ public class ParsedConfiguration {
     public void transmit(DataOutput output) throws IOException {
         if (sync) {
             val syncFields = new HashMap<>(fields);
-            for (val key: fields.keySet()) {
+            for (val key : fields.keySet()) {
                 if (syncFields.get(key).noSync) {
                     syncFields.remove(key);
                 }
             }
-            for (val field: syncFields.entrySet()) {
+            for (val field : syncFields.entrySet()) {
                 StringConfigField.transmitString(output, field.getKey());
                 field.getValue().transmit(output);
             }
         }
     }
 
-    public void reloadFields() throws ConfigException, NoSuchFieldException, IllegalAccessException {
+    public void reloadFields() throws ConfigException, IllegalAccessException {
         fields.clear();
         maxFieldNameLength = 0;
         val cat = rawConfig.getCategory(category);
@@ -209,7 +211,7 @@ public class ParsedConfiguration {
 
     public boolean validate(BiConsumer<Class<?>, Field> invalidFieldHandler, boolean resetInvalid) {
         boolean valid = true;
-        for (val field: fields.values()) {
+        for (val field : fields.values()) {
             if (!field.validateField()) {
                 if (resetInvalid) {
                     field.setToDefault();

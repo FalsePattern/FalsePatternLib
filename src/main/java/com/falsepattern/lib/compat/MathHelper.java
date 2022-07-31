@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -169,7 +169,7 @@ public class MathHelper {
     }
 
     /**
-     * Buckets an integer with specifed bucket sizes.  Args: i, bucketSize
+     * Buckets an integer with specified bucket sizes.  Args: i, bucketSize
      */
     public static int bucketInt(int i, int bucketSize) {
         return i < 0 ? -((-i - 1) / bucketSize) - 1 : i / bucketSize;
@@ -196,11 +196,8 @@ public class MathHelper {
 
     public static double average(long[] values) {
         long i = 0L;
-        long[] along1 = values;
-        int j = values.length;
 
-        for (int k = 0; k < j; ++k) {
-            long l = along1[k];
+        for (long l : values) {
             i += l;
         }
 
@@ -245,25 +242,23 @@ public class MathHelper {
      * parses the string as integer or returns the second parameter if it fails
      */
     public static int parseIntWithDefault(String str, int def) {
-        int j = def;
-
         try {
-            j = Integer.parseInt(str);
+            return Integer.parseInt(str);
         } catch (Throwable throwable) {
+            return def;
         }
-
-        return j;
     }
 
     /**
      * parses the string as integer or returns the second parameter if it fails. this value is capped to par2
      */
     public static int parseIntWithDefaultAndMax(String str, int def, int min) {
-        int k = def;
+        int k;
 
         try {
             k = Integer.parseInt(str);
         } catch (Throwable throwable) {
+            k = def;
         }
 
         if (k < min) {
@@ -288,11 +283,12 @@ public class MathHelper {
     }
 
     public static double parseDoubleWithDefaultAndMin(String str, double def, double min) {
-        double d2 = def;
+        double d2;
 
         try {
             d2 = Double.parseDouble(str);
         } catch (Throwable throwable) {
+            d2 = def;
         }
 
         if (d2 < min) {
@@ -337,7 +333,7 @@ public class MathHelper {
      * highest bit that is set.  For example, if the number in binary is 0...100101, this will return 5.
      */
     public static int calculateLogBaseTwo(int a) {
-        /**
+        /*
          * Uses a B(2, 5) De Bruijn sequence and a lookup table to efficiently calculate the log-base-two of the given
          * value.  Optimized for cases where the input value is a power-of-two.  If the input value is not a power-of-
          * two, then subtract 1 from the return value.

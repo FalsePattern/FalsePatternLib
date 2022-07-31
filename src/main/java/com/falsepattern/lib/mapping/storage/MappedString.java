@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -40,16 +40,17 @@ public class MappedString {
     public final String notch;
     public final String srg;
     public final String mcp;
+
     public MappedString(String[] source, int offset, int stride, Function<String, String> remapper, Map<String, String> stringPool) {
-        notch = stringPool.computeIfAbsent(remapper.apply(source[offset             ]), (str) -> str);
-        srg   = stringPool.computeIfAbsent(remapper.apply(source[offset + stride    ]), (str) -> str);
-        mcp   = stringPool.computeIfAbsent(remapper.apply(source[offset + stride * 2]), (str) -> str);
+        notch = stringPool.computeIfAbsent(remapper.apply(source[offset]), (str) -> str);
+        srg = stringPool.computeIfAbsent(remapper.apply(source[offset + stride]), (str) -> str);
+        mcp = stringPool.computeIfAbsent(remapper.apply(source[offset + stride * 2]), (str) -> str);
     }
 
     public static MappedString fuse(MappedString a, MappedString b, String delimiter, Map<String, String> stringPool) {
         return new MappedString(stringPool.computeIfAbsent(a.notch + delimiter + b.notch, (str) -> str),
-                                stringPool.computeIfAbsent(a.srg   + delimiter + b.srg  , (str) -> str),
-                                stringPool.computeIfAbsent(a.mcp   + delimiter + b.mcp  , (str) -> str));
+                                stringPool.computeIfAbsent(a.srg + delimiter + b.srg, (str) -> str),
+                                stringPool.computeIfAbsent(a.mcp + delimiter + b.mcp, (str) -> str));
     }
 
     public String get(MappingType type) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -45,6 +45,8 @@ public class LibraryConfig {
     public static ValidationLogging CONFIG_ERROR_LOUDNESS;
 
     public enum ValidationLogging {
-        None, Log, LogAndToast
+        None,
+        Log,
+        LogAndToast
     }
 }

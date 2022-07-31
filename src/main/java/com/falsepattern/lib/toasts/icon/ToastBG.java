@@ -36,17 +36,24 @@ import cpw.mods.fml.relauncher.SideOnly;
 @StableAPI(since = "0.10.0")
 public class ToastBG extends ToastTexture {
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_DARK = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark.png"), 160, 32, 0xFFFFFFFF);
+    public static final ToastBG TOAST_DARK =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark.png"), 160, 32, 0xFFFFFFFF);
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_DARK_ROUNDED = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark_rounded.png"), 160, 32, 0xFFFFFFFF);
+    public static final ToastBG TOAST_DARK_ROUNDED =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark_rounded.png"), 160, 32, 0xFFFFFFFF);
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_NARRATOR = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator.png"), 160, 32, 0xFFAAAA00);
+    public static final ToastBG TOAST_NARRATOR =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator.png"), 160, 32, 0xFFAAAA00);
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_NARRATOR_ROUNDED = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator_rounded.png"), 160, 32, 0xFFAAAA00);
+    public static final ToastBG TOAST_NARRATOR_ROUNDED =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator_rounded.png"), 160, 32,
+                        0xFFAAAA00);
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_WHITE = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white.png"), 160, 32, 0xFF500050);
+    public static final ToastBG TOAST_WHITE =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white.png"), 160, 32, 0xFF500050);
     @StableAPI(since = "0.10.0")
-    public static final ToastBG TOAST_WHITE_ROUNDED = new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white_rounded.png"), 160, 32, 0xFF500050);
+    public static final ToastBG TOAST_WHITE_ROUNDED =
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white_rounded.png"), 160, 32, 0xFF500050);
 
     @StableAPI(since = "0.10.0")
     public final int defaultTextColor;

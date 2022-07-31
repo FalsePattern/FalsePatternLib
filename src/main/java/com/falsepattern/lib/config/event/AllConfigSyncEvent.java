@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -32,7 +32,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * This event is pushed on the FMLCommonHandler event bus once all the config synchronizations have finished.
- *
+ * <p>
  * This is a client-only event, and is never triggered serverside!
  */
 @SideOnly(Side.CLIENT)

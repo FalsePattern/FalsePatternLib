@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,6 +21,7 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+
 import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -34,14 +34,7 @@ public class DependencyLoader {
     }
 
     @Builder
-    public static void loadLibrary(@NonNull String loadingModId,
-                                   @NonNull String groupId,
-                                   @NonNull String artifactId,
-                                   @NonNull Version minVersion,
-                                   Version maxVersion,
-                                   @NonNull Version preferredVersion,
-                                   String regularSuffix,
-                                   String devSuffix) {
+    public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
         DependencyLoaderImpl.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
                                          regularSuffix, devSuffix);
     }

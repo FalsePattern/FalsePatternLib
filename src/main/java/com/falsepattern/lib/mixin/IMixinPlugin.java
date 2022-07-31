@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,6 +21,16 @@
 package com.falsepattern.lib.mixin;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.util.FileUtil;
+import lombok.val;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.lib.tree.ClassNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+
+import net.minecraft.launchwrapper.Launch;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,15 +41,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.falsepattern.lib.util.FileUtil;
-import lombok.val;
-import net.minecraft.launchwrapper.Launch;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.lib.tree.ClassNode;
-import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
 import static java.nio.file.Files.walk;
 
 @StableAPI(since = "0.8.0")
@@ -48,6 +49,15 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
 
     static Logger createLogger(String modName) {
         return LogManager.getLogger(modName + " Mixin Loader");
+    }
+
+    static File findJarOf(final ITargetedMod mod) {
+        try (val stream = walk(MODS_DIRECTORY_PATH)) {
+            return stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -123,15 +133,6 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     Logger getLogger();
 
     IMixin[] getMixinEnumValues();
-
-    static File findJarOf(final ITargetedMod mod) {
-        try (val stream = walk(MODS_DIRECTORY_PATH)) {
-            return stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     @Override
     default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {

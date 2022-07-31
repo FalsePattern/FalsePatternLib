@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -49,17 +49,18 @@ public class ConfigurationManager {
     }
 
     @StableAPI(since = "0.10.0")
-    public static void initialize(BiConsumer<Class<?>, Field> validatorErrorCallback, Class<?>... configClasses) throws ConfigException {
-        for (val clazz: configClasses) {
+    public static void initialize(BiConsumer<Class<?>, Field> validatorErrorCallback, Class<?>... configClasses)
+            throws ConfigException {
+        for (val clazz : configClasses) {
             ConfigurationManagerImpl.register(clazz);
             ConfigurationManagerImpl.load(clazz);
             ConfigurationManagerImpl.validateFields(validatorErrorCallback, clazz, true);
             ConfigurationManagerImpl.save(clazz);
         }
     }
+
     @StableAPI(since = "0.10.0")
-    public static boolean validate(boolean resetInvalid, Class<?>... configClasses)
-            throws ConfigException {
+    public static boolean validate(boolean resetInvalid, Class<?>... configClasses) throws ConfigException {
         return validate((x, y) -> {}, resetInvalid, configClasses);
     }
 
@@ -67,7 +68,7 @@ public class ConfigurationManager {
     public static boolean validate(BiConsumer<Class<?>, Field> validatorErrorCallback, boolean resetInvalid, Class<?>... configClasses)
             throws ConfigException {
         boolean valid = true;
-        for (val clazz: configClasses) {
+        for (val clazz : configClasses) {
             valid &= ConfigurationManagerImpl.validateFields(validatorErrorCallback, clazz, resetInvalid);
         }
         return valid;
@@ -75,14 +76,14 @@ public class ConfigurationManager {
 
     @StableAPI(since = "0.10.0")
     public static void loadFromFile(Class<?>... configClasses) throws ConfigException {
-        for (val clazz: configClasses) {
+        for (val clazz : configClasses) {
             ConfigurationManagerImpl.load(clazz);
         }
     }
 
     @StableAPI(since = "0.10.0")
     public static void saveToFile(boolean validateAndResetInvalid, Class<?>... configClasses) throws ConfigException {
-        for (val clazz: configClasses) {
+        for (val clazz : configClasses) {
             if (validateAndResetInvalid) {
                 ConfigurationManagerImpl.validateFields((a, b) -> {}, clazz, true);
             }
@@ -99,7 +100,9 @@ public class ConfigurationManager {
     @DeprecationDetails(stableSince = "0.6.0",
                         deprecatedSince = "0.10.0")
     public static void registerConfig(Class<?> configClass) throws ConfigException {
-        FalsePatternLib.getLog().warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.", new Exception());
+        FalsePatternLib.getLog()
+                       .warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.",
+                             new Exception());
         ConfigurationManagerImpl.registerLoadSaveConfig(configClass);
     }
 
@@ -127,11 +130,13 @@ public class ConfigurationManager {
     @StableAPI(since = "0.10.0")
     public static List<IConfigElement> getConfigElementsMulti(Class<?>... configClasses) throws ConfigException {
         switch (configClasses.length) {
-            case 0: return Collections.emptyList();
-            case 1: return getConfigElements(configClasses[0]);
+            case 0:
+                return Collections.emptyList();
+            case 1:
+                return getConfigElements(configClasses[0]);
             default:
                 val result = new ArrayList<IConfigElement>();
-                for (val configClass: configClasses) {
+                for (val configClass : configClasses) {
                     result.addAll(getConfigElements(configClass));
                 }
                 return result;

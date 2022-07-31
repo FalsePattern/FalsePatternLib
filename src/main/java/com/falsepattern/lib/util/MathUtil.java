@@ -207,7 +207,7 @@ public class MathUtil {
     }
 
     /**
-     * Buckets an integer with specifed bucket sizes.
+     * Buckets an integer with specified bucket sizes.
      */
     @StableAPI(since = "0.10.0")
     public static int intFloorDiv(int number, int bucket) {

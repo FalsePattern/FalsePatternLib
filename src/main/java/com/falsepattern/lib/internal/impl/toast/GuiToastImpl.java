@@ -20,7 +20,6 @@
  */
 package com.falsepattern.lib.internal.impl.toast;
 
-import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.config.ToastConfig;
 import com.falsepattern.lib.toasts.IToast;
 import com.falsepattern.lib.util.MathUtil;
@@ -45,10 +44,14 @@ import java.util.Deque;
 
 @SideOnly(Side.CLIENT)
 public class GuiToastImpl extends Gui {
+    private static GuiToastImpl instance;
     private final Minecraft mc;
     private final Deque<IToast> toastsQueue = Queues.newArrayDeque();
     private ToastInstance<?>[] visible = new ToastInstance[0];
-    private static GuiToastImpl instance;
+
+    public GuiToastImpl(Minecraft mcIn) {
+        this.mc = mcIn;
+    }
 
     public static void initialize(Minecraft mc) {
         if (instance != null) {
@@ -64,17 +67,12 @@ public class GuiToastImpl extends Gui {
 
     @SubscribeEvent
     public void updateToasts(TickEvent.RenderTickEvent event) {
-        if ( event.phase != TickEvent.Phase.END) {
+        if (event.phase != TickEvent.Phase.END) {
             return;
         }
         mc.mcProfiler.startSection("toasts");
         drawToast(new ScaledResolution(mc, mc.displayWidth, mc.displayHeight));
         mc.mcProfiler.endSection();
-    }
-
-
-    public GuiToastImpl(Minecraft mcIn) {
-        this.mc = mcIn;
     }
 
     public void drawToast(ScaledResolution resolution) {
@@ -168,9 +166,7 @@ public class GuiToastImpl extends Gui {
             GL11.glPushMatrix();
             val shift = toast.width() * getVisibility(sysTime);
             val X = ToastConfig.leftAlign() ? shift - toast.width() : x - shift;
-            GL11.glTranslatef(X,
-                              (float) (y * 32) + ToastConfig.Y_OFFSET,
-                              (float) (500 + y));
+            GL11.glTranslatef(X, (float) (y * 32) + ToastConfig.Y_OFFSET, (float) (500 + y));
             val visibility = this.toast.draw(GuiToastImpl.this, sysTime - this.visibleTime);
             GL11.glPopMatrix();
 

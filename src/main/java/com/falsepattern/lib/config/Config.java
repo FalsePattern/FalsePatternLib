@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -22,6 +22,7 @@ package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,7 +32,7 @@ import java.util.function.BiConsumer;
 
 /**
  * A modern configuration system to replace the old and obtuse forge config system.
- *
+ * <p>
  * Note that just annotating a configuration class with {@link Config} is not enough, you must also register it using
  * {@link ConfigurationManager#initialize(Class[])} or {@link ConfigurationManager#initialize(BiConsumer, Class[])}!
  */
@@ -191,10 +192,10 @@ public @interface Config {
 
     /**
      * This annotation limits the maximum number of characters present in a string configuration.
-     *
+     * <p>
      * Note: If this annotation is not present, the maximum length will be implicitly set to 256 to avoid malicious
      * synchronizations that would make clients run out of memory!
-     *
+     * <p>
      * When used with a string list, this limit will apply to each element individually, not to the size of the list as a whole.
      */
     @StableAPI(since = "0.10.0")
@@ -265,7 +266,7 @@ public @interface Config {
     }
 
     /**
-     * The default value for an boolean array field. Not having a default is deprecated since 0.10, and will be strongly
+     * The default value for a boolean array field. Not having a default is deprecated since 0.10, and will be strongly
      * enforced in 0.11+!
      */
     @StableAPI(since = "0.10.0")
@@ -290,7 +291,7 @@ public @interface Config {
     /**
      * This annotation limits the maximum number of elements present in an array configuration. Only effective if
      * {@link ListFixedLength} is NOT present.
-     *
+     * <p>
      * Note: If this annotation is not present, the maximum length will be implicitly set to 256 to avoid malicious
      * synchronizations that would make clients run out of memory!
      */
@@ -301,7 +302,6 @@ public @interface Config {
     @interface ListMaxLength {
         int value();
     }
-
 
 
     /**
@@ -338,7 +338,7 @@ public @interface Config {
     /**
      * Signals that this configuration class should be synchronized between the client and the server when
      * joining a multiplayer instance.
-     *
+     * <p>
      * Note that synchronization ALWAYS happens FROM the server TO the client. The server should NEVER attempt to get
      * configuration values from a client. This is to avoid malicious clients manipulating the server configs.
      */

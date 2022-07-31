@@ -102,6 +102,7 @@ public abstract class AConfigField<T> {
         return property;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public abstract boolean validateField();
 
     public abstract void transmit(DataOutput output) throws IOException;

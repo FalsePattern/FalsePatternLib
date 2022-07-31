@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,20 +21,18 @@
 package com.falsepattern.lib.internal;
 
 import com.falsepattern.lib.internal.proxy.CommonProxy;
+import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import cpw.mods.fml.common.*;
+import net.minecraft.launchwrapper.Launch;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-
-import lombok.Getter;
-
-import net.minecraft.launchwrapper.Launch;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class used by FalsePatternLib's internal code. This can change between versions without notice, so do not use
@@ -50,12 +48,14 @@ public class FalsePatternLib {
     public static final String UPDATE_URL = "https://falsepattern.com/mc/versions.json";
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 
-    @Getter private static final Logger log = LogManager.getLogger(Tags.MODNAME);
+    @Getter
+    private static final Logger log = LogManager.getLogger(Tags.MODNAME);
 
-    @Getter private static final boolean developerEnvironment =
-            (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    @Getter
+    private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-    @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy", serverSide = Tags.GROUPNAME + ".internal.proxy.CommonProxy")
+    @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy",
+                serverSide = Tags.GROUPNAME + ".internal.proxy.CommonProxy")
     private static CommonProxy proxy;
 
     public FalsePatternLib() {

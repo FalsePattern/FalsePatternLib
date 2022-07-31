@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -21,8 +21,11 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +43,9 @@ public final class LangUtil {
     }
 
     public static void defaultLocalization(@NonNull String key, @NonNull String value) {
-        if (!LanguageRegistry.instance().getStringLocalization(key, DEFAULT_LOCALE).isEmpty())
+        if (!LanguageRegistry.instance().getStringLocalization(key, DEFAULT_LOCALE).isEmpty()) {
             return;
+        }
         val map = tempMap.get();
         map.put(key, value);
         LanguageRegistry.instance().injectLanguage(DEFAULT_LOCALE, map);

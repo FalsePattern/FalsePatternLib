@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -116,7 +116,8 @@ public class UniversalClass {
         }
     }
 
-    public UniversalMethod getMethod(MappingType mappingType, String methodName, String methodDescriptor) throws NoSuchMethodException {
+    public UniversalMethod getMethod(MappingType mappingType, String methodName, String methodDescriptor)
+            throws NoSuchMethodException {
         try {
             return methods.get(mappingType, methodName + methodDescriptor);
         } catch (Lookup.LookupException e) {

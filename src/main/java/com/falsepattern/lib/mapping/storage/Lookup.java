@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2022 FalsePattern
  * All Rights Reserved
  *
@@ -39,6 +39,16 @@ public class Lookup<T> {
     private final Map<String, T> notch = new HashMap<>();
     private final Map<String, T> srg = new HashMap<>();
     private final Map<String, T> mcp = new HashMap<>();
+
+    private static <T> void removeFirst(Iterator<Map.Entry<String, T>> iterator, T value) {
+        while (iterator.hasNext()) {
+            val entry = iterator.next();
+            if (entry.getValue().equals(value)) {
+                iterator.remove();
+                return;
+            }
+        }
+    }
 
     public boolean contains(T value) {
         return values.contains(value);
@@ -90,16 +100,6 @@ public class Lookup<T> {
             throw new LookupException("No such key " + key + " in " + mappingType);
         }
         return result;
-    }
-
-    private static <T> void removeFirst(Iterator<Map.Entry<String, T>> iterator, T value) {
-        while (iterator.hasNext()) {
-            val entry = iterator.next();
-            if (entry.getValue().equals(value)) {
-                iterator.remove();
-                return;
-            }
-        }
     }
 
     public static class LookupException extends Exception {
