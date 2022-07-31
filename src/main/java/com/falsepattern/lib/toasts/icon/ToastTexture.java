@@ -28,7 +28,10 @@ import lombok.NonNull;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public abstract class ToastTexture {
     @Getter(onMethod_={@StableAPI(since = "0.10.0")})

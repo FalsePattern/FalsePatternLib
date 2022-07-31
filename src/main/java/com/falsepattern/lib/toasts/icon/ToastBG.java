@@ -29,7 +29,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public class ToastBG extends ToastTexture {
     @StableAPI(since = "0.10.0")
