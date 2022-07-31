@@ -26,12 +26,20 @@ import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.config.ToastConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
+import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
+import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
+import com.falsepattern.lib.internal.impl.config.net.SyncReply;
+import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
+import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
+import com.falsepattern.lib.internal.impl.config.net.SyncRequestHandler;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
 
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+
 import lombok.val;
 
 import java.util.Collections;
@@ -43,15 +51,17 @@ public class CommonProxy {
     protected CompletableFuture<List<ModUpdateInfo>> updatesFuture;
 
     public void construct(FMLConstructionEvent e) {
+        FalsePatternLib.NETWORK.registerMessage(SyncRequestHandler.class, SyncRequest.class, 0, Side.SERVER);
+        FalsePatternLib.NETWORK.registerMessage(SyncReplyHandler.class, SyncReply.class, 1, Side.CLIENT);
+        FalsePatternLib.NETWORK.registerMessage(SyncPromptHandler.class, SyncPrompt.class, 2, Side.CLIENT);
     }
 
     public void preInit(FMLPreInitializationEvent e) {
         ConfigurationManagerImpl.registerBus();
         try {
-            ConfigurationManager.registerConfig(LibraryConfig.class);
-            ConfigurationManager.registerConfig(ToastConfig.class);
+            ConfigurationManager.initialize(LibraryConfig.class);
         } catch (ConfigException ex) {
-            FalsePatternLib.getLog().error("Failed to register config!", ex);
+            throw new RuntimeException(ex);
         }
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");

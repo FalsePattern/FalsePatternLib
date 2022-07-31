@@ -26,6 +26,8 @@ import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 import lombok.Getter;
 
@@ -46,6 +48,7 @@ import org.apache.logging.log4j.Logger;
      acceptableRemoteVersions = "*")
 public class FalsePatternLib {
     public static final String UPDATE_URL = "https://falsepattern.com/mc/versions.json";
+    public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 
     @Getter private static final Logger log = LogManager.getLogger(Tags.MODNAME);
 

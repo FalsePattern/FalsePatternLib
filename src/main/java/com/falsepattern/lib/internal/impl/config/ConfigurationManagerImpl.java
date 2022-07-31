@@ -22,34 +22,53 @@ package com.falsepattern.lib.internal.impl.config;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.IConfigElementProxy;
+import com.falsepattern.lib.config.event.AllConfigSyncEvent;
+import com.falsepattern.lib.config.event.ConfigSyncEvent;
+import com.falsepattern.lib.config.event.ConfigSyncRequestEvent;
+import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.config.LibraryConfig;
+import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
+import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
+import com.falsepattern.lib.text.FormattedText;
+import com.falsepattern.lib.toasts.GuiToast;
+import com.falsepattern.lib.toasts.SimpleToast;
+import com.falsepattern.lib.toasts.icon.ToastBG;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-import lombok.var;
 
-import net.minecraftforge.common.config.ConfigElement;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.function.BiConsumer;
 
 /**
  * The actual implementation of ConfigurationManager. Migrated stuff here so that we don't unnecessarily expose
@@ -61,173 +80,166 @@ import java.util.stream.Collectors;
 public class ConfigurationManagerImpl {
     private static final Map<String, Configuration> configs = new HashMap<>();
     private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
+    private static final Map<Class<?>, ParsedConfiguration> parsedConfigMap = new HashMap<>();
     private static final ConfigurationManagerImpl instance = new ConfigurationManagerImpl();
     private static boolean initialized = false;
     private static Path configDir;
 
-    public static void registerConfig(Class<?> configClass) throws ConfigException {
+    public static void register(Class<?> configClass) throws ConfigException {
         init();
-        val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
-                          .orElseThrow(() -> new ConfigException(
-                                  "Class " + configClass.getName() + " does not have a @Config annotation!"));
-        val category = Optional.of(cfg.category().trim())
-                               .map((cat) -> cat.length() == 0 ? null : cat)
-                               .orElseThrow(() -> new ConfigException(
-                                       "Config class " + configClass.getName() + " has an empty category!"));
-        val rawConfig = configs.computeIfAbsent(cfg.modid(), (ignored) -> {
-            val c = new Configuration(configDir.resolve(cfg.modid() + ".cfg").toFile());
+        if (!parsedConfigMap.containsKey(configClass)) {
+            val parsedConfig = ParsedConfiguration.parseConfig(configClass);
+            configToClassMap.computeIfAbsent(parsedConfig.rawConfig, (ignored) -> new HashSet<>()).add(configClass);
+            parsedConfigMap.put(configClass, ParsedConfiguration.parseConfig(configClass));
+        }
+    }
+
+    static Configuration getForgeConfig(String modid) {
+        return configs.computeIfAbsent(modid, (ignored) -> {
+            val c = new Configuration(configDir.resolve(modid + ".cfg").toFile());
             c.load();
             return c;
         });
-        configToClassMap.computeIfAbsent(rawConfig, (ignored) -> new HashSet<>()).add(configClass);
-        try {
-            processConfigInternal(configClass, category, rawConfig);
-            rawConfig.save();
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException e) {
-            throw new ConfigException(e);
-        }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
-        init();
-        val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
-                          .orElseThrow(() -> new ConfigException(
-                                  "Class " + configClass.getName() + " does not have a @Config annotation!"));
-        val rawConfig = Optional.ofNullable(configs.get(cfg.modid()))
-                                .map((conf) -> Optional.ofNullable(configToClassMap.get(conf))
-                                                       .map((l) -> l.contains(configClass))
-                                                       .orElse(false) ? conf : null)
-                                .orElseThrow(() -> new ConfigException(
-                                        "Tried to get config elements for non-registered config class!"));
-        val category = cfg.category();
-        val elements = new ConfigElement<>(rawConfig.getCategory(category)).getChildElements();
-        return elements.stream().map((element) -> new IConfigElementProxy(element, () -> {
-            try {
-                processConfigInternal(configClass, category, rawConfig);
-                rawConfig.save();
-            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | NoSuchFieldException |
-                     ConfigException e) {
-                e.printStackTrace();
+    public static void load(Class<?> configClass) throws ConfigException {
+        if (!parsedConfigMap.containsKey(configClass)) {
+            throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
+        }
+        parsedConfigMap.get(configClass).load();
+    }
+
+    public static void save(Class<?> configClass) throws ConfigException {
+        if (!parsedConfigMap.containsKey(configClass)) {
+            throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
+        }
+        parsedConfigMap.get(configClass).save();
+    }
+
+    public static boolean validateFields(BiConsumer<Class<?>, Field> invalidFieldHandler, Class<?> configClass, boolean resetInvalid) throws ConfigException {
+        if (!parsedConfigMap.containsKey(configClass)) {
+            throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
+        }
+        val parsed = parsedConfigMap.get(configClass);
+        return parsed.validate(invalidFieldHandler, resetInvalid);
+    }
+
+    @Deprecated
+    public static void registerLoadSaveConfig(Class<?> configClass) throws ConfigException {
+        register(configClass);
+        load(configClass);
+        save(configClass);
+    }
+
+    public static void sendRequest(DataOutput output) throws IOException {
+        val synced = new ArrayList<Class<?>>();
+        for (val entry: parsedConfigMap.entrySet()) {
+            if (entry.getValue().sync) {
+                synced.add(entry.getKey());
             }
-        })).collect(Collectors.toList());
+        }
+        output.writeInt(synced.size());
+        for (val clazz: synced) {
+            output.writeUTF(clazz.getName());
+        }
     }
 
-    private static void processConfigInternal(Class<?> configClass, String category, Configuration rawConfig)
-            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException,
-            ConfigException {
-        val cat = rawConfig.getCategory(category);
-        if (configClass.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
-            cat.setRequiresWorldRestart(true);
+    public static List<Class<?>> receiveRequest(DataInput input) throws IOException {
+        val result = new ArrayList<Class<?>>();
+        val count = input.readInt();
+        val classNames = new HashSet<String>();
+        for (int i = 0; i < count; i++) {
+            classNames.add(input.readUTF());
         }
-        if (configClass.isAssignableFrom(Config.RequiresMcRestart.class)) {
-            cat.setRequiresMcRestart(true);
+        for (val entry: parsedConfigMap.keySet()) {
+            if (classNames.contains(entry.getName())) {
+                result.add(entry);
+            }
         }
-        for (val field : configClass.getDeclaredFields()) {
-            if (field.getAnnotation(Config.Ignore.class) != null) {
+        return result;
+    }
+
+    public static void sendReply(DataOutput output, List<Class<?>> requestedClasses) throws IOException {
+        val syncEntries = new HashMap<>(parsedConfigMap);
+        for (val entry: parsedConfigMap.entrySet()) {
+            if (!entry.getValue().sync || !requestedClasses.contains(entry.getKey())) {
+                syncEntries.remove(entry.getKey());
+            }
+        }
+        output.writeInt(syncEntries.size());
+        for (val entry: syncEntries.entrySet()) {
+            output.writeUTF(entry.getKey().getName());
+            val b = new ByteArrayOutputStream();
+            val bo = new DataOutputStream(b);
+            entry.getValue().transmit(bo);
+            bo.close();
+            val bytes = b.toByteArray();
+            output.writeInt(bytes.length);
+            output.write(bytes);
+        }
+    }
+
+    public static void receiveReply(DataInput input) throws IOException {
+        if (!AllConfigSyncEvent.postStart()) {
+            FalsePatternLib.getLog().warn("Config synchronization was cancelled by event.");
+        }
+        int count = input.readInt();
+        for (int i = 0; i < count; i++) {
+            String className = input.readUTF();
+            int dataSize = input.readInt();
+            val opt = parsedConfigMap.keySet().stream().filter((clazz) -> clazz.getName().equals(className)).findFirst();
+            if (!opt.isPresent()) {
+                input.skipBytes(dataSize);
+                FalsePatternLib.getLog().warn("Server tried to sync config not registered on our side: " + className);
                 continue;
             }
-            field.setAccessible(true);
-            val comment = Optional.ofNullable(field.getAnnotation(Config.Comment.class))
-                                  .map(Config.Comment::value)
-                                  .map((lines) -> String.join("\n", lines))
-                                  .orElse("");
-            val name = Optional.ofNullable(field.getAnnotation(Config.Name.class))
-                               .map(Config.Name::value)
-                               .orElse(field.getName());
-            val langKey = Optional.ofNullable(field.getAnnotation(Config.LangKey.class))
-                                  .map(Config.LangKey::value)
-                                  .orElse(name);
-            val fieldClass = field.getType();
-            var boxed = false;
-            if ((boxed = fieldClass.equals(Boolean.class)) || fieldClass.equals(boolean.class)) {
-                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class))
-                                           .map(Config.DefaultBoolean::value)
-                                           .orElse(boxed ? (Boolean) field.get(null) : field.getBoolean(null));
-                field.setBoolean(null, rawConfig.getBoolean(name, category, defaultValue, comment, langKey));
-            } else if ((boxed = fieldClass.equals(Integer.class)) || fieldClass.equals(int.class)) {
-                val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
-                val min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
-                val max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
-                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class))
-                                           .map(Config.DefaultInt::value)
-                                           .orElse(boxed ? (Integer) field.get(null) : field.getInt(null));
-                field.setInt(null, rawConfig.getInt(name, category, defaultValue, min, max, comment, langKey));
-            } else if ((boxed = fieldClass.equals(Float.class)) || fieldClass.equals(float.class)) {
-                val range = Optional.ofNullable(field.getAnnotation(Config.RangeFloat.class));
-                val min = range.map(Config.RangeFloat::min).orElse(Float.MIN_VALUE);
-                val max = range.map(Config.RangeFloat::max).orElse(Float.MAX_VALUE);
-                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultFloat.class))
-                                           .map(Config.DefaultFloat::value)
-                                           .orElse(boxed ? (Float) field.get(null) : field.getFloat(null));
-                field.setFloat(null, rawConfig.getFloat(name, category, defaultValue, min, max, comment, langKey));
-            } else if (fieldClass.equals(String.class)) {
-                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class))
-                                           .map(Config.DefaultString::value)
-                                           .orElse((String) field.get(null));
-                val pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class))
-                                      .map(Config.Pattern::value)
-                                      .map(Pattern::compile)
-                                      .orElse(null);
-                field.set(null, rawConfig.getString(name, category, defaultValue, comment, langKey, pattern));
-            } else if (fieldClass.isEnum()) {
-                val enumValues = Arrays.stream((Object[]) fieldClass.getDeclaredMethod("values").invoke(null))
-                                       .map((obj) -> (Enum<?>) obj)
-                                       .collect(Collectors.toList());
-                val defaultValue = (Enum<?>) Optional.ofNullable(field.getAnnotation(Config.DefaultEnum.class))
-                                                     .map(Config.DefaultEnum::value)
-                                                     .map((defName) -> extractField(fieldClass, defName))
-                                                     .map(ConfigurationManagerImpl::extractValue)
-                                                     .orElse(field.get(null));
-                val possibleValues = enumValues.stream().map(Enum::name).toArray(String[]::new);
-                var value = rawConfig.getString(name, category, defaultValue.name(),
-                                                comment + "\nPossible values: " + Arrays.toString(possibleValues) +
-                                                "\n", possibleValues, langKey);
+            val clazz = opt.get();
+            val config = parsedConfigMap.get(clazz);
+            if (!config.sync) {
+                input.skipBytes(dataSize);
+                FalsePatternLib.getLog().warn("Server tried to sync config without @Synchronize annotation on our side: " + className);
+                continue;
+            }
+            if (!ConfigSyncEvent.postStart(clazz)) {
+                input.skipBytes(dataSize);
+                FalsePatternLib.getLog().warn("Config synchronization was cancelled by event for: " + className);
+                continue;
+            }
+            val bytes = new byte[dataSize];
+            input.readFully(bytes);
+            val b = new ByteArrayInputStream(bytes);
+            val bi = new DataInputStream(b);
+            try {
+                config.receive(bi);
+                config.validate((x, y) -> {}, true);
+                ConfigSyncEvent.postEndSuccess(clazz);
+            } catch (Throwable e) {
+                ConfigSyncEvent.postEndFailure(clazz, e);
+            }
+            bi.close();
+        }
+        AllConfigSyncEvent.postEnd();
+    }
 
-                try {
-                    if (!Arrays.asList(possibleValues).contains(value)) {
-                        throw new NoSuchFieldException();
-                    }
-                    val enumField = fieldClass.getDeclaredField(value);
-                    if (!enumField.isEnumConstant()) {
-                        throw new NoSuchFieldException();
-                    }
-                    field.set(null, enumField.get(null));
-                } catch (NoSuchFieldException e) {
-                    FalsePatternLib.getLog()
-                                   .warn("Invalid value " + value + " for enum configuration field " + field.getName() +
-                                         " of type " + fieldClass.getName() + " in config class " +
-                                         configClass.getName() + "! Using default value of " + defaultValue + "!");
-                    field.set(null, defaultValue);
-                }
-            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(String.class)) {
-                val defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class))
-                                           .map(Config.DefaultStringList::value)
-                                           .orElse((String[]) field.get(null));
-                var value = rawConfig.getStringList(name, category, defaultValue, comment, null, langKey);
-                field.set(null, value);
-            } else {
-                throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() +
-                                          ": Unsupported type " + fieldClass.getName() +
-                                          "! Did you forget an @Ignore annotation?");
-            }
-            if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
-                cat.setRequiresMcRestart(true);
-            }
-            if (field.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
-                cat.setRequiresWorldRestart(true);
+    public static void loadRawConfig(Configuration rawConfig) throws ConfigException {
+        rawConfig.load();
+        for (val configClass: configToClassMap.get(rawConfig)) {
+            val config = parsedConfigMap.get(configClass);
+            try {
+                config.reloadFields();
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new ConfigException(e);
             }
         }
     }
 
-    @SneakyThrows
-    private static Field extractField(Class<?> clazz, String field) {
-        return clazz.getDeclaredField(field);
-    }
-
-    @SneakyThrows
-    private static Object extractValue(Field field) {
-        return field.get(null);
+    @SuppressWarnings({"rawtypes"})
+    public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
+        if (!parsedConfigMap.containsKey(configClass)) {
+            throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
+        }
+        val config = parsedConfigMap.get(configClass);
+        return config.getConfigElements();
     }
 
     private static void init() {
@@ -240,26 +252,85 @@ public class ConfigurationManagerImpl {
 
     public static void registerBus() {
         FMLCommonHandler.instance().bus().register(instance);
+        MinecraftForge.EVENT_BUS.register(instance);
+    }
+
+    private static void sendSyncRequest() throws IOException {
+        val event = new SyncRequest();
+        event.transmit();
+        FalsePatternLib.NETWORK.sendToServer(event);
+    }
+
+    @SneakyThrows
+    @SubscribeEvent
+    public void onJoinWorld(EntityJoinWorldEvent e) {
+        if (e.world.isRemote && e.entity instanceof EntityClientPlayerMP) {
+            sendSyncRequest();
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SneakyThrows
+    @SubscribeEvent
+    public void onSyncRequestClient(ConfigSyncRequestEvent.Client e) {
+        sendSyncRequest();
+    }
+
+    @SubscribeEvent
+    public void onSyncRequestServer(ConfigSyncRequestEvent.Server e) {
+        val players = e.getPlayers();
+        if (players.size() == 0) {
+            FalsePatternLib.NETWORK.sendToAll(new SyncPrompt());
+        } else {
+            for (EntityPlayerMP player : e.getPlayers()) {
+                FalsePatternLib.NETWORK.sendTo(new SyncPrompt(), player);
+            }
+        }
     }
 
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         init();
-        val config = configs.get(event.modID);
-        if (config == null) {
+        val rawConfig = configs.get(event.modID);
+        if (rawConfig == null) {
             return;
         }
-        val configClasses = configToClassMap.get(config);
-        configClasses.forEach((configClass) -> {
-            try {
-                val category = Optional.ofNullable(configClass.getAnnotation(Config.class))
-                                       .map(Config::category)
-                                       .orElseThrow(() -> new ConfigException(
-                                               "Failed to get config category for class " + configClass.getName()));
-                processConfigInternal(configClass, category, config);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        val configClasses = configToClassMap.get(rawConfig);
+        for (val clazz: configClasses) {
+            val config = parsedConfigMap.get(clazz);
+            config.configChanged();
+        }
+    }
+
+    @SubscribeEvent
+    public void onValidationErrorLog(ConfigValidationFailureEvent e) {
+        if (LibraryConfig.CONFIG_ERROR_LOUDNESS != LibraryConfig.ValidationLogging.None) {
+            e.logWarn();
+        }
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onValidationErrorToast(ConfigValidationFailureEvent e) {
+        if (LibraryConfig.CONFIG_ERROR_LOUDNESS == LibraryConfig.ValidationLogging.LogAndToast) {
+            e.toast();
+        }
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onConfigSyncFinished(ConfigSyncEvent.End e) {
+        val cfg = e.configClass.getAnnotation(Config.class);
+        if (e.successful) {
+            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
+                                         FormattedText.parse(EnumChatFormatting.GREEN + "Synced config").toChatText().get(0),
+                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
+                                         false, 5000));
+        } else {
+            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
+                                         FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config").toChatText().get(0),
+                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
+                                         false, 5000));
+        }
     }
 }

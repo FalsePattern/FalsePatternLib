@@ -20,8 +20,15 @@
  */
 package com.falsepattern.lib.internal.proxy;
 
+import com.falsepattern.lib.config.ConfigException;
+import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.config.ToastConfig;
+import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
+import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
+import com.falsepattern.lib.internal.impl.config.net.SyncReply;
+import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
@@ -55,6 +62,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        try {
+            ConfigurationManager.initialize(ToastConfig.class);
+        } catch (ConfigException ex) {
+            throw new RuntimeException(ex);
+        }
         MinecraftForge.EVENT_BUS.register(this);
     }
 

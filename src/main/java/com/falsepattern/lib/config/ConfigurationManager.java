@@ -20,7 +20,9 @@
  */
 package com.falsepattern.lib.config;
 
+import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -28,9 +30,11 @@ import lombok.val;
 
 import cpw.mods.fml.client.config.IConfigElement;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * Class for controlling the loading of configuration files.
@@ -39,13 +43,64 @@ import java.util.List;
 @StableAPI(since = "0.6.0")
 public class ConfigurationManager {
 
+    @StableAPI(since = "0.10.0")
+    public static void initialize(Class<?>... configClasses) throws ConfigException {
+        initialize((a, b) -> {}, configClasses);
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static void initialize(BiConsumer<Class<?>, Field> validatorErrorCallback, Class<?>... configClasses) throws ConfigException {
+        for (val clazz: configClasses) {
+            ConfigurationManagerImpl.register(clazz);
+            ConfigurationManagerImpl.load(clazz);
+            ConfigurationManagerImpl.validateFields(validatorErrorCallback, clazz, true);
+            ConfigurationManagerImpl.save(clazz);
+        }
+    }
+    @StableAPI(since = "0.10.0")
+    public static boolean validate(boolean resetInvalid, Class<?>... configClasses)
+            throws ConfigException {
+        return validate((x, y) -> {}, resetInvalid, configClasses);
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static boolean validate(BiConsumer<Class<?>, Field> validatorErrorCallback, boolean resetInvalid, Class<?>... configClasses)
+            throws ConfigException {
+        boolean valid = true;
+        for (val clazz: configClasses) {
+            valid &= ConfigurationManagerImpl.validateFields(validatorErrorCallback, clazz, resetInvalid);
+        }
+        return valid;
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static void loadFromFile(Class<?>... configClasses) throws ConfigException {
+        for (val clazz: configClasses) {
+            ConfigurationManagerImpl.load(clazz);
+        }
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static void saveToFile(boolean validateAndResetInvalid, Class<?>... configClasses) throws ConfigException {
+        for (val clazz: configClasses) {
+            if (validateAndResetInvalid) {
+                ConfigurationManagerImpl.validateFields((a, b) -> {}, clazz, true);
+            }
+            ConfigurationManagerImpl.save(clazz);
+        }
+    }
+
     /**
-     * Registers a configuration class to be loaded. This should be done in preInit.
+     * Registers a configuration class to be loaded. This should be done early on.
      *
      * @param configClass The class to register.
      */
+    @Deprecated
+    @DeprecationDetails(stableSince = "0.6.0",
+                        deprecatedSince = "0.10.0")
     public static void registerConfig(Class<?> configClass) throws ConfigException {
-        ConfigurationManagerImpl.registerConfig(configClass);
+        FalsePatternLib.getLog().warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.", new Exception());
+        ConfigurationManagerImpl.registerLoadSaveConfig(configClass);
     }
 
     /**
@@ -56,6 +111,7 @@ public class ConfigurationManager {
      * @return The configuration elements.
      */
     @SuppressWarnings("rawtypes")
+    @StableAPI(since = "0.6.0")
     public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
         return ConfigurationManagerImpl.getConfigElements(configClass);
     }

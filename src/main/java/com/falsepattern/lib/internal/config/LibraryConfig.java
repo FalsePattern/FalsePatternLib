@@ -38,4 +38,13 @@ public class LibraryConfig {
     @Config.LangKey("config.falsepatternlib.disableinternet")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_LIBRARY_DOWNLOADS;
+
+    @Config.Comment("How \"loud\" the config error logging should be.")
+    @Config.LangKey("config.falsepatternlib.configlogging")
+    @Config.DefaultEnum("Log")
+    public static ValidationLogging CONFIG_ERROR_LOUDNESS;
+
+    public enum ValidationLogging {
+        None, Log, LogAndToast
+    }
 }
