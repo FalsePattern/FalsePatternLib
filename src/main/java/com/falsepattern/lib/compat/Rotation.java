@@ -28,16 +28,22 @@ import net.minecraft.util.EnumFacing;
 
 @StableAPI(since = "0.6.0")
 public enum Rotation {
+    @StableAPI.Expose
     NONE,
+    @StableAPI.Expose
     CLOCKWISE_90,
+    @StableAPI.Expose
     CLOCKWISE_180,
+    @StableAPI.Expose
     COUNTERCLOCKWISE_90;
 
+    @StableAPI.Expose
     public Rotation add(@NonNull Rotation rotation) {
         val values = Rotation.values();
         return values[(ordinal() + rotation.ordinal()) % values.length];
     }
 
+    @StableAPI.Expose
     public EnumFacing rotate(@NonNull EnumFacing facing) {
         if (facing == EnumFacing.UP || facing == EnumFacing.DOWN) {
             return facing;
@@ -87,6 +93,7 @@ public enum Rotation {
         }
     }
 
+    @StableAPI.Expose
     public int rotate(int x, int z) {
         switch (this) {
             case CLOCKWISE_90:

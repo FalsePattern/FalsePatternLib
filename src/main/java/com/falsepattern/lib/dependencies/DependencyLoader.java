@@ -29,11 +29,13 @@ import lombok.NonNull;
 @StableAPI(since = "0.6.0")
 public class DependencyLoader {
 
+    @StableAPI.Expose
     public static void addMavenRepo(String url) {
         DependencyLoaderImpl.addMavenRepo(url);
     }
 
     @Builder
+    @StableAPI.Expose
     public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
         DependencyLoaderImpl.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
                                          regularSuffix, devSuffix);

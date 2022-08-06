@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.config;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.internal.Tags;
 
@@ -44,9 +45,13 @@ public class LibraryConfig {
     @Config.DefaultEnum("Log")
     public static ValidationLogging CONFIG_ERROR_LOUDNESS;
 
+    @StableAPI(since = "__INTERNAL__")
     public enum ValidationLogging {
+        @StableAPI.Expose
         None,
+        @StableAPI.Expose
         Log,
+        @StableAPI.Expose
         LogAndToast
     }
 }

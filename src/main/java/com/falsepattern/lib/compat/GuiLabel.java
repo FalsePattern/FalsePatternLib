@@ -49,26 +49,32 @@ public class GuiLabel extends Gui {
     /**
      * The id of the label.
      */
+    @StableAPI.Expose
     public int id;
     /**
      * The x position of the label.
      */
+    @StableAPI.Expose
     public int x;
     /**
      * The y position of the label.
      */
+    @StableAPI.Expose
     public int y;
     /**
      * The visibility of the label.
      */
+    @StableAPI.Expose
     public boolean visible = true;
     /**
      * The label width.
      */
+    @StableAPI.Expose
     protected int width;
     /**
      * The label height.
      */
+    @StableAPI.Expose
     protected int height;
     private boolean centered = false;
 
@@ -83,6 +89,7 @@ public class GuiLabel extends Gui {
      * @param height       the height
      * @param textColour   the text colour
      */
+    @StableAPI.Expose
     public GuiLabel(@NonNull FontRenderer fontRenderer, int id, int x, int y, int width, int height, int textColour) {
         this.fontRenderer = fontRenderer;
         this.id = id;
@@ -98,6 +105,7 @@ public class GuiLabel extends Gui {
      *
      * @param text string to add
      */
+    @StableAPI.Expose
     public void addLine(@NonNull String text) {
         lines.add(I18n.format(text));
     }
@@ -107,6 +115,7 @@ public class GuiLabel extends Gui {
      *
      * @return the GuiLabel itself
      */
+    @StableAPI.Expose
     public GuiLabel setCentered() {
         centered = true;
         return this;
@@ -120,6 +129,7 @@ public class GuiLabel extends Gui {
      * @param mouseX    the mouse x
      * @param mouseY    the mouse y
      */
+    @StableAPI.Expose
     public void drawLabel(@NonNull Minecraft minecraft, int mouseX, int mouseY) {
         if (!visible) {
             return;

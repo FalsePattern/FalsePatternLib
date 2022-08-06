@@ -21,6 +21,7 @@
 package com.falsepattern.lib.compat;
 
 import com.falsepattern.lib.DeprecationDetails;
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.MathUtil;
 
 import java.util.Random;
@@ -30,6 +31,7 @@ import java.util.Random;
  */
 @Deprecated
 @DeprecationDetails(deprecatedSince = "0.10.0")
+@StableAPI(since = "0.9.2")
 public class MathHelper {
     /**
      * Though it looks like an array, this is really more like a mapping.  Key (index of this array) is the upper 5 bits
@@ -54,6 +56,7 @@ public class MathHelper {
     /**
      * sin looked up in a table
      */
+    @StableAPI.Expose
     public static float sin(float a) {
         return SIN_TABLE[(int) (a * 10430.378F) & 65535];
     }
@@ -61,14 +64,17 @@ public class MathHelper {
     /**
      * cos looked up in the sin table with the appropriate offset
      */
+    @StableAPI.Expose
     public static float cos(float a) {
         return SIN_TABLE[(int) (a * 10430.378F + 16384.0F) & 65535];
     }
 
+    @StableAPI.Expose
     public static float sqrt_float(float a) {
         return (float) Math.sqrt(a);
     }
 
+    @StableAPI.Expose
     public static float sqrt_double(double a) {
         return (float) Math.sqrt(a);
     }
@@ -76,6 +82,7 @@ public class MathHelper {
     /**
      * Returns the greatest integer less than or equal to the float argument
      */
+    @StableAPI.Expose
     public static int floor_float(float a) {
         int i = (int) a;
         return a < (float) i ? i - 1 : i;
@@ -84,6 +91,7 @@ public class MathHelper {
     /**
      * returns par0 cast as an int, and no greater than Integer.MAX_VALUE-1024
      */
+    @StableAPI.Expose
     public static int truncateDoubleToInt(double a) {
         return (int) (a + 1024.0D) - 1024;
     }
@@ -91,6 +99,7 @@ public class MathHelper {
     /**
      * Returns the greatest integer less than or equal to the double argument
      */
+    @StableAPI.Expose
     public static int floor_double(double a) {
         int i = (int) a;
         return a < (double) i ? i - 1 : i;
@@ -99,15 +108,18 @@ public class MathHelper {
     /**
      * Long version of floor_double
      */
+    @StableAPI.Expose
     public static long floor_double_long(double a) {
         long i = (long) a;
         return a < (double) i ? i - 1L : i;
     }
 
+    @StableAPI.Expose
     public static int absFloor(double a) {
         return (int) (a >= 0.0D ? a : -a + 1.0D);
     }
 
+    @StableAPI.Expose
     public static float abs(float a) {
         return a >= 0.0F ? a : -a;
     }
@@ -115,15 +127,18 @@ public class MathHelper {
     /**
      * Returns the unsigned value of an int.
      */
+    @StableAPI.Expose
     public static int abs_int(int a) {
         return a >= 0 ? a : -a;
     }
 
+    @StableAPI.Expose
     public static int ceiling_float_int(float a) {
         int i = (int) a;
         return a > (float) i ? i + 1 : i;
     }
 
+    @StableAPI.Expose
     public static int ceiling_double_int(double a) {
         int i = (int) a;
         return a > (double) i ? i + 1 : i;
@@ -133,6 +148,7 @@ public class MathHelper {
      * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
      * third parameters.
      */
+    @StableAPI.Expose
     public static int clamp_int(int a, int min, int max) {
         return a < min ? min : (Math.min(a, max));
     }
@@ -141,14 +157,17 @@ public class MathHelper {
      * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
      * third parameters
      */
+    @StableAPI.Expose
     public static float clamp_float(float a, float min, float max) {
         return a < min ? min : Math.min(a, max);
     }
 
+    @StableAPI.Expose
     public static double clamp_double(double a, double min, double max) {
         return a < min ? min : Math.min(a, max);
     }
 
+    @StableAPI.Expose
     public static double denormalizeClamp(double min, double max, double normalized) {
         return normalized < 0.0D ? min : (normalized > 1.0D ? max : min + (max - min) * normalized);
     }
@@ -156,6 +175,7 @@ public class MathHelper {
     /**
      * Maximum of the absolute value of two numbers.
      */
+    @StableAPI.Expose
     public static double abs_max(double a, double b) {
         if (a < 0.0D) {
             a = -a;
@@ -171,6 +191,7 @@ public class MathHelper {
     /**
      * Buckets an integer with specified bucket sizes.  Args: i, bucketSize
      */
+    @StableAPI.Expose
     public static int bucketInt(int i, int bucketSize) {
         return i < 0 ? -((-i - 1) / bucketSize) - 1 : i / bucketSize;
     }
@@ -178,22 +199,27 @@ public class MathHelper {
     /**
      * Tests if a string is null or of length zero
      */
+    @StableAPI.Expose
     public static boolean stringNullOrLengthZero(String str) {
         return str == null || str.length() == 0;
     }
 
+    @StableAPI.Expose
     public static int getRandomIntegerInRange(Random rng, int min, int max) {
         return min >= max ? min : rng.nextInt(max - min + 1) + min;
     }
 
+    @StableAPI.Expose
     public static float randomFloatClamp(Random rng, float min, float max) {
         return min >= max ? min : rng.nextFloat() * (max - min) + min;
     }
 
+    @StableAPI.Expose
     public static double getRandomDoubleInRange(Random rng, double min, double max) {
         return min >= max ? min : rng.nextDouble() * (max - min) + min;
     }
 
+    @StableAPI.Expose
     public static double average(long[] values) {
         long i = 0L;
 
@@ -207,6 +233,7 @@ public class MathHelper {
     /**
      * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
      */
+    @StableAPI.Expose
     public static float wrapAngleTo180_float(float angle) {
         angle %= 360.0F;
 
@@ -224,6 +251,7 @@ public class MathHelper {
     /**
      * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
      */
+    @StableAPI.Expose
     public static double wrapAngleTo180_double(double angle) {
         angle %= 360.0D;
 
@@ -241,6 +269,7 @@ public class MathHelper {
     /**
      * parses the string as integer or returns the second parameter if it fails
      */
+    @StableAPI.Expose
     public static int parseIntWithDefault(String str, int def) {
         try {
             return Integer.parseInt(str);
@@ -252,6 +281,7 @@ public class MathHelper {
     /**
      * parses the string as integer or returns the second parameter if it fails. this value is capped to par2
      */
+    @StableAPI.Expose
     public static int parseIntWithDefaultAndMax(String str, int def, int min) {
         int k;
 
@@ -271,6 +301,7 @@ public class MathHelper {
     /**
      * parses the string as double or returns the second parameter if it fails.
      */
+    @StableAPI.Expose
     public static double parseDoubleWithDefault(String str, double def) {
         double d1 = def;
 
@@ -282,6 +313,7 @@ public class MathHelper {
         return d1;
     }
 
+    @StableAPI.Expose
     public static double parseDoubleWithDefaultAndMin(String str, double def, double min) {
         double d2;
 
@@ -301,6 +333,7 @@ public class MathHelper {
     /**
      * Returns the input value rounded up to the next highest power of two.
      */
+    @StableAPI.Expose
     public static int roundUpToPowerOfTwo(int a) {
         int j = a - 1;
         j |= j >> 1;
@@ -332,6 +365,7 @@ public class MathHelper {
      * Efficiently calculates the floor of the base-2 log of an integer value.  This is effectively the index of the
      * highest bit that is set.  For example, if the number in binary is 0...100101, this will return 5.
      */
+    @StableAPI.Expose
     public static int calculateLogBaseTwo(int a) {
         /*
          * Uses a B(2, 5) De Bruijn sequence and a lookup table to efficiently calculate the log-base-two of the given
@@ -341,6 +375,7 @@ public class MathHelper {
         return calculateLogBaseTwoDeBruijn(a) - (isPowerOfTwo(a) ? 0 : 1);
     }
 
+    @StableAPI.Expose
     public static int roundUp(int a, int b) {
         if (b == 0) {
             return 0;

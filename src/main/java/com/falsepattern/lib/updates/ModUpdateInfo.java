@@ -29,14 +29,19 @@ import org.apache.logging.log4j.Logger;
 @StableAPI(since = "0.8.0")
 public class ModUpdateInfo {
     @NonNull
+    @StableAPI.Expose
     public final String modID;
     @NonNull
+    @StableAPI.Expose
     public final String currentVersion;
     @NonNull
+    @StableAPI.Expose
     public final String latestVersion;
     @NonNull
+    @StableAPI.Expose
     public final String updateURL;
 
+    @StableAPI.Expose
     public void log(Logger logger) {
         logger.info("Updates are available for mod {}: Currently installed version is {}, " +
                     "latest available version is {}. Update URL: {}", modID, currentVersion, latestVersion,

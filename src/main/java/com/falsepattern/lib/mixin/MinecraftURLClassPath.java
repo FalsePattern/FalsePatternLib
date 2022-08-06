@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.StableAPI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
@@ -38,6 +39,7 @@ import java.net.URL;
  * Also added Grimoire protection.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@StableAPI(since = "0.10.0")
 public final class MinecraftURLClassPath {
     /**
      * Utility to manipulate the minecraft URL ClassPath
@@ -93,6 +95,7 @@ public final class MinecraftURLClassPath {
      * Adds a Jar to the Minecraft URL ClassPath - Needed when using mixins on classes outside of Minecraft or other
      * coremods
      */
+    @StableAPI.Expose
     public static void addJar(File pathToJar) throws Exception {
         if (!GRIMOIRE) {
             addURL.invoke(ucp, pathToJar.toURI().toURL());

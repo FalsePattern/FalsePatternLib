@@ -97,8 +97,8 @@ public class ConfigurationManager {
      * @param configClass The class to register.
      */
     @Deprecated
-    @DeprecationDetails(stableSince = "0.6.0",
-                        deprecatedSince = "0.10.0")
+    @DeprecationDetails(deprecatedSince = "0.10.0")
+    @StableAPI.Expose
     public static void registerConfig(Class<?> configClass) throws ConfigException {
         FalsePatternLib.getLog()
                        .warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.",
@@ -114,7 +114,7 @@ public class ConfigurationManager {
      * @return The configuration elements.
      */
     @SuppressWarnings("rawtypes")
-    @StableAPI(since = "0.6.0")
+    @StableAPI.Expose
     public static List<IConfigElement> getConfigElements(Class<?> configClass) throws ConfigException {
         return ConfigurationManagerImpl.getConfigElements(configClass);
     }

@@ -20,7 +20,11 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "0.10.0")
 public class AsmFieldNotFoundException extends AsmTransformException {
+    @StableAPI.Internal
     public AsmFieldNotFoundException(final String field) {
         super("can't find field " + field);
     }

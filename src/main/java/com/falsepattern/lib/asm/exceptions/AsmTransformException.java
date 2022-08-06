@@ -20,15 +20,21 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "0.10.0")
 public class AsmTransformException extends RuntimeException {
+    @StableAPI.Expose
     public AsmTransformException(final String message) {
         super(message);
     }
 
+    @StableAPI.Expose
     public AsmTransformException(final Throwable cause) {
         super(cause);
     }
 
+    @StableAPI.Expose
     public AsmTransformException(final String message, final Throwable cause) {
         super(message, cause);
     }

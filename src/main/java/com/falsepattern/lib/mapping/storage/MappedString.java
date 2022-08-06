@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.mapping.storage;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.mapping.types.MappingType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -36,23 +37,32 @@ import java.util.function.Function;
 @EqualsAndHashCode
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@StableAPI(since = "0.10.0")
 public class MappedString {
+    @StableAPI.Expose
     public final String notch;
+
+    @StableAPI.Expose
     public final String srg;
+
+    @StableAPI.Expose
     public final String mcp;
 
+    @StableAPI.Expose
     public MappedString(String[] source, int offset, int stride, Function<String, String> remapper, Map<String, String> stringPool) {
         notch = stringPool.computeIfAbsent(remapper.apply(source[offset]), (str) -> str);
         srg = stringPool.computeIfAbsent(remapper.apply(source[offset + stride]), (str) -> str);
         mcp = stringPool.computeIfAbsent(remapper.apply(source[offset + stride * 2]), (str) -> str);
     }
 
+    @StableAPI.Expose
     public static MappedString fuse(MappedString a, MappedString b, String delimiter, Map<String, String> stringPool) {
         return new MappedString(stringPool.computeIfAbsent(a.notch + delimiter + b.notch, (str) -> str),
                                 stringPool.computeIfAbsent(a.srg + delimiter + b.srg, (str) -> str),
                                 stringPool.computeIfAbsent(a.mcp + delimiter + b.mcp, (str) -> str));
     }
 
+    @StableAPI.Expose
     public String get(MappingType type) {
         switch (type) {
             case Notch:

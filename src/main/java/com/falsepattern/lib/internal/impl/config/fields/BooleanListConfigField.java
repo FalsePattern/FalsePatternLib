@@ -38,7 +38,7 @@ import java.util.Optional;
 public class BooleanListConfigField extends AListConfigField<boolean[]> {
     private final boolean[] defaultValue;
 
-    protected BooleanListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
+    public BooleanListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
         super(field, configuration, category, Property.Type.BOOLEAN);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBooleanList.class))
                                .map(Config.DefaultBooleanList::value)

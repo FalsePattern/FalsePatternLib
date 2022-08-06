@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 public class ComplexVersion extends Version {
     final Version[] versions;
 
+    @StableAPI.Expose
     public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {
         this.versions = new Version[subVersions.length + 1];
         this.versions[0] = mainVersion;

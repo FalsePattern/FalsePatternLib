@@ -31,13 +31,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.9.0")
 public class SimpleGuiConfig extends GuiConfig {
+    @StableAPI.Expose
     public SimpleGuiConfig(GuiScreen parent, Class<?> configClass, String modID, String modName)
             throws ConfigException {
-        this(parent, new Class<?>[]{configClass}, modID, modName);
+        this(parent, modID, modName, configClass);
     }
 
     @StableAPI(since = "0.10.0")
-    public SimpleGuiConfig(GuiScreen parent, Class<?>[] configClasses, String modID, String modName)
+    public SimpleGuiConfig(GuiScreen parent, String modID, String modName, Class<?>... configClasses)
             throws ConfigException {
         super(parent, ConfigurationManager.getConfigElementsMulti(configClasses), modID, false, false,
               modName + " Configuration", I18n.format("falsepatternlib.gui.config.description"));

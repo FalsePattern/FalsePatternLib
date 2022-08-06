@@ -41,6 +41,7 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 public final class RenderUtil {
     private final static Timer MINECRAFT_TIMER = getMinecraftTimer();
 
+    @StableAPI.Expose
     @SneakyThrows
     private static Timer getMinecraftTimer() {
         val timerField = ReflectionHelper.findField(Minecraft.class, "timer", "field_71428_T");
@@ -98,6 +99,7 @@ public final class RenderUtil {
         };
     }
 
+    @StableAPI.Expose
     public static float partialTick() {
         return MINECRAFT_TIMER.renderPartialTicks;
     }

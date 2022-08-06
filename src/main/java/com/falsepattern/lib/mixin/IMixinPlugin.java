@@ -45,12 +45,15 @@ import static java.nio.file.Files.walk;
 
 @StableAPI(since = "0.8.0")
 public interface IMixinPlugin extends IMixinConfigPlugin {
+    @StableAPI.Expose
     Path MODS_DIRECTORY_PATH = FileUtil.getMinecraftHome().toPath().resolve("mods");
 
+    @StableAPI.Expose
     static Logger createLogger(String modName) {
         return LogManager.getLogger(modName + " Mixin Loader");
     }
 
+    @StableAPI.Expose
     static File findJarOf(final ITargetedMod mod) {
         try (val stream = walk(MODS_DIRECTORY_PATH)) {
             return stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
@@ -59,6 +62,15 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
             return null;
         }
     }
+
+    @StableAPI.Expose
+    Logger getLogger();
+
+    @StableAPI.Expose
+    IMixin[] getMixinEnumValues();
+
+    @StableAPI.Expose
+    ITargetedMod[] getTargetedModEnumValues();
 
     @Override
     default void onLoad(String mixinPackage) {
@@ -107,8 +119,6 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return mixins;
     }
 
-    ITargetedMod[] getTargetedModEnumValues();
-
     default boolean loadJarOf(final ITargetedMod mod) {
         boolean success = false;
         try {
@@ -129,10 +139,6 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         }
         return success;
     }
-
-    Logger getLogger();
-
-    IMixin[] getMixinEnumValues();
 
     @Override
     default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {

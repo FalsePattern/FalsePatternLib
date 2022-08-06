@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.mapping.types;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.storage.MappedString;
@@ -33,12 +34,13 @@ import java.util.Map;
 @Accessors(fluent = true)
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@StableAPI(since = "0.10.0")
 public class UniversalClass {
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     @ToString.Include
     @EqualsAndHashCode.Include
     public final MappedString internalName;
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     @ToString.Include
     @EqualsAndHashCode.Include
     public final MappedString regularName;
@@ -50,25 +52,27 @@ public class UniversalClass {
     @Getter
     private MappingType realClassMapping = null;
 
+    @StableAPI.Expose
     public UniversalClass(String[] names, Map<String, String> stringPool) {
         internalName = new MappedString(names, 0, 1, (str) -> str, stringPool);
         regularName = new MappedString(names, 0, 1, (str) -> str.replace('/', '.'), stringPool);
     }
 
-    public void addField(UniversalField field) {
+    void addField(UniversalField field) {
         if (field.parent != this) {
             throw new IllegalArgumentException("Field's parent is not this class");
         }
         fields.unwrap(field.name, field);
     }
 
-    public void addMethod(UniversalMethod method) {
+    void addMethod(UniversalMethod method) {
         if (method.parent != this) {
             throw new IllegalArgumentException("Method's parent is not this class");
         }
         methods.unwrap(method.fusedNameDescriptor, method);
     }
 
+    @StableAPI.Expose
     public Class<?> asJavaClass() throws ClassNotFoundException {
         if (javaClassCache != null) {
             return javaClassCache;
@@ -93,6 +97,7 @@ public class UniversalClass {
         return javaClassCache;
     }
 
+    @StableAPI.Expose
     public String getName(NameType nameType, MappingType mappingType) {
         switch (nameType) {
             case Internal:
@@ -104,10 +109,12 @@ public class UniversalClass {
         }
     }
 
+    @StableAPI.Expose
     public String getNameAsDescriptor(MappingType mappingType) {
         return "L" + getName(NameType.Internal, mappingType) + ";";
     }
 
+    @StableAPI.Expose
     public UniversalField getField(MappingType mappingType, String fieldName) throws NoSuchFieldException {
         try {
             return fields.get(mappingType, fieldName);
@@ -116,6 +123,7 @@ public class UniversalClass {
         }
     }
 
+    @StableAPI.Expose
     public UniversalMethod getMethod(MappingType mappingType, String methodName, String methodDescriptor)
             throws NoSuchMethodException {
         try {

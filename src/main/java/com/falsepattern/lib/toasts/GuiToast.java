@@ -31,18 +31,18 @@ import javax.annotation.Nullable;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public class GuiToast {
-    @StableAPI(since = "0.10.0")
     @Nullable
+    @StableAPI.Expose
     public static <T extends IToast> T getToast(Class<? extends T> toastClass, Object type) {
         return GuiToastImpl.getInstance().getToast(toastClass, type);
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public static void clear() {
         GuiToastImpl.getInstance().clear();
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public static void add(IToast toastIn) {
         GuiToastImpl.getInstance().add(toastIn);
     }

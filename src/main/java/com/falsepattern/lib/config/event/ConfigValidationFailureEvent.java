@@ -40,19 +40,21 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.lang.reflect.Field;
 
 @StableAPI(since = "0.10.0")
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED,
+                         onConstructor_ = @StableAPI.Internal)
 public abstract class ConfigValidationFailureEvent extends Event {
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public final String reason;
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public final Class<?> configClass;
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public final String fieldName;
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public final boolean listElement;
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public final int listIndex;
 
+    @StableAPI.Internal
     public static void postNumericRangeOutOfBounds(Field field, int listIndex, String value, String min, String max) {
         FMLCommonHandler.instance()
                         .bus()
@@ -60,6 +62,7 @@ public abstract class ConfigValidationFailureEvent extends Event {
                                                           min, max));
     }
 
+    @StableAPI.Internal
     public static void postSize(Field field, int requestedSize, boolean fixedSize, int maxSize, int defaultSize) {
         FMLCommonHandler.instance()
                         .bus()
@@ -67,6 +70,7 @@ public abstract class ConfigValidationFailureEvent extends Event {
                                                       fixedSize, maxSize, defaultSize));
     }
 
+    @StableAPI.Internal
     public static void postStringSizeOutOfBounds(Field field, int listIndex, String text, int maxSize) {
         FMLCommonHandler.instance()
                         .bus()
@@ -74,10 +78,12 @@ public abstract class ConfigValidationFailureEvent extends Event {
                                                         maxSize));
     }
 
+    @StableAPI.Internal
     public static void fieldIsNull(Field field, int listIndex) {
         FMLCommonHandler.instance().bus().post(new FieldIsNull(field.getDeclaringClass(), field.getName(), listIndex));
     }
 
+    @StableAPI.Internal
     public static void postStringPatternMismatch(Field field, int listIndex, String text, String pattern) {
         FMLCommonHandler.instance()
                         .bus()
@@ -86,6 +92,7 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @SideOnly(Side.CLIENT)
+    @StableAPI.Internal
     public void toast() {
         val ann = configClass.getAnnotation(Config.class);
         val toast = new SimpleToast(ToastBG.TOAST_DARK, null,
@@ -97,8 +104,10 @@ public abstract class ConfigValidationFailureEvent extends Event {
         GuiToast.add(toast);
     }
 
+    @StableAPI.Internal
     protected abstract void customText(StringBuilder b);
 
+    @StableAPI.Internal
     public void logWarn() {
         val errorString = new StringBuilder("Error validating configuration field!");
         errorString.append("\nReason: ").append(reason);
@@ -111,14 +120,15 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    public static class NumericRangeOutOfBounds extends ConfigValidationFailureEvent {
-        @StableAPI(since = "0.10.0")
+    public static final class NumericRangeOutOfBounds extends ConfigValidationFailureEvent {
+        @StableAPI.Expose
         public final String value;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final String min;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final String max;
 
+        @StableAPI.Internal
         public NumericRangeOutOfBounds(Class<?> configClass, String fieldName, int listIndex, String value, String min, String max) {
             super("Number range out of bounds", configClass, fieldName, listIndex >= 0, listIndex);
             this.value = value;
@@ -133,17 +143,18 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    public static class ListSizeOutOfBounds extends ConfigValidationFailureEvent {
-        @StableAPI(since = "0.10.0")
+    public static final class ListSizeOutOfBounds extends ConfigValidationFailureEvent {
+        @StableAPI.Expose
         public final int size;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final boolean fixedSize;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final int maxSize;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final int defaultSize;
 
-        private ListSizeOutOfBounds(Class<?> configClass, String fieldName, int size, boolean fixedSize, int maxSize, int defaultSize) {
+        @StableAPI.Internal
+        public ListSizeOutOfBounds(Class<?> configClass, String fieldName, int size, boolean fixedSize, int maxSize, int defaultSize) {
             super("Array size out of bounds", configClass, fieldName, false, -1);
             this.size = size;
             this.fixedSize = fixedSize;
@@ -162,13 +173,14 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    public static class StringSizeOutOfBounds extends ConfigValidationFailureEvent {
-        @StableAPI(since = "0.10.0")
+    public static final class StringSizeOutOfBounds extends ConfigValidationFailureEvent {
+        @StableAPI.Expose
         public final String text;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final int maxSize;
 
-        private StringSizeOutOfBounds(Class<?> configClass, String fieldName, int listIndex, String text, int maxSize) {
+        @StableAPI.Internal
+        public StringSizeOutOfBounds(Class<?> configClass, String fieldName, int listIndex, String text, int maxSize) {
             super("String size out of bounds", configClass, fieldName, listIndex >= 0, listIndex);
             this.text = text;
             this.maxSize = maxSize;
@@ -186,8 +198,9 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    public static class FieldIsNull extends ConfigValidationFailureEvent {
-        private FieldIsNull(Class<?> configClass, String fieldName, int listIndex) {
+    public static final class FieldIsNull extends ConfigValidationFailureEvent {
+        @StableAPI.Internal
+        public FieldIsNull(Class<?> configClass, String fieldName, int listIndex) {
             super("Unexpected null", configClass, fieldName, listIndex >= 0, listIndex);
         }
 
@@ -198,13 +211,14 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    public static class StringPatternMismatch extends ConfigValidationFailureEvent {
-        @StableAPI(since = "0.10.0")
+    public static final class StringPatternMismatch extends ConfigValidationFailureEvent {
+        @StableAPI.Expose
         public final String text;
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public final String pattern;
 
-        private StringPatternMismatch(Class<?> configClass, String fieldName, int listIndex, String text, String pattern) {
+        @StableAPI.Internal
+        public StringPatternMismatch(Class<?> configClass, String fieldName, int listIndex, String text, String pattern) {
             super("String pattern mismatch", configClass, fieldName, listIndex >= 0, listIndex);
             this.text = text;
             this.pattern = pattern;

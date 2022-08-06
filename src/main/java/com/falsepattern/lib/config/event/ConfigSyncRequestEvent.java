@@ -38,28 +38,33 @@ import java.util.List;
  * {@link #postClient}
  */
 @StableAPI(since = "0.10.0")
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED,
+                         onConstructor_ = @StableAPI.Internal)
 public class ConfigSyncRequestEvent extends Event {
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public static void postClient() {
         FMLCommonHandler.instance().bus().post(new Client());
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public static void postServer(List<EntityPlayerMP> players) {
         FMLCommonHandler.instance().bus().post(new Server(new ArrayList<>(players)));
     }
 
     @StableAPI(since = "0.10.0")
-    public static class Client extends ConfigSyncRequestEvent {
+    @RequiredArgsConstructor(access = AccessLevel.PROTECTED,
+                             onConstructor_ = @StableAPI.Internal)
+    public static final class Client extends ConfigSyncRequestEvent {
 
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @StableAPI(since = "0.10.0")
-    public static class Server extends ConfigSyncRequestEvent {
+    @RequiredArgsConstructor(access = AccessLevel.PUBLIC,
+                             onConstructor_ = @StableAPI.Internal)
+    public static final class Server extends ConfigSyncRequestEvent {
         private final List<EntityPlayerMP> players;
 
+        @StableAPI.Expose
         public List<EntityPlayerMP> getPlayers() {
             return Collections.unmodifiableList(players);
         }

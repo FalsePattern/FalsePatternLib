@@ -41,10 +41,12 @@ public class ChunkPos {
     /**
      * The x position of the chunk.
      */
+    @StableAPI.Expose
     public final int x;
     /**
      * The z position of the chunk.
      */
+    @StableAPI.Expose
     public final int z;
 
     /**
@@ -52,6 +54,7 @@ public class ChunkPos {
      *
      * @param blockPos the block pos
      */
+    @StableAPI.Expose
     public ChunkPos(@NonNull BlockPos blockPos) {
         x = blockPos.getX() >> 4;
         z = blockPos.getZ() >> 4;
@@ -65,6 +68,7 @@ public class ChunkPos {
      *
      * @return the unique chunk long
      */
+    @StableAPI.Expose
     public static long asLong(int x, int z) {
         return (long) x & 0xFFFFFFFFL | ((long) z & 0xFFFFFFFFL) << 32;
     }
@@ -76,6 +80,7 @@ public class ChunkPos {
      *
      * @return the distance sq
      */
+    @StableAPI.Expose
     public double getDistanceSq(@NonNull Entity entity) {
         val dX = ((x << 4) + 8) - entity.posX;
         val dY = ((z << 4) + 8) - entity.posZ;
@@ -87,6 +92,7 @@ public class ChunkPos {
      *
      * @return the x start
      */
+    @StableAPI.Expose
     public int getXStart() {
         return x << 4;
     }
@@ -96,6 +102,7 @@ public class ChunkPos {
      *
      * @return the z start
      */
+    @StableAPI.Expose
     public int getZStart() {
         return z << 4;
     }
@@ -105,6 +112,7 @@ public class ChunkPos {
      *
      * @return the x end
      */
+    @StableAPI.Expose
     public int getXEnd() {
         return (x << 4) + 15;
     }
@@ -114,6 +122,7 @@ public class ChunkPos {
      *
      * @return the z end
      */
+    @StableAPI.Expose
     public int getZEnd() {
         return (z << 4) + 15;
     }
@@ -127,6 +136,7 @@ public class ChunkPos {
      *
      * @return the relative block position
      */
+    @StableAPI.Expose
     public BlockPos getBlock(int x, int y, int z) {
         return new BlockPos((this.x << 4) + x, y, (this.z << 4) + z);
     }

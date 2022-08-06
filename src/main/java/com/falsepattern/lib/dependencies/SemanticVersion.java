@@ -41,11 +41,13 @@ public class SemanticVersion extends Version {
     @Getter
     private final String build;
 
+    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
         this(majorVersion, minorVersion, patchVersion, preRelease, null);
     }
 
     @Builder
+    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease, String build) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
@@ -56,6 +58,7 @@ public class SemanticVersion extends Version {
         this.build = "".equals(build) ? null : build;
     }
 
+    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion) {
         this(majorVersion, minorVersion, patchVersion, null, null);
     }

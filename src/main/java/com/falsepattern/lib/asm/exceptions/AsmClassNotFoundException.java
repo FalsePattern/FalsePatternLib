@@ -20,7 +20,11 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "0.10.0")
 public class AsmClassNotFoundException extends AsmTransformException {
+    @StableAPI.Internal
     public AsmClassNotFoundException(final String clazz) {
         super("can't find class " + clazz);
     }

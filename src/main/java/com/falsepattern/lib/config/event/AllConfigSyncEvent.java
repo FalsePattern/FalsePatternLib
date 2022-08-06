@@ -37,23 +37,27 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED,
+                   onConstructor_ = @StableAPI.Internal)
 public class AllConfigSyncEvent extends Event {
 
+    @StableAPI.Internal
     public static boolean postStart() {
         val event = new Start();
         FMLCommonHandler.instance().bus().post(event);
         return !event.isCanceled();
     }
 
+    @StableAPI.Internal
     public static void postEnd() {
         FMLCommonHandler.instance().bus().post(new End());
     }
 
     @SideOnly(Side.CLIENT)
     @StableAPI(since = "0.10.0")
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Start extends AllConfigSyncEvent {
+    @NoArgsConstructor(access = AccessLevel.PUBLIC,
+                       onConstructor_ = @StableAPI.Internal)
+    public static final class Start extends AllConfigSyncEvent {
         @Override
         public boolean isCancelable() {
             return true;
@@ -62,7 +66,8 @@ public class AllConfigSyncEvent extends Event {
 
     @SideOnly(Side.CLIENT)
     @StableAPI(since = "0.10.0")
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class End extends AllConfigSyncEvent {
+    @NoArgsConstructor(access = AccessLevel.PUBLIC,
+                       onConstructor_ = @StableAPI.Internal)
+    public static final class End extends AllConfigSyncEvent {
     }
 }

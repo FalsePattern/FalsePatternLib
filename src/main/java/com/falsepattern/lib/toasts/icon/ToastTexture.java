@@ -34,17 +34,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public abstract class ToastTexture {
-    @Getter(onMethod_ = {@StableAPI(since = "0.10.0")})
+    @Getter(onMethod_ = @StableAPI.Expose)
     protected final IIcon icon;
-    @Getter(onMethod_ = {@StableAPI(since = "0.10.0")})
+    @Getter(onMethod_ = @StableAPI.Expose)
     protected final ResourceLocation texture;
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public ToastTexture(@NonNull ResourceLocation texture, int width, int height) {
         this(texture, RenderUtil.getFullTextureIcon(texture.toString(), width, height));
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public ToastTexture(@NonNull ResourceLocation texture, @NonNull IIcon icon) {
         this.icon = icon;
         this.texture = texture;
@@ -53,6 +53,6 @@ public abstract class ToastTexture {
     /**
      * Draws the icon at the specified position in the specified Gui
      */
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public abstract void draw(Gui guiIn, int x, int y);
 }

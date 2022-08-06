@@ -28,10 +28,12 @@ import com.falsepattern.lib.StableAPI;
 @StableAPI(since = "0.6.0")
 public class ConfigException extends Exception {
 
+    @StableAPI.Internal
     public ConfigException(String message) {
         super(message);
     }
 
+    @StableAPI.Internal
     public ConfigException(Throwable cause) {
         super(cause);
     }

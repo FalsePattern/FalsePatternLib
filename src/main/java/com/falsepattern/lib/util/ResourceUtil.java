@@ -48,6 +48,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static String getResourceStringFromJar(String resourcePath, Class<?> referenceClass) throws IOException {
         return getResourceStringFromJar(resourcePath, referenceClass, StandardCharsets.UTF_8);
     }
@@ -64,6 +65,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static String getResourceStringFromJar(String resourcePath, Class<?> referenceClass, Charset charset)
             throws IOException {
         return new String(getResourceBytesFromJar(resourcePath, referenceClass), charset);
@@ -79,6 +81,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static byte[] getResourceBytesFromJar(String resourcePath, Class<?> referenceClass) throws IOException {
         return readBytesSafe(getResourceFromJar(resourcePath, referenceClass), resourcePath);
     }
@@ -100,6 +103,7 @@ public class ResourceUtil {
      *
      * @return The resource, or null if it was not found.
      */
+    @StableAPI.Expose
     public static InputStream getResourceFromJar(String resourcePath, Class<?> referenceClass) {
         URL classFile = referenceClass.getResource('/' + referenceClass.getName().replace('.', '/') + ".class");
         lookup:
@@ -136,6 +140,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link InputStream#read(byte[])}
      */
+    @StableAPI.Expose
     public static byte[] readBytes(InputStream stream) throws IOException {
         val out = new ByteArrayOutputStream();
         val buf = new byte[4096];
@@ -155,6 +160,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static String getResourceString(String resourcePath) throws IOException {
         return getResourceString(resourcePath, StandardCharsets.UTF_8);
     }
@@ -169,6 +175,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static String getResourceString(String resourcePath, Charset charset) throws IOException {
         return new String(getResourceBytes(resourcePath), charset);
     }
@@ -182,6 +189,7 @@ public class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
+    @StableAPI.Expose
     public static byte[] getResourceBytes(String resourcePath) throws IOException {
         return readBytesSafe(ResourceUtil.class.getResourceAsStream(resourcePath), resourcePath);
     }

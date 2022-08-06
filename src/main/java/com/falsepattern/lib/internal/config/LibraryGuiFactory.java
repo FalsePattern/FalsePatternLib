@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.config;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.SimpleGuiFactory;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -27,6 +28,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
+@StableAPI(since = "__INTERNAL__")
 public class LibraryGuiFactory implements SimpleGuiFactory {
     @Override
     public Class<? extends GuiScreen> mainConfigGuiClass() {

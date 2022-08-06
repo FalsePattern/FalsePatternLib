@@ -50,7 +50,7 @@ public class SimpleToast implements IToast {
     private float displayedProgress;
     private float currentProgress;
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public SimpleToast(@NonNull ToastBG background,
                        @Nullable ToastIcon icon, IChatComponent titleComponent,
                        @Nullable IChatComponent subtitleComponent, boolean drawProgressBar, long timeout) {

@@ -28,6 +28,7 @@ import java.io.File;
 
 @StableAPI(since = "0.8.2")
 public class FileUtil {
+    @StableAPI.Expose
     public static File getMinecraftHome() {
         return Launch.minecraftHome == null ? new File(".") : Launch.minecraftHome;
     }

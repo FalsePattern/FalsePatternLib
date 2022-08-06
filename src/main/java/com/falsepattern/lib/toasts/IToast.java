@@ -33,25 +33,25 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public interface IToast {
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     Object NO_TOKEN = new Object();
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     Visibility draw(GuiToastImpl toastGui, long delta);
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     int width();
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     int height();
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     default Object getType() {
         return NO_TOKEN;
     }
 
-    @StableAPI(since = "0.10.0")
     @SideOnly(Side.CLIENT)
+    @StableAPI(since = "0.10.0")
     enum Visibility {
         SHOW(new ResourceLocation(Tags.MODID, "ui.toast.in")),
         HIDE(new ResourceLocation(Tags.MODID, "ui.toast.out"));
@@ -62,7 +62,7 @@ public interface IToast {
             this.sound = soundIn;
         }
 
-        @StableAPI(since = "0.10.0")
+        @StableAPI.Expose
         public void playSound(SoundHandler handler) {
             handler.playSound(PositionedSoundRecord.func_147674_a(this.sound, 1.0F));
         }

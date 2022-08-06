@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.asm;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import lombok.val;
 import org.apache.logging.log4j.Logger;
@@ -35,9 +36,12 @@ import java.util.List;
 /**
  * An ASM transformation dispatcher utility, inspired by mixins.
  */
+@StableAPI(since = "0.10.0")
 public interface SmartTransformer extends IClassTransformer {
+    @StableAPI.Expose
     Logger logger();
 
+    @StableAPI.Expose
     List<IClassNodeTransformer> transformers();
 
     @Override

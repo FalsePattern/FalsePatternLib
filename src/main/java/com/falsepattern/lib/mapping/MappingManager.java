@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.mapping;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.mapping.storage.Lookup;
@@ -35,10 +36,13 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.util.HashMap;
+import java.util.Map;
 
+@StableAPI(since = "0.10.0")
 public class MappingManager {
     private static final Lookup<UniversalClass> internalLookup = new Lookup<>();
     private static final Lookup<UniversalClass> regularLookup = new Lookup<>();
+    private static final Map<String, String> stringPool = new HashMap<>();
     private static boolean initialized = false;
 
     @SneakyThrows
@@ -47,8 +51,6 @@ public class MappingManager {
             return;
         }
         initialized = true;
-        long start = System.nanoTime();
-        val stringPool = new HashMap<String, String>();
         {
             val classMappings =
                     ResourceUtil.getResourceStringFromJar("/classes.csv", FalsePatternLib.class).split("\n");
@@ -64,7 +66,7 @@ public class MappingManager {
             for (int i = 1; i < fieldMappings.length; i++) {
                 val line = fieldMappings[i].split(",");
                 val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
-                new UniversalField(clazz, line, stringPool);
+                UniversalField.createAndAddToParent(clazz, line, stringPool);
             }
         }
         {
@@ -73,13 +75,12 @@ public class MappingManager {
             for (int i = 1; i < methodMappings.length; i++) {
                 val line = methodMappings[i].split(",");
                 val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
-                new UniversalMethod(clazz, line, stringPool);
+                UniversalMethod.createAndAddToParent(clazz, line, stringPool);
             }
         }
-        long end = System.nanoTime();
-        System.out.println("Parsed in " + (end - start) / 1000000 + "ms");
     }
 
+    @StableAPI.Expose
     public static UniversalClass classForName(NameType nameType, MappingType mappingType, String className)
             throws ClassNotFoundException {
         initialize();
@@ -99,6 +100,7 @@ public class MappingManager {
         }
     }
 
+    @StableAPI.Expose
     public static boolean containsClass(NameType nameType, MappingType mappingType, String className) {
         switch (nameType) {
             case Internal:
@@ -110,6 +112,7 @@ public class MappingManager {
         }
     }
 
+    @StableAPI.Expose
     public static UniversalField getField(FieldInsnNode instruction)
             throws ClassNotFoundException, NoSuchFieldException {
         if (!CoreLoadingPlugin.isObfuscated()) {
@@ -136,6 +139,7 @@ public class MappingManager {
         }
     }
 
+    @StableAPI.Expose
     public static UniversalMethod getMethod(MethodInsnNode instruction)
             throws ClassNotFoundException, NoSuchMethodException {
         if (!CoreLoadingPlugin.isObfuscated()) {

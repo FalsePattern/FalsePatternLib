@@ -73,6 +73,7 @@ public class UpdateChecker {
      *
      * @return A list of mods that were both available on the URL and installed
      */
+    @StableAPI.Expose
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
         return CompletableFuture.supplyAsync(() -> {
             if (!LibraryConfig.ENABLE_UPDATE_CHECKER) {
@@ -168,6 +169,7 @@ public class UpdateChecker {
      *
      * @throws UpdateCheckException If the update checker is disabled in config, the URL is invalid, or
      */
+    @StableAPI.Expose
     public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
         try {
             return fetchUpdatesAsync(url).join();
@@ -190,6 +192,7 @@ public class UpdateChecker {
      *
      * @return A list of chat messages that can be sent to players
      */
+    @StableAPI.Expose
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
         if (updates == null || updates.size() == 0) {
             return null;

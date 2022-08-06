@@ -32,7 +32,14 @@ import java.util.function.Supplier;
 @StableAPI(since = "0.8.0")
 public interface IMixin {
 
+    @StableAPI.Expose
     String getMixin();
+
+    @StableAPI.Expose
+    Side getSide();
+
+    @StableAPI.Expose
+    Predicate<List<ITargetedMod>> getFilter();
 
     default boolean shouldLoad(List<ITargetedMod> loadedMods) {
         val side = getSide();
@@ -40,33 +47,39 @@ public interface IMixin {
                 side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
     }
 
-    Side getSide();
-
-    Predicate<List<ITargetedMod>> getFilter();
-
+    @StableAPI(since = "0.10.0")
     enum Side {
+        @StableAPI.Expose
         COMMON,
+        @StableAPI.Expose
         CLIENT,
+        @StableAPI.Expose
         SERVER
     }
 
+    @StableAPI(since = "0.10.0")
     final class PredicateHelpers {
+        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> never() {
             return (list) -> false;
         }
 
+        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> condition(Supplier<Boolean> condition) {
             return (list) -> condition.get();
         }
 
+        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> always() {
             return (list) -> true;
         }
 
+        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> require(ITargetedMod mod) {
             return (list) -> list.contains(mod);
         }
 
+        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> avoid(ITargetedMod mod) {
             return (list) -> !list.contains(mod);
         }

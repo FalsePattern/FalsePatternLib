@@ -34,12 +34,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
 public class ToastIcon extends ToastTexture {
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public ToastIcon(@NonNull ResourceLocation texture, int width, int height) {
         super(texture, width, height);
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public ToastIcon(@NonNull ResourceLocation texture, @NonNull IIcon icon) {
         super(texture, icon);
     }

@@ -40,7 +40,7 @@ public abstract class AConfigField<T> {
     protected final String langKey;
     protected final Property.Type type;
     protected final Property property;
-    protected String comment;
+    protected final String comment;
 
     protected AConfigField(Field field, Configuration configuration, String category, Property.Type type) {
         this(field, configuration, category, type, false);

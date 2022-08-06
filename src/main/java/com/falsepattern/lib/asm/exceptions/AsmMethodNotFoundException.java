@@ -20,6 +20,9 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "0.10.0")
 public class AsmMethodNotFoundException extends AsmTransformException {
     public AsmMethodNotFoundException(final String method) {
         super("can't find method " + method);

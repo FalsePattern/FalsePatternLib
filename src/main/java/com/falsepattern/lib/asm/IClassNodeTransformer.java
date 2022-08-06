@@ -20,16 +20,22 @@
  */
 package com.falsepattern.lib.asm;
 
+import com.falsepattern.lib.StableAPI;
 import org.objectweb.asm.tree.ClassNode;
 
+@StableAPI(since = "0.10.0")
 public interface IClassNodeTransformer {
+    @StableAPI.Expose
     String getName();
 
+    @StableAPI.Expose
     boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated);
 
+    @StableAPI.Expose
     default int internalSortingOrder() {
         return 0;
     }
 
+    @StableAPI.Expose
     void transform(ClassNode cn, String transformedName, boolean obfuscated);
 }

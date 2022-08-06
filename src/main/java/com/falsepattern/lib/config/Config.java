@@ -44,11 +44,13 @@ public @interface Config {
     /**
      * The mod id that this configuration is associated with.
      */
+    @StableAPI.Expose
     String modid();
 
     /**
      * Root element category, defaults to "general". You must not specify an empty string.
      */
+    @StableAPI.Expose
     String category() default "general";
 
     /**
@@ -59,6 +61,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     @interface LangKey {
+        @StableAPI.Expose
         String value();
     }
 
@@ -70,6 +73,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface Comment {
+        @StableAPI.Expose
         String[] value();
     }
 
@@ -93,6 +97,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultBoolean {
+        @StableAPI.Expose
         boolean value();
     }
 
@@ -104,8 +109,9 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface RangeInt {
+        @StableAPI.Expose
         int min() default Integer.MIN_VALUE;
-
+        @StableAPI.Expose
         int max() default Integer.MAX_VALUE;
     }
 
@@ -118,6 +124,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultInt {
+        @StableAPI.Expose
         int value();
     }
 
@@ -126,14 +133,15 @@ public @interface Config {
      * Notice: float configs are deprecated! Use double configs instead!
      */
     @Deprecated
-    @DeprecationDetails(stableSince = "0.6.0",
-                        deprecatedSince = "0.10.0")
+    @DeprecationDetails(deprecatedSince = "0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @StableAPI(since = "0.6.0")
     @interface RangeFloat {
+        @StableAPI.Expose
         float min() default -Float.MAX_VALUE;
-
+        @StableAPI.Expose
         float max() default Float.MAX_VALUE;
     }
 
@@ -143,12 +151,13 @@ public @interface Config {
      * Notice: float configs are deprecated! Use double configs instead!
      */
     @Deprecated
-    @DeprecationDetails(stableSince = "0.6.0",
-                        deprecatedSince = "0.10.0")
+    @DeprecationDetails(deprecatedSince = "0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @StableAPI(since = "0.6.0")
     @interface DefaultFloat {
+        @StableAPI.Expose
         float value();
     }
 
@@ -160,8 +169,9 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface RangeDouble {
+        @StableAPI.Expose
         double min() default -Double.MAX_VALUE;
-
+        @StableAPI.Expose
         double max() default Double.MAX_VALUE;
     }
 
@@ -174,6 +184,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultDouble {
+        @StableAPI.Expose
         double value();
     }
 
@@ -186,6 +197,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultString {
+        @StableAPI.Expose
         String value();
     }
 
@@ -203,6 +215,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface StringMaxLength {
+        @StableAPI.Expose
         int value();
     }
 
@@ -214,6 +227,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface Pattern {
+        @StableAPI.Expose
         String value();
     }
 
@@ -226,6 +240,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultEnum {
+        @StableAPI.Expose
         String value();
     }
 
@@ -238,6 +253,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultStringList {
+        @StableAPI.Expose
         String[] value();
     }
 
@@ -250,6 +266,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultDoubleList {
+        @StableAPI.Expose
         double[] value();
     }
 
@@ -262,6 +279,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultIntList {
+        @StableAPI.Expose
         int[] value();
     }
 
@@ -274,6 +292,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DefaultBooleanList {
+        @StableAPI.Expose
         boolean[] value();
     }
 
@@ -300,6 +319,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface ListMaxLength {
+        @StableAPI.Expose
         int value();
     }
 
@@ -312,6 +332,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface Name {
+        @StableAPI.Expose
         String value();
     }
 

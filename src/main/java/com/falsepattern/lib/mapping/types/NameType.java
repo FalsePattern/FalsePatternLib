@@ -20,7 +20,12 @@
  */
 package com.falsepattern.lib.mapping.types;
 
+import com.falsepattern.lib.StableAPI;
+
+@StableAPI(since = "0.10.0")
 public enum NameType {
+    @StableAPI.Expose
     Internal,
+    @StableAPI.Expose
     Regular
 }

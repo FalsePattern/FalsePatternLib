@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.config;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.internal.Tags;
 
@@ -53,8 +54,11 @@ public class ToastConfig {
         return ALIGN == Side.Left;
     }
 
+    @StableAPI(since = "__INTERNAL__")
     public enum Side {
+        @StableAPI.Expose
         Left,
+        @StableAPI.Expose
         Right
     }
 }

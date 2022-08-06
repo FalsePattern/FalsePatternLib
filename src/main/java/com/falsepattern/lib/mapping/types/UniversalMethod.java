@@ -20,11 +20,13 @@
  */
 package com.falsepattern.lib.mapping.types;
 
+import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.mapping.storage.MappedString;
-import com.falsepattern.lib.util.ReflectionUtil;
+import com.falsepattern.lib.internal.ReflectionUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -38,27 +40,35 @@ import java.util.Map;
 @Accessors(fluent = true)
 @ToString
 @EqualsAndHashCode
+@StableAPI(since = "0.10.0")
 public class UniversalMethod {
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     public final UniversalClass parent;
 
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     public final MappedString name;
-    @Getter
+
+    @Getter(onMethod_ = @StableAPI.Expose)
     public final MappedString descriptor;
-    @Getter
+
+    @Getter(onMethod_ = @StableAPI.Expose)
     public final MappedString fusedNameDescriptor;
 
     private Method javaMethodCache = null;
 
-    public UniversalMethod(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
+    private UniversalMethod(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
         this.parent = parent;
         name = new MappedString(names, 0, 2, (str) -> str.substring(str.lastIndexOf('/') + 1), stringPool);
         descriptor = new MappedString(names, 1, 2, (str) -> str, stringPool);
         fusedNameDescriptor = MappedString.fuse(name, descriptor, "", stringPool);
         parent.addMethod(this);
+    }
+
+    @StableAPI.Expose
+    public static void createAndAddToParent(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
+        new UniversalMethod(parent, names, stringPool);
     }
 
     private static Class<?>[] decodeMethodDescriptor(String desc) throws ClassNotFoundException {
@@ -124,14 +134,17 @@ public class UniversalMethod {
         return result.toArray(new Class[0]);
     }
 
+    @StableAPI.Expose
     public String getName(MappingType mappingType) {
         return name.get(mappingType);
     }
 
+    @StableAPI.Expose
     public String getDescriptor(MappingType mappingType) {
         return descriptor.get(mappingType);
     }
 
+    @StableAPI.Expose
     public Method asJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
         if (javaMethodCache != null) {
             return javaMethodCache;
@@ -144,14 +157,33 @@ public class UniversalMethod {
     }
 
     /**
+     * A convenience method for {@link Method#invoke(Object, Object...)} with a {@link SneakyThrows} annotation, so that
+     * you don't need to manually handle exceptions.
+     */
+    @SuppressWarnings("unchecked")
+    @SneakyThrows
+    @StableAPI.Expose
+    public <T> T invoke(Object instance, Object... arguments) {
+        val m = asJavaMethod();
+        return (T) m.invoke(instance, arguments);
+    }
+
+    @StableAPI.Expose
+    public <T> T invokeStatic(Object... arguments) {
+        return invoke(null, arguments);
+    }
+
+    /**
      * This is only here for completeness' sake, given that MethodInsnNode itself also has a deprecated yet functional constructor.
      */
     @Deprecated
+    @StableAPI.Expose
     public MethodInsnNode asInstruction(int opcode, MappingType mapping) {
         return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
                                   getDescriptor(mapping));
     }
 
+    @StableAPI.Expose
     public MethodInsnNode asInstruction(int opcode, MappingType mapping, boolean itf) {
         return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
                                   getDescriptor(mapping), itf);

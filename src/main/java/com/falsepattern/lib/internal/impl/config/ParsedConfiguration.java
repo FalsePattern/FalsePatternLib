@@ -24,6 +24,8 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.internal.impl.config.fields.AConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.BooleanConfigField;
+import com.falsepattern.lib.internal.impl.config.fields.BooleanListConfigField;
+import com.falsepattern.lib.internal.impl.config.fields.DoubleConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.DoubleListConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.EnumConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.FloatConfigField;
@@ -31,7 +33,7 @@ import com.falsepattern.lib.internal.impl.config.fields.IntConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.IntListConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.StringConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.StringListConfigField;
-import com.falsepattern.lib.util.ReflectionUtil;
+import com.falsepattern.lib.internal.ReflectionUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -175,12 +177,14 @@ public class ParsedConfiguration {
             } else if (fieldClass.equals(Float.class) || fieldClass.equals(float.class)) {
                 //noinspection deprecation
                 fields.put(name, new FloatConfigField(field, rawConfig, category));
+            } else if (fieldClass.equals(Double.class) || fieldClass.equals(double.class)) {
+                fields.put(name, new DoubleConfigField(field, rawConfig, category));
             } else if (fieldClass.equals(String.class)) {
                 fields.put(name, new StringConfigField(field, rawConfig, category));
             } else if (fieldClass.isEnum()) {
                 fields.put(name, new EnumConfigField<>(field, rawConfig, category));
             } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(boolean.class)) {
-                fields.put(name, new StringListConfigField(field, rawConfig, category));
+                fields.put(name, new BooleanListConfigField(field, rawConfig, category));
             } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(int.class)) {
                 fields.put(name, new IntListConfigField(field, rawConfig, category));
             } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(double.class)) {

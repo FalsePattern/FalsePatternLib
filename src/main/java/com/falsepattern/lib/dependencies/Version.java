@@ -35,6 +35,7 @@ public abstract class Version implements Comparable<Version> {
         return equals((Version) obj);
     }
 
+    @StableAPI.Expose
     public boolean equals(Version other) {
         return compareTo(other) == 0;
     }
