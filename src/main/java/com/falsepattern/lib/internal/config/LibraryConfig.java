@@ -45,13 +45,12 @@ public class LibraryConfig {
     @Config.DefaultEnum("Log")
     public static ValidationLogging CONFIG_ERROR_LOUDNESS;
 
-    @StableAPI(since = "__INTERNAL__")
     public enum ValidationLogging {
-        @StableAPI.Expose
+        @StableAPI.Expose(since = "__INTERNAL__")
         None,
-        @StableAPI.Expose
+        @StableAPI.Expose(since = "__INTERNAL__")
         Log,
-        @StableAPI.Expose
+        @StableAPI.Expose(since = "__INTERNAL__")
         LogAndToast
     }
 }

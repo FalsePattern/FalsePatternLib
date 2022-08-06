@@ -35,6 +35,8 @@ import com.falsepattern.lib.toasts.GuiToast;
 import com.falsepattern.lib.toasts.SimpleToast;
 import com.falsepattern.lib.toasts.icon.ToastBG;
 import com.falsepattern.lib.util.FileUtil;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -81,6 +83,7 @@ public class ConfigurationManagerImpl {
     private static final Map<String, Configuration> configs = new HashMap<>();
     private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
     private static final Map<Class<?>, ParsedConfiguration> parsedConfigMap = new HashMap<>();
+    private static final BiMap<String, Class<?>> serializedNames = HashBiMap.create();
     private static final ConfigurationManagerImpl instance = new ConfigurationManagerImpl();
     private static boolean initialized = false;
     private static Path configDir;
@@ -91,6 +94,7 @@ public class ConfigurationManagerImpl {
             val parsedConfig = ParsedConfiguration.parseConfig(configClass);
             configToClassMap.computeIfAbsent(parsedConfig.rawConfig, (ignored) -> new HashSet<>()).add(configClass);
             parsedConfigMap.put(configClass, ParsedConfiguration.parseConfig(configClass));
+            serializedNames.put(parsedConfig.modid + "$" + parsedConfig.category, configClass);
         }
     }
 
@@ -134,6 +138,7 @@ public class ConfigurationManagerImpl {
 
     public static void sendRequest(DataOutput output) throws IOException {
         val synced = new ArrayList<Class<?>>();
+        val inv = serializedNames.inverse();
         for (val entry : parsedConfigMap.entrySet()) {
             if (entry.getValue().sync) {
                 synced.add(entry.getKey());
@@ -141,20 +146,20 @@ public class ConfigurationManagerImpl {
         }
         output.writeInt(synced.size());
         for (val clazz : synced) {
-            output.writeUTF(clazz.getName());
+            output.writeUTF(inv.get(clazz));
         }
     }
 
     public static List<Class<?>> receiveRequest(DataInput input) throws IOException {
         val result = new ArrayList<Class<?>>();
         val count = input.readInt();
-        val classNames = new HashSet<String>();
+        val requestedNames = new HashSet<String>();
         for (int i = 0; i < count; i++) {
-            classNames.add(input.readUTF());
+            requestedNames.add(input.readUTF());
         }
-        for (val entry : parsedConfigMap.keySet()) {
-            if (classNames.contains(entry.getName())) {
-                result.add(entry);
+        for (val entry : serializedNames.keySet()) {
+            if (requestedNames.contains(entry)) {
+                result.add(serializedNames.get(entry));
             }
         }
         return result;
@@ -168,8 +173,9 @@ public class ConfigurationManagerImpl {
             }
         }
         output.writeInt(syncEntries.size());
+        val inv = serializedNames.inverse();
         for (val entry : syncEntries.entrySet()) {
-            output.writeUTF(entry.getKey().getName());
+            output.writeUTF(inv.get(entry.getKey()));
             val b = new ByteArrayOutputStream();
             val bo = new DataOutputStream(b);
             entry.getValue().transmit(bo);
@@ -186,27 +192,26 @@ public class ConfigurationManagerImpl {
         }
         int count = input.readInt();
         for (int i = 0; i < count; i++) {
-            String className = input.readUTF();
+            String serializedName = input.readUTF();
             int dataSize = input.readInt();
-            val opt =
-                    parsedConfigMap.keySet().stream().filter((clazz) -> clazz.getName().equals(className)).findFirst();
+            val opt = serializedNames.keySet().stream().filter((key) -> key.equals(serializedName)).findFirst();
             if (!opt.isPresent()) {
                 input.skipBytes(dataSize);
-                FalsePatternLib.getLog().warn("Server tried to sync config not registered on our side: " + className);
+                FalsePatternLib.getLog().warn("Server tried to sync config not registered on our side: " + serializedName);
                 continue;
             }
-            val clazz = opt.get();
+            val clazz = serializedNames.get(opt.get());
             val config = parsedConfigMap.get(clazz);
             if (!config.sync) {
                 input.skipBytes(dataSize);
                 FalsePatternLib.getLog()
                                .warn("Server tried to sync config without @Synchronize annotation on our side: " +
-                                     className);
+                                     serializedName);
                 continue;
             }
             if (!ConfigSyncEvent.postStart(clazz)) {
                 input.skipBytes(dataSize);
-                FalsePatternLib.getLog().warn("Config synchronization was cancelled by event for: " + className);
+                FalsePatternLib.getLog().warn("Config synchronization was cancelled by event for: " + serializedName);
                 continue;
             }
             val bytes = new byte[dataSize];

@@ -54,11 +54,10 @@ public class ToastConfig {
         return ALIGN == Side.Left;
     }
 
-    @StableAPI(since = "__INTERNAL__")
     public enum Side {
-        @StableAPI.Expose
+        @StableAPI.Expose(since = "__INTERNAL__")
         Left,
-        @StableAPI.Expose
+        @StableAPI.Expose(since = "__INTERNAL__")
         Right
     }
 }
