@@ -49,7 +49,7 @@ public final class RenderUtil {
         return (Timer) timerField.get(getMinecraft());
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
         return new IIcon() {
             @Override

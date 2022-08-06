@@ -115,12 +115,12 @@ public class SimpleToast implements IToast {
         return background.getIcon().getIconHeight();
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public void hide() {
         visibility = IToast.Visibility.HIDE;
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose
     public void setProgress(float progress) {
         this.currentProgress = progress;
     }

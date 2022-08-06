@@ -43,12 +43,12 @@ import java.util.function.BiConsumer;
 @StableAPI(since = "0.6.0")
 public class ConfigurationManager {
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static void initialize(Class<?>... configClasses) throws ConfigException {
         initialize((a, b) -> {}, configClasses);
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static void initialize(BiConsumer<Class<?>, Field> validatorErrorCallback, Class<?>... configClasses)
             throws ConfigException {
         for (val clazz : configClasses) {
@@ -59,12 +59,12 @@ public class ConfigurationManager {
         }
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static boolean validate(boolean resetInvalid, Class<?>... configClasses) throws ConfigException {
         return validate((x, y) -> {}, resetInvalid, configClasses);
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static boolean validate(BiConsumer<Class<?>, Field> validatorErrorCallback, boolean resetInvalid, Class<?>... configClasses)
             throws ConfigException {
         boolean valid = true;
@@ -74,14 +74,14 @@ public class ConfigurationManager {
         return valid;
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static void loadFromFile(Class<?>... configClasses) throws ConfigException {
         for (val clazz : configClasses) {
             ConfigurationManagerImpl.load(clazz);
         }
     }
 
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static void saveToFile(boolean validateAndResetInvalid, Class<?>... configClasses) throws ConfigException {
         for (val clazz : configClasses) {
             if (validateAndResetInvalid) {
@@ -127,7 +127,7 @@ public class ConfigurationManager {
      * @return The configuration elements.
      */
     @SuppressWarnings("rawtypes")
-    @StableAPI(since = "0.10.0")
+    @StableAPI.Expose(since = "0.10.0")
     public static List<IConfigElement> getConfigElementsMulti(Class<?>... configClasses) throws ConfigException {
         switch (configClasses.length) {
             case 0:

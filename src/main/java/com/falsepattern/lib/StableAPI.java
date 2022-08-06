@@ -38,7 +38,8 @@ import java.lang.annotation.Target;
  * fields or non-override methods you may have added if you want to expose those too.
  * <p>
  * NOTICE: You should no longer use this annotation exclusively on classes themselves, and instead, annotate every single
- * public or protected member you want to expose as a public API!
+ * public or protected member you want to expose as a public API! See the {@link Expose} and {@link Internal} annotations
+ * for extra info.
  * <p>
  * Private members will never be considered stable, and can be removed without notice.
  * <p>
@@ -48,30 +49,33 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
+@Target(ElementType.TYPE)
 @StableAPI(since = "0.6.0")
 public @interface StableAPI {
     /**
      * The version this API was introduced/stabilized in. Used for library version tracking.
      */
-    @StableAPI(since = "0.6.0") String since();
+    @StableAPI.Expose
+    String since();
 
     /**
      * You may use this annotation if you want a member to have an equal effective {@link #since()} value as its owner
      * class.
      * <p>
      * Everything else from the {@link StableAPI} class still applies, this is only here for brevity's sake.
-     * Note that if you add a new field in a version newer than the class, you must use {@link StableAPI} with the
-     * correct version!
+     * Note that if you add a method/field in a version newer than the class, you must also specify the correct version!
      * <p>
      * Also note that this only works for class members (methods and fields),
      * inner classes still need to use {@link StableAPI}.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(value = {ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
+    @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
     @StableAPI(since = "0.10.0")
-    @interface Expose {}
+    @interface Expose {
+        @StableAPI.Expose
+        String since() default "__PARENT__";
+    }
 
     /**
      * Use this if you want to explicitly mark specific members of a {@link StableAPI} class as internal-use only.
@@ -81,7 +85,7 @@ public @interface StableAPI {
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(value = {ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
+    @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
     @StableAPI(since = "0.10.0")
     @interface Internal {}
 }
