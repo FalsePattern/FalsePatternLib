@@ -21,12 +21,14 @@
 package com.falsepattern.lib.internal.impl.dependencies;
 
 import com.falsepattern.lib.dependencies.DependencyLoader;
+import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.Version;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.util.FileUtil;
+import io.netty.util.internal.ConcurrentSet;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -45,27 +47,40 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class DependencyLoaderImpl {
 
     /**
-     * Dependency checksum formats in a decreasing order of quality.
+     * Library checksum formats in a decreasing order of quality.
      */
     private static final String[] CHECKSUM_TYPES = new String[]{"sha512", "sha256", "sha1", "md5"};
-    private static final Map<String, Version> loadedLibraries = new HashMap<>();
-    private static final Map<String, String> loadedLibraryMods = new HashMap<>();
-    private static final Set<String> mavenRepositories = new HashSet<>();
-    private static final Logger log = LogManager.getLogger(Tags.MODNAME + " Dependency Downloader");
+    private static final Map<String, Version> loadedLibraries = new ConcurrentHashMap<>();
+    private static final Map<String, String> loadedLibraryMods = new ConcurrentHashMap<>();
+    private static final Set<String> mavenRepositories = new ConcurrentSet<>();
+    private static final Logger log = LogManager.getLogger(Tags.MODNAME + " Library Downloader");
+
+    private static final AtomicLong counter = new AtomicLong(0);
+    private static final ExecutorService executor = Executors.newCachedThreadPool(r -> {
+        val thread = new Thread(r);
+        thread.setDaemon(true);
+        thread.setName("Dependency Download Thread " + counter.incrementAndGet());
+        return thread;
+    });
 
     public static void addMavenRepo(String url) {
         mavenRepositories.add(url);
     }
 
+    @Deprecated
     public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
         new DependencyLoadTask(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
                                regularSuffix, devSuffix).load();
@@ -115,7 +130,7 @@ public class DependencyLoaderImpl {
         }
     }
 
-    private static void addToClasspath(File file) {
+    private static synchronized void addToClasspath(File file) {
         try {
             val cl = (LaunchClassLoader) DependencyLoader.class.getClassLoader();
             cl.addURL(file.toURI().toURL());
@@ -131,6 +146,21 @@ public class DependencyLoaderImpl {
             return;
         }
         Internet.transferAndClose(is, new BufferedOutputStream(Files.newOutputStream(target.toPath())));
+    }
+
+    public static void loadLibraries(Library... libraries) {
+        loadLibrariesAsync(libraries).join();
+    }
+
+    public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
+        val futures = new ArrayList<CompletableFuture<Void>>();
+        for (val library: libraries) {
+            val task = new DependencyLoadTask(library.loadingModId, library.groupId, library.artifactId,
+                                              library.minVersion, library.maxVersion, library.preferredVersion,
+                                              library.regularSuffix, library.devSuffix);
+            futures.add(CompletableFuture.runAsync(task::load, executor));
+        }
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     @RequiredArgsConstructor

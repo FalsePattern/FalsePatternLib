@@ -23,6 +23,7 @@ package com.falsepattern.lib.updates;
 import com.falsepattern.json.node.JsonNode;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
+import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.Internet;
 import com.falsepattern.lib.internal.Tags;
@@ -88,14 +89,14 @@ public class UpdateChecker {
             if (!jsonLibraryLoaded.get()) {
                 try {
                     DependencyLoader.addMavenRepo("https://maven.falsepattern.com/");
-                    DependencyLoader.builder()
-                                    .loadingModId(Tags.MODID)
-                                    .groupId("com.falsepattern")
-                                    .artifactId("json")
-                                    .minVersion(new SemanticVersion(0, 4, 0))
-                                    .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE, Integer.MAX_VALUE))
-                                    .preferredVersion(new SemanticVersion(0, 4, 1))
-                                    .build();
+                    DependencyLoader.loadLibraries(Library.builder()
+                                                          .loadingModId(Tags.MODID)
+                                                          .groupId("com.falsepattern")
+                                                          .artifactId("json")
+                                                          .minVersion(new SemanticVersion(0, 4, 0))
+                                                          .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE, Integer.MAX_VALUE))
+                                                          .preferredVersion(new SemanticVersion(0, 4, 1))
+                                                          .build());
                 } catch (Exception e) {
                     throw new CompletionException(
                             new UpdateCheckException("Failed to load json library for update checker!", e));
