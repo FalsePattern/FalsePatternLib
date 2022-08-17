@@ -24,22 +24,22 @@ import com.falsepattern.lib.StableAPI;
 
 @StableAPI(since = "0.8.3")
 public class UpdateCheckException extends Exception {
-    @StableAPI.Expose
+    @StableAPI.Internal
     public UpdateCheckException(String message) {
         super(message);
     }
 
-    @StableAPI.Expose
+    @StableAPI.Internal
     public UpdateCheckException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    @StableAPI.Expose
+    @StableAPI.Internal
     public UpdateCheckException(Throwable cause) {
         super(cause);
     }
 
-    @StableAPI.Expose
+    @StableAPI.Internal
     protected UpdateCheckException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

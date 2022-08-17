@@ -21,8 +21,10 @@
 package com.falsepattern.lib.mapping;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.dependencies.DependencyLoader;
+import com.falsepattern.lib.dependencies.Library;
+import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.CoreLoadingPlugin;
-import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.types.MappingType;
 import com.falsepattern.lib.mapping.types.NameType;
@@ -32,9 +34,12 @@ import com.falsepattern.lib.mapping.types.UniversalMethod;
 import com.falsepattern.lib.util.ResourceUtil;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.var;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.tukaani.xz.LZMA2Options;
 
+import java.io.DataInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,9 +56,26 @@ public class MappingManager {
             return;
         }
         initialized = true;
+        DependencyLoader.addMavenRepo("https://repo1.maven.org/maven2/");
+        DependencyLoader.loadLibraries(Library.builder()
+                                              .groupId("org.tukaani")
+                                              .artifactId("xz")
+                                              .minVersion(SemanticVersion.builder()
+                                                                         .majorVersion(1)
+                                                                         .minorVersion(9)
+                                                                         .patchVersion(-1)
+                                                                         .build())
+                                              .preferredVersion(SemanticVersion.builder()
+                                                                               .majorVersion(1)
+                                                                               .minorVersion(9)
+                                                                               .patchVersion(-1)
+                                                                               .build())
+                                              .build());
+        val input = new DataInputStream(new LZMA2Options(6).getInputStream(ResourceUtil.getResourceFromJar("/mappings.lzma2", CoreLoadingPlugin.class)));
         {
-            val classMappings =
-                    ResourceUtil.getResourceStringFromJar("/classes.csv", FalsePatternLib.class).split("\n");
+            var classBytes = new byte[input.readInt()];
+            input.readFully(classBytes);
+            val classMappings = new String(classBytes).split("\n");
             for (int i = 1; i < classMappings.length; i++) {
                 val line = classMappings[i].split(",");
                 val clazz = new UniversalClass(line, stringPool);
@@ -62,7 +84,9 @@ public class MappingManager {
             }
         }
         {
-            val fieldMappings = ResourceUtil.getResourceStringFromJar("/fields.csv", FalsePatternLib.class).split("\n");
+            var fieldBytes = new byte[input.readInt()];
+            input.readFully(fieldBytes);
+            var fieldMappings = new String(fieldBytes).split( "\n");
             for (int i = 1; i < fieldMappings.length; i++) {
                 val line = fieldMappings[i].split(",");
                 val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
@@ -70,8 +94,9 @@ public class MappingManager {
             }
         }
         {
-            val methodMappings =
-                    ResourceUtil.getResourceStringFromJar("/methods.csv", FalsePatternLib.class).split("\n");
+            var methodBytes = new byte[input.readInt()];
+            input.readFully(methodBytes);
+            val methodMappings = new String(methodBytes).split("\n");
             for (int i = 1; i < methodMappings.length; i++) {
                 val line = methodMappings[i].split(",");
                 val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));

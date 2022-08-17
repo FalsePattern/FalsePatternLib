@@ -21,7 +21,6 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
@@ -30,23 +29,17 @@ import java.util.Objects;
 
 @StableAPI(since = "0.6.0")
 public class SemanticVersion extends Version {
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     private final int majorVersion;
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     private final int minorVersion;
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     private final int patchVersion;
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     private final String preRelease;
-    @Getter
+    @Getter(onMethod_ = @StableAPI.Expose)
     private final String build;
 
-    @StableAPI.Expose
-    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
-        this(majorVersion, minorVersion, patchVersion, preRelease, null);
-    }
-
-    @Builder
     @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease, String build) {
         this.majorVersion = majorVersion;
@@ -59,8 +52,28 @@ public class SemanticVersion extends Version {
     }
 
     @StableAPI.Expose
+    public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
+        this(majorVersion, minorVersion, patchVersion, preRelease, null);
+    }
+
+    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion) {
         this(majorVersion, minorVersion, patchVersion, null, null);
+    }
+
+    @StableAPI.Expose(since = "0.10.0")
+    public SemanticVersion(int majorVersion, int minorVersion) {
+        this(majorVersion, minorVersion, -1, null, null);
+    }
+
+    @StableAPI.Expose(since = "0.10.0")
+    public SemanticVersion(int majorVersion) {
+        this(majorVersion, -1, -1, null, null);
+    }
+
+    @StableAPI.Expose
+    public static SemanticVersionBuilder builder() {
+        return new SemanticVersionBuilder();
     }
 
     @Override
@@ -98,7 +111,62 @@ public class SemanticVersion extends Version {
 
     @Override
     public String toString() {
-        return majorVersion + "." + minorVersion + "." + patchVersion + (preRelease == null ? "" : "-" + preRelease) +
+        return majorVersion + (minorVersion < 0 ? "" : "." + minorVersion) + (patchVersion < 0 ? "" : "." + patchVersion) + (preRelease == null ? "" : "-" + preRelease) +
                (build == null ? "" : "+" + build);
+    }
+
+    @StableAPI(since = "0.10.0")
+    public static class SemanticVersionBuilder {
+        private int majorVersion;
+        private int minorVersion = -1;
+        private int patchVersion = -1;
+        private String preRelease;
+        private String build;
+
+        @StableAPI.Internal
+        SemanticVersionBuilder() {
+        }
+
+        @StableAPI.Expose
+        public SemanticVersionBuilder majorVersion(int majorVersion) {
+            this.majorVersion = majorVersion;
+            return this;
+        }
+
+        @StableAPI.Expose
+        public SemanticVersionBuilder minorVersion(int minorVersion) {
+            this.minorVersion = minorVersion;
+            return this;
+        }
+
+        @StableAPI.Expose
+        public SemanticVersionBuilder patchVersion(int patchVersion) {
+            this.patchVersion = patchVersion;
+            return this;
+        }
+
+        @StableAPI.Expose
+        public SemanticVersionBuilder preRelease(String preRelease) {
+            this.preRelease = preRelease;
+            return this;
+        }
+
+        @StableAPI.Expose
+        public SemanticVersionBuilder build(String build) {
+            this.build = build;
+            return this;
+        }
+
+        @StableAPI.Expose
+        public SemanticVersion build() {
+            return new SemanticVersion(majorVersion, minorVersion, patchVersion, preRelease, build);
+        }
+
+        @Override
+        public String toString() {
+            return "SemanticVersion.SemanticVersionBuilder(majorVersion=" + this.majorVersion + ", minorVersion=" +
+                   this.minorVersion + ", patchVersion=" + this.patchVersion + ", preRelease=" + this.preRelease +
+                   ", build=" + this.build + ")";
+        }
     }
 }

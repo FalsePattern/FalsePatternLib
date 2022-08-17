@@ -1,10 +1,10 @@
 repositories {
     maven {
         name = "sponge"
-        url = "https://sponge.falsepattern.com/"
+        url = "https://mvn.falsepattern.com/sponge"
     }
     maven {
-        name = "mavenpattern"
-        url = "https://maven.falsepattern.com/"
+        name = "mvnpattern"
+        url = "https://mvn.falsepattern.com/releases/"
     }
 }

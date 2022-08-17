@@ -18,9 +18,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal;
+package com.falsepattern.lib.internal.tooling;
 
-import lombok.Getter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("ALL")
-@Getter
 class SRGGen {
     private static final Map<String, String> class_notch_srg = new HashMap<>();
     private static final Map<String, String> class_notch_mcp = new HashMap<>();
@@ -77,6 +74,7 @@ class SRGGen {
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private static boolean crossValidate(Map<?, ?> notch_srg, Map<?, ?> notch_mcp, Map<?, ?> srg_mcp, Map<?, ?> mcp_srg, Map<?, ?> mcp_notch, OutputStream output)
             throws IOException {
         for (Map.Entry<?, ?> notch_srg_entry : notch_srg.entrySet()) {
