@@ -14,7 +14,8 @@ public class Compact {
         byte[] file1 = Files.readAllBytes(Paths.get("mappings", "classes.csv"));
         byte[] file2 = Files.readAllBytes(Paths.get("mappings", "fields.csv"));
         byte[] file3 = Files.readAllBytes(Paths.get("mappings", "methods.csv"));
-        FinishableOutputStream lzOut = new LZMA2Options(6).getOutputStream(new FinishableWrapperOutputStream(Files.newOutputStream(Paths.get("src", "main", "resources", "mappings.lzma2"))));
+        FinishableOutputStream lzOut = new LZMA2Options(6).getOutputStream(new FinishableWrapperOutputStream(
+                Files.newOutputStream(Paths.get("src", "main", "resources", "mappings.lzma2"))));
         DataOutputStream dOut = new DataOutputStream(lzOut);
         dOut.writeInt(file1.length);
         dOut.write(file1);

@@ -22,6 +22,7 @@ package com.falsepattern.lib.internal.impl.config;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
+import com.falsepattern.lib.internal.ReflectionUtil;
 import com.falsepattern.lib.internal.impl.config.fields.AConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.BooleanConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.BooleanListConfigField;
@@ -33,7 +34,6 @@ import com.falsepattern.lib.internal.impl.config.fields.IntConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.IntListConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.StringConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.StringListConfigField;
-import com.falsepattern.lib.internal.ReflectionUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

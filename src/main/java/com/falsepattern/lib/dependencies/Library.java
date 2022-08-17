@@ -6,17 +6,22 @@ import lombok.NonNull;
 @StableAPI(since = "0.10.0")
 public class Library {
     @StableAPI.Expose
-    @NonNull public final String loadingModId;
+    @NonNull
+    public final String loadingModId;
     @StableAPI.Expose
-    @NonNull public final String groupId;
+    @NonNull
+    public final String groupId;
     @StableAPI.Expose
-    @NonNull public final String artifactId;
+    @NonNull
+    public final String artifactId;
     @StableAPI.Expose
-    @NonNull public final Version minVersion;
+    @NonNull
+    public final Version minVersion;
     @StableAPI.Expose
     public final Version maxVersion;
     @StableAPI.Expose
-    @NonNull public final Version preferredVersion;
+    @NonNull
+    public final Version preferredVersion;
     @StableAPI.Expose
     public final String regularSuffix;
     @StableAPI.Expose

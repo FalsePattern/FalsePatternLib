@@ -111,7 +111,8 @@ public class SemanticVersion extends Version {
 
     @Override
     public String toString() {
-        return majorVersion + (minorVersion < 0 ? "" : "." + minorVersion) + (patchVersion < 0 ? "" : "." + patchVersion) + (preRelease == null ? "" : "-" + preRelease) +
+        return majorVersion + (minorVersion < 0 ? "" : "." + minorVersion) +
+               (patchVersion < 0 ? "" : "." + patchVersion) + (preRelease == null ? "" : "-" + preRelease) +
                (build == null ? "" : "+" + build);
     }
 

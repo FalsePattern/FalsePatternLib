@@ -55,9 +55,7 @@ public class ToastConfig {
     }
 
     public enum Side {
-        @StableAPI.Expose(since = "__INTERNAL__")
-        Left,
-        @StableAPI.Expose(since = "__INTERNAL__")
-        Right
+        @StableAPI.Expose(since = "__INTERNAL__") Left,
+        @StableAPI.Expose(since = "__INTERNAL__") Right
     }
 }

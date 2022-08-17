@@ -12,6 +12,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @StableAPI(since = "0.10.0")
 public @interface DeprecationDetails {
-    @StableAPI.Expose
-    String deprecatedSince();
+    @StableAPI.Expose String deprecatedSince();
 }

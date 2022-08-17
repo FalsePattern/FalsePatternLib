@@ -197,7 +197,8 @@ public class ConfigurationManagerImpl {
             val opt = serializedNames.keySet().stream().filter((key) -> key.equals(serializedName)).findFirst();
             if (!opt.isPresent()) {
                 input.skipBytes(dataSize);
-                FalsePatternLib.getLog().warn("Server tried to sync config not registered on our side: " + serializedName);
+                FalsePatternLib.getLog()
+                               .warn("Server tried to sync config not registered on our side: " + serializedName);
                 continue;
             }
             val clazz = serializedNames.get(opt.get());

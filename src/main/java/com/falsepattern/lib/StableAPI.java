@@ -55,8 +55,7 @@ public @interface StableAPI {
     /**
      * The version this API was introduced/stabilized in. Used for library version tracking.
      */
-    @StableAPI.Expose
-    String since();
+    @StableAPI.Expose String since();
 
     /**
      * You may use this annotation if you want a member to have an equal effective {@link #since()} value as its owner
@@ -73,8 +72,7 @@ public @interface StableAPI {
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
     @StableAPI(since = "0.10.0")
     @interface Expose {
-        @StableAPI.Expose
-        String since() default "__PARENT__";
+        @StableAPI.Expose String since() default "__PARENT__";
     }
 
     /**
@@ -87,5 +85,6 @@ public @interface StableAPI {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
     @StableAPI(since = "0.10.0")
-    @interface Internal {}
+    @interface Internal {
+    }
 }

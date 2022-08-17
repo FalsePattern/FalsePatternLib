@@ -71,7 +71,8 @@ public class MappingManager {
                                                                                .patchVersion(-1)
                                                                                .build())
                                               .build());
-        val input = new DataInputStream(new LZMA2Options(6).getInputStream(ResourceUtil.getResourceFromJar("/mappings.lzma2", CoreLoadingPlugin.class)));
+        val input = new DataInputStream(new LZMA2Options(6).getInputStream(
+                ResourceUtil.getResourceFromJar("/mappings.lzma2", CoreLoadingPlugin.class)));
         {
             var classBytes = new byte[input.readInt()];
             input.readFully(classBytes);
@@ -86,7 +87,7 @@ public class MappingManager {
         {
             var fieldBytes = new byte[input.readInt()];
             input.readFully(fieldBytes);
-            var fieldMappings = new String(fieldBytes).split( "\n");
+            var fieldMappings = new String(fieldBytes).split("\n");
             for (int i = 1; i < fieldMappings.length; i++) {
                 val line = fieldMappings[i].split(",");
                 val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));

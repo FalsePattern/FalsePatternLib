@@ -154,7 +154,7 @@ public class DependencyLoaderImpl {
 
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         val futures = new ArrayList<CompletableFuture<Void>>();
-        for (val library: libraries) {
+        for (val library : libraries) {
             val task = new DependencyLoadTask(library.loadingModId, library.groupId, library.artifactId,
                                               library.minVersion, library.maxVersion, library.preferredVersion,
                                               library.regularSuffix, library.devSuffix);

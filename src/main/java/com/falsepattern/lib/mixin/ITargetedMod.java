@@ -44,6 +44,7 @@ public interface ITargetedMod {
 
         return "jar".equals(fileExtension) && getCondition().test(nameLowerCase);
     }
+
     @StableAPI.Expose
     Predicate<String> getCondition();
 

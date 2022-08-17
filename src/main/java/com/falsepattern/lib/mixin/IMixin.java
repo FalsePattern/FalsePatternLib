@@ -49,12 +49,9 @@ public interface IMixin {
 
     @StableAPI(since = "0.10.0")
     enum Side {
-        @StableAPI.Expose
-        COMMON,
-        @StableAPI.Expose
-        CLIENT,
-        @StableAPI.Expose
-        SERVER
+        @StableAPI.Expose COMMON,
+        @StableAPI.Expose CLIENT,
+        @StableAPI.Expose SERVER
     }
 
     @StableAPI(since = "0.10.0")

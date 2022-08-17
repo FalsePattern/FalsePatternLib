@@ -28,14 +28,10 @@ import net.minecraft.util.EnumFacing;
 
 @StableAPI(since = "0.6.0")
 public enum Rotation {
-    @StableAPI.Expose
-    NONE,
-    @StableAPI.Expose
-    CLOCKWISE_90,
-    @StableAPI.Expose
-    CLOCKWISE_180,
-    @StableAPI.Expose
-    COUNTERCLOCKWISE_90;
+    @StableAPI.Expose NONE,
+    @StableAPI.Expose CLOCKWISE_90,
+    @StableAPI.Expose CLOCKWISE_180,
+    @StableAPI.Expose COUNTERCLOCKWISE_90;
 
     @StableAPI.Expose
     public Rotation add(@NonNull Rotation rotation) {

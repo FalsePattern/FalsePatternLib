@@ -105,9 +105,11 @@ public class BlockPos extends Vec3i {
      * In situations where it is usable, prefer
      * {@link #getAllInBoxMutable(BlockPos, BlockPos) instead as it has better performance (fewer allocations)
      * <p>
+     *
      * @param from One corner of the box
      * @param to   Another corner of the box
-     * <p>
+     *             <p>
+     *
      * @see #getAllInBox(int, int, int, int, int, int)
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
@@ -125,13 +127,15 @@ public class BlockPos extends Vec3i {
      * In situations where it is usable, prefer
      * {@link #getAllInBoxMutable(BlockPos, BlockPos) instead as it has better performance (fewer allocations)
      * <p>
+     *
      * @param x0 The lower x coordinate
      * @param y0 The lower y coordinate
      * @param z0 The lower z coordinate
      * @param x1 The upper x coordinate
      * @param y1 The upper y coordinate
      * @param z1 The upper z coordinate
-     * <p>
+     *           <p>
+     *
      * @see #getAllInBox(BlockPos, BlockPos)
      * @see #getAllInBoxMutable(BlockPos, BlockPos)
      */
@@ -440,6 +444,7 @@ public class BlockPos extends Vec3i {
             return super.rotate(rotation).toImmutable();
         }
 
+        @Override
         @StableAPI.Expose
         public BlockPos toImmutable() {
             return new BlockPos(this);
