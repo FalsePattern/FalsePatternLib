@@ -7,5 +7,6 @@ dependencies {
     }
     compileOnly("com.falsepattern:json:0.4.1")
     compileOnly("org.tukaani:xz:1.9")
+    testCompile("org.tukaani:xz:1.9")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 }
