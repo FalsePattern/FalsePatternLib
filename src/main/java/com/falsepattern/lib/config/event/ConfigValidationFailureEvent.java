@@ -27,8 +27,6 @@ import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
 import com.falsepattern.lib.toasts.SimpleToast;
 import com.falsepattern.lib.toasts.icon.ToastBG;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import net.minecraft.util.EnumChatFormatting;
@@ -40,8 +38,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.lang.reflect.Field;
 
 @StableAPI(since = "0.10.0")
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED,
-                         onConstructor_ = @StableAPI.Internal)
 public abstract class ConfigValidationFailureEvent extends Event {
     @StableAPI.Expose
     public final String reason;
@@ -53,6 +49,15 @@ public abstract class ConfigValidationFailureEvent extends Event {
     public final boolean listElement;
     @StableAPI.Expose
     public final int listIndex;
+
+    @StableAPI.Internal
+    public ConfigValidationFailureEvent(String reason, Class<?> configClass, String fieldName, boolean listElement, int listIndex) {
+        this.reason = reason;
+        this.configClass = configClass;
+        this.fieldName = fieldName;
+        this.listElement = listElement;
+        this.listIndex = listIndex;
+    }
 
     @StableAPI.Internal
     public static void postNumericRangeOutOfBounds(Field field, int listIndex, String value, String min, String max) {

@@ -21,8 +21,6 @@
 package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -38,9 +36,11 @@ import java.util.List;
  * {@link #postClient}
  */
 @StableAPI(since = "0.10.0")
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED,
-                         onConstructor_ = @StableAPI.Internal)
 public class ConfigSyncRequestEvent extends Event {
+    @StableAPI.Internal
+    public ConfigSyncRequestEvent() {
+    }
+
     @StableAPI.Expose
     public static void postClient() {
         FMLCommonHandler.instance().bus().post(new Client());
@@ -52,17 +52,20 @@ public class ConfigSyncRequestEvent extends Event {
     }
 
     @StableAPI(since = "0.10.0")
-    @RequiredArgsConstructor(access = AccessLevel.PROTECTED,
-                             onConstructor_ = @StableAPI.Internal)
     public static final class Client extends ConfigSyncRequestEvent {
-
+        @StableAPI.Internal
+        public Client() {
+        }
     }
 
     @StableAPI(since = "0.10.0")
-    @RequiredArgsConstructor(access = AccessLevel.PUBLIC,
-                             onConstructor_ = @StableAPI.Internal)
     public static final class Server extends ConfigSyncRequestEvent {
         private final List<EntityPlayerMP> players;
+
+        @StableAPI.Internal
+        public Server(List<EntityPlayerMP> players) {
+            this.players = players;
+        }
 
         @StableAPI.Expose
         public List<EntityPlayerMP> getPlayers() {

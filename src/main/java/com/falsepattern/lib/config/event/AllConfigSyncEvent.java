@@ -21,8 +21,6 @@
 package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.val;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -37,9 +35,11 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 @SideOnly(Side.CLIENT)
 @StableAPI(since = "0.10.0")
-@NoArgsConstructor(access = AccessLevel.PROTECTED,
-                   onConstructor_ = @StableAPI.Internal)
 public class AllConfigSyncEvent extends Event {
+
+    @StableAPI.Internal
+    public AllConfigSyncEvent() {
+    }
 
     @StableAPI.Internal
     public static boolean postStart() {
@@ -55,9 +55,11 @@ public class AllConfigSyncEvent extends Event {
 
     @SideOnly(Side.CLIENT)
     @StableAPI(since = "0.10.0")
-    @NoArgsConstructor(access = AccessLevel.PUBLIC,
-                       onConstructor_ = @StableAPI.Internal)
     public static final class Start extends AllConfigSyncEvent {
+        @StableAPI.Internal
+        public Start() {
+        }
+
         @Override
         public boolean isCancelable() {
             return true;
@@ -66,8 +68,9 @@ public class AllConfigSyncEvent extends Event {
 
     @SideOnly(Side.CLIENT)
     @StableAPI(since = "0.10.0")
-    @NoArgsConstructor(access = AccessLevel.PUBLIC,
-                       onConstructor_ = @StableAPI.Internal)
     public static final class End extends AllConfigSyncEvent {
+        @StableAPI.Internal
+        public End() {
+        }
     }
 }

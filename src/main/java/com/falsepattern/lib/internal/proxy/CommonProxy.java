@@ -24,6 +24,7 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.config.LibraryConfig;
+import com.falsepattern.lib.internal.impl.config.ConfigSyncEventHandler;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
 import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
@@ -86,7 +87,7 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-
+        ConfigSyncEventHandler.registerBus();
     }
 
 

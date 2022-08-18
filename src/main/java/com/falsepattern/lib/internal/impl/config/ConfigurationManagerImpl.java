@@ -24,11 +24,9 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.AllConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigSyncEvent;
-import com.falsepattern.lib.config.event.ConfigSyncRequestEvent;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.config.LibraryConfig;
-import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
@@ -39,15 +37,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.val;
 
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -265,37 +259,10 @@ public class ConfigurationManagerImpl {
         MinecraftForge.EVENT_BUS.register(instance);
     }
 
-    private static void sendSyncRequest() throws IOException {
+    static void sendSyncRequest() throws IOException {
         val event = new SyncRequest();
         event.transmit();
         FalsePatternLib.NETWORK.sendToServer(event);
-    }
-
-    @SneakyThrows
-    @SubscribeEvent
-    public void onJoinWorld(EntityJoinWorldEvent e) {
-        if (e.world.isRemote && e.entity instanceof EntityClientPlayerMP) {
-            sendSyncRequest();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SneakyThrows
-    @SubscribeEvent
-    public void onSyncRequestClient(ConfigSyncRequestEvent.Client e) {
-        sendSyncRequest();
-    }
-
-    @SubscribeEvent
-    public void onSyncRequestServer(ConfigSyncRequestEvent.Server e) {
-        val players = e.getPlayers();
-        if (players.size() == 0) {
-            FalsePatternLib.NETWORK.sendToAll(new SyncPrompt());
-        } else {
-            for (EntityPlayerMP player : e.getPlayers()) {
-                FalsePatternLib.NETWORK.sendTo(new SyncPrompt(), player);
-            }
-        }
     }
 
     @SubscribeEvent
