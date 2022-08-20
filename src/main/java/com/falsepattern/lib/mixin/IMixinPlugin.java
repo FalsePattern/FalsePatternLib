@@ -73,26 +73,31 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     ITargetedMod[] getTargetedModEnumValues();
 
     @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
     default void onLoad(String mixinPackage) {
 
     }
 
     @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
     default String getRefMapperConfig() {
         return null;
     }
 
     @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
     default boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         return true;
     }
 
     @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
     default void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
 
     }
 
     @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
     default List<String> getMixins() {
         val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
         val targetedMods = getTargetedModEnumValues();
@@ -119,6 +124,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return mixins;
     }
 
+    @StableAPI.Expose(since = "__INTERNAL__")
     default boolean loadJarOf(final ITargetedMod mod) {
         boolean success = false;
         try {
@@ -140,13 +146,37 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return success;
     }
 
-    @Override
-    default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    /**
+     * Fallback for spongemixins. Removed for mixinbooter
+     */
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void preApply_obsolete(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
+    /**
+     * Fallback for spongemixins. Removed for mixinbooter
+     */
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void postApply_obsolete(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+
+    }
+
+    /**
+     * Regular behaviour for mixinbooter. Removed for spongemixins
+     */
     @Override
-    default void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void preApply(String targetClassName, org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+
+    }
+
+    /**
+     * Regular behaviour for mixinbooter. Removed for spongemixins
+     */
+    @Override
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void postApply(String targetClassName, org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 }

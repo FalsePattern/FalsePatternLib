@@ -21,7 +21,7 @@
 package com.falsepattern.lib.mapping.types;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;

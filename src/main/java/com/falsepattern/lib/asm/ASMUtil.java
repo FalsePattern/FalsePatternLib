@@ -24,7 +24,7 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.asm.exceptions.AsmClassNotFoundException;
 import com.falsepattern.lib.asm.exceptions.AsmFieldNotFoundException;
 import com.falsepattern.lib.asm.exceptions.AsmMethodNotFoundException;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.MappingManager;
 import com.falsepattern.lib.mapping.types.MappingType;
 import com.falsepattern.lib.mapping.types.NameType;

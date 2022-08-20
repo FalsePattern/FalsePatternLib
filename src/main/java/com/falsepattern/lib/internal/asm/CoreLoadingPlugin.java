@@ -18,8 +18,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal;
+package com.falsepattern.lib.internal.asm;
 
+import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.asm.FPTransformer;
 import lombok.Getter;
 import lombok.val;
 
@@ -36,6 +38,7 @@ import java.util.Map;
 @MCVersion("1.7.10")
 @Name(Tags.MODID)
 @SortingIndex(500)
+@IFMLLoadingPlugin.TransformerExclusions({Tags.GROUPNAME + ".internal.asm", Tags.GROUPNAME + ".asm"})
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
@@ -101,7 +104,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return null;
+        return new String[]{Tags.GROUPNAME + ".internal.asm.FPTransformer"};
     }
 
     @Override

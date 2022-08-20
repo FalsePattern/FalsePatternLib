@@ -24,7 +24,7 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.types.MappingType;
 import com.falsepattern.lib.mapping.types.NameType;

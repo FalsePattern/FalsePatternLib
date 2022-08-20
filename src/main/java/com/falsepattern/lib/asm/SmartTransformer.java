@@ -21,7 +21,7 @@
 package com.falsepattern.lib.asm;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import lombok.val;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
