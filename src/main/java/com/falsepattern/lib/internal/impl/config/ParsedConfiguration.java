@@ -57,6 +57,7 @@ import java.util.function.BiConsumer;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParsedConfiguration {
     private static final Field propField;
+    private static final Map<Class<?>, FieldRefConstructor> constructors = new HashMap<>();
 
     static {
         try {
@@ -65,6 +66,18 @@ public class ParsedConfiguration {
             throw new RuntimeException(e);
         }
         ReflectionUtil.jailBreak(propField);
+        constructors.put(Boolean.class, BooleanConfigField::new);
+        constructors.put(boolean.class, BooleanConfigField::new);
+        constructors.put(Integer.class, IntConfigField::new);
+        constructors.put(int.class, IntConfigField::new);
+        constructors.put(Float.class, FloatConfigField::new);
+        constructors.put(float.class, FloatConfigField::new);
+        constructors.put(Double.class, DoubleConfigField::new);
+        constructors.put(double.class, DoubleConfigField::new);
+        constructors.put(boolean[].class, BooleanListConfigField::new);
+        constructors.put(int[].class, IntListConfigField::new);
+        constructors.put(double[].class, DoubleListConfigField::new);
+        constructors.put(String[].class, StringListConfigField::new);
     }
 
     public final Class<?> configClass;
@@ -170,27 +183,10 @@ public class ParsedConfiguration {
             maxFieldNameLength = Math.max(maxFieldNameLength, field.getName().length());
             val fieldClass = field.getType();
             val name = field.getName();
-            if (fieldClass.equals(Boolean.class) || fieldClass.equals(boolean.class)) {
-                fields.put(name, new BooleanConfigField(field, rawConfig, category));
-            } else if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-                fields.put(name, new IntConfigField(field, rawConfig, category));
-            } else if (fieldClass.equals(Float.class) || fieldClass.equals(float.class)) {
-                //noinspection deprecation
-                fields.put(name, new FloatConfigField(field, rawConfig, category));
-            } else if (fieldClass.equals(Double.class) || fieldClass.equals(double.class)) {
-                fields.put(name, new DoubleConfigField(field, rawConfig, category));
-            } else if (fieldClass.equals(String.class)) {
-                fields.put(name, new StringConfigField(field, rawConfig, category));
+            if (constructors.containsKey(fieldClass)) {
+                fields.put(name, constructors.get(fieldClass).construct(field, rawConfig, category));
             } else if (fieldClass.isEnum()) {
                 fields.put(name, new EnumConfigField<>(field, rawConfig, category));
-            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(boolean.class)) {
-                fields.put(name, new BooleanListConfigField(field, rawConfig, category));
-            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(int.class)) {
-                fields.put(name, new IntListConfigField(field, rawConfig, category));
-            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(double.class)) {
-                fields.put(name, new DoubleListConfigField(field, rawConfig, category));
-            } else if (fieldClass.isArray() && fieldClass.getComponentType().equals(String.class)) {
-                fields.put(name, new StringListConfigField(field, rawConfig, category));
             } else {
                 throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() +
                                           ": Unsupported type " + fieldClass.getName() +
@@ -225,5 +221,9 @@ public class ParsedConfiguration {
             }
         }
         return valid;
+    }
+
+    private interface FieldRefConstructor {
+        AConfigField<?> construct(Field field, Configuration configuration, String category) throws ConfigException;
     }
 }
