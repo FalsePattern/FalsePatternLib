@@ -76,7 +76,7 @@ public class StringConfigField extends AConfigField<String> {
             ConfigValidationFailureEvent.fieldIsNull(field, listIndex);
             return false;
         }
-        if (value.length() <= maxLength) {
+        if (value.length() > maxLength) {
             ConfigValidationFailureEvent.postStringSizeOutOfBounds(field, listIndex, value, maxLength);
             return false;
         }
