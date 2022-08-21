@@ -38,7 +38,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import java.lang.reflect.Field;
 
 @StableAPI(since = "0.10.0")
-public abstract class ConfigValidationFailureEvent extends Event {
+public class ConfigValidationFailureEvent extends Event {
     @StableAPI.Expose
     public final String reason;
     @StableAPI.Expose
@@ -51,7 +51,7 @@ public abstract class ConfigValidationFailureEvent extends Event {
     public final int listIndex;
 
     @StableAPI.Internal
-    public ConfigValidationFailureEvent(String reason, Class<?> configClass, String fieldName, boolean listElement, int listIndex) {
+    protected ConfigValidationFailureEvent(String reason, Class<?> configClass, String fieldName, boolean listElement, int listIndex) {
         this.reason = reason;
         this.configClass = configClass;
         this.fieldName = fieldName;
@@ -110,7 +110,8 @@ public abstract class ConfigValidationFailureEvent extends Event {
     }
 
     @StableAPI.Internal
-    protected abstract void customText(StringBuilder b);
+    protected void customText(StringBuilder b) {
+    }
 
     @StableAPI.Internal
     public void logWarn() {
