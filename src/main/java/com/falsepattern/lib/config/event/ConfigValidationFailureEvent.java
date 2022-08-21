@@ -122,7 +122,9 @@ public class ConfigValidationFailureEvent extends Event {
             errorString.append("\nArray index: ").append(listIndex);
         }
         customText(errorString);
-        FalsePatternLib.getLog().error(errorString.toString());
+        for (val line: errorString.toString().split("\n")) {
+            FalsePatternLib.getLog().error(line);
+        }
     }
 
     @StableAPI(since = "0.10.0")
