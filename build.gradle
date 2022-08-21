@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern31
+//version: 1656003793falsepattern32
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -24,7 +24,7 @@ buildscript {
         mavenLocal()
         maven {
             name = "forge"
-            url = "https://mvn.falsepattern.com/forge/"
+            url = "https://mvn.falsepattern.com/forge"
         }
         maven {
             name = "sonatype"
@@ -39,7 +39,7 @@ buildscript {
             url = "https://mvn.falsepattern.com/jitpack/"
         }
         maven {
-            name = "mvnpattern"
+            name = "mavenpattern"
             url = "https://mvn.falsepattern.com/releases/"
         }
     }
@@ -125,12 +125,6 @@ propertyDefaultIfUnset("useObsoleteSpongeMixins", false)
 propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/MinecraftForge/FML/1.7.10/conf/")
 propertyDefaultIfUnset("mappingsChannel", "stable")
 propertyDefaultIfUnset("mappingsVersion", "12")
-
-if (usesMixins.toBoolean() && !useObsoleteSpongeMixins.toBoolean()) {
-    //1.1.2
-    //Currently using upstream, will make a fork soon(tm)
-    apply from: 'https://raw.githubusercontent.com/tox1cozZ/mixin-booter-legacy/30de05f4c3e41360f423d8c5fd4adc73d4677a37/gradle/configurations/v1.gradle'
-}
 
 String javaSourceDir = "src/main/java/"
 String scalaSourceDir = "src/main/scala/"
@@ -309,6 +303,7 @@ dependencies {
             compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
         } else {
             compile("com.github.tox1cozZ:mixin-booter-legacy:1.1.2")
+            annotationProcessor("com.github.tox1cozZ:mixin-booter-legacy:1.1.2:processor")
         }
     }
     if(hasMixinDeps.toBoolean()) {
@@ -395,7 +390,7 @@ jar {
 }
 
 reobf {
-    if(usesMixins.toBoolean() && useObsoleteSpongeMixins.toBoolean() && file(mixinSrg).exists()) {
+    if(usesMixins.toBoolean() && file(mixinSrg).exists()) {
         addExtraSrgFile mixinSrg
     }
 }
@@ -403,14 +398,10 @@ reobf {
 afterEvaluate {
     if(usesMixins.toBoolean()) {
         tasks.compileJava {
-            if (useObsoleteSpongeMixins.toBoolean()) {
-                options.compilerArgs += [
-                        "-AreobfSrgFile=${tasks.reobf.srg}",
-                        "-AoutSrgFile=${mixinSrg}",
-                        "-AoutRefMapFile=${refMap}"
-                ]
-            }
             options.compilerArgs += [
+                    "-AreobfSrgFile=${tasks.reobf.srg}",
+                    "-AoutSrgFile=${mixinSrg}",
+                    "-AoutRefMapFile=${refMap}",
                     // Elan: from what I understand they are just some linter configs so you get some warning on how to properly code
                     "-XDenableSunApiLintControl",
                     "-XDignore.symbol.file"

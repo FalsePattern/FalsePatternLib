@@ -2,17 +2,14 @@ package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.internal.Tags;
-import lombok.RequiredArgsConstructor;
+import com.falsepattern.lib.mixin.MixinInfo;
 import lombok.val;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.util.ArrayList;
 
-@RequiredArgsConstructor
 public class IMixinPluginTransformer implements IClassNodeTransformer {
-    private final boolean obsolete;
-
     @Override
     public String getName() {
         return "IMixinPluginTransformer";
@@ -27,7 +24,16 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
     public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
         val methods = cn.methods;
         val remove = new ArrayList<MethodNode>();
-        if (obsolete) {
+        if (MixinInfo.isMixinBooterLegacy()) {
+            FPTransformer.LOG.info("Detected MixinBooterLegacy. Selecting proper methods in IMixinPlugin.");
+            for (val method : methods) {
+                if (method.name.equals("preApply_obsolete") || method.name.equals("postApply_obsolete")) {
+                    remove.add(method);
+                }
+            }
+            methods.removeAll(remove);
+        } else {
+            FPTransformer.LOG.info("Could not detect MixinBooterLegacy. Selecting proper methods in IMixinPlugin.");
             for (val method : methods) {
                 if (method.name.equals("preApply") || method.name.equals("postApply")) {
                     remove.add(method);
@@ -37,12 +43,6 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
             for (val method : methods) {
                 if (method.name.equals("preApply_obsolete") || method.name.equals("postApply_obsolete")) {
                     method.name = method.name.substring(0, method.name.indexOf('_'));
-                }
-            }
-        } else {
-            for (val method : methods) {
-                if (method.name.equals("preApply_obsolete") || method.name.equals("postApply_obsolete")) {
-                    remove.add(method);
                 }
             }
         }

@@ -15,22 +15,15 @@ import java.util.List;
 @Accessors(fluent = true)
 @StableAPI(since = "__INTERNAL__")
 public class FPTransformer implements SmartTransformer {
+    static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " ASM");
+
     @Getter
     private final List<IClassNodeTransformer> transformers;
 
     @Getter
-    private final Logger logger = LogManager.getLogger(Tags.MODNAME + " ASM");
+    private final Logger logger = LOG;
 
     public FPTransformer() {
-        boolean obsolete;
-        try {
-            Class.forName("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin");
-            logger.info("Detected MixinBooter Legacy.");
-            obsolete = false;
-        } catch (ClassNotFoundException e) {
-            logger.info("Detected SpongeMixins or Grimoire. Applying legacy compat fix to IMixinPlugin.");
-            obsolete = true;
-        }
-        transformers = Collections.singletonList(new IMixinPluginTransformer(obsolete));
+        transformers = Collections.singletonList(new IMixinPluginTransformer());
     }
 }
