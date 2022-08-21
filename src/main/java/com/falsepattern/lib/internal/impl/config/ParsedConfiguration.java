@@ -74,6 +74,7 @@ public class ParsedConfiguration {
         constructors.put(float.class, FloatConfigField::new);
         constructors.put(Double.class, DoubleConfigField::new);
         constructors.put(double.class, DoubleConfigField::new);
+        constructors.put(String.class, StringConfigField::new);
         constructors.put(boolean[].class, BooleanListConfigField::new);
         constructors.put(int[].class, IntListConfigField::new);
         constructors.put(double[].class, DoubleListConfigField::new);
