@@ -181,6 +181,7 @@ public class ASMUtil {
     @StableAPI.Expose
     public static byte[] serializeClass(ClassNode cn, int writerFlags) {
         val writer = new ClassWriter(writerFlags);
+        cn.accept(writer);
         return writer.toByteArray();
     }
 

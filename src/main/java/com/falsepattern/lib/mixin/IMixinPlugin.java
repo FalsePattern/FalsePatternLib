@@ -25,9 +25,9 @@ import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -146,37 +146,15 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return success;
     }
 
-    /**
-     * Fallback for spongemixins. Removed for mixinbooter
-     */
-    @StableAPI.Expose(since = "__INTERNAL__")
-    default void preApply_obsolete(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
-
-    /**
-     * Fallback for spongemixins. Removed for mixinbooter
-     */
-    @StableAPI.Expose(since = "__INTERNAL__")
-    default void postApply_obsolete(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
-
-    /**
-     * Regular behaviour for mixinbooter. Removed for spongemixins
-     */
     @Override
     @StableAPI.Expose(since = "__INTERNAL__")
-    default void preApply(String targetClassName, org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
-    /**
-     * Regular behaviour for mixinbooter. Removed for spongemixins
-     */
     @Override
     @StableAPI.Expose(since = "__INTERNAL__")
-    default void postApply(String targetClassName, org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    default void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 }
