@@ -84,8 +84,7 @@ public final class UpdateCheckerImpl {
                                                           .groupId("com.falsepattern")
                                                           .artifactId("json")
                                                           .minVersion(new SemanticVersion(0, 4, 0))
-                                                          .maxVersion(new SemanticVersion(0,
-                                                                                          Integer.MAX_VALUE,
+                                                          .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE,
                                                                                           Integer.MAX_VALUE))
                                                           .preferredVersion(new SemanticVersion(0, 4, 1))
                                                           .build());

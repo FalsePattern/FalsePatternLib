@@ -76,22 +76,18 @@ public final class MixinInfo {
         try {
             Class.forName("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin");
             return MixinBootstrapperType.MixinBooterLegacy;
-        } catch (ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {
+        }
 
         return MixinBootstrapperType.Other;
     }
 
     @StableAPI(since = "0.10.2")
     public enum MixinBootstrapperType {
-        @StableAPI.Expose
-        None,
-        @StableAPI.Expose
-        SpongeMixins,
-        @StableAPI.Expose
-        Grimoire,
-        @StableAPI.Expose
-        MixinBooterLegacy,
-        @StableAPI.Expose
-        Other
+        @StableAPI.Expose None,
+        @StableAPI.Expose SpongeMixins,
+        @StableAPI.Expose Grimoire,
+        @StableAPI.Expose MixinBooterLegacy,
+        @StableAPI.Expose Other
     }
 }

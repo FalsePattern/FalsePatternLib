@@ -21,7 +21,6 @@
 package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.internal.asm.FPTransformer;
 import lombok.Getter;
 import lombok.val;
 

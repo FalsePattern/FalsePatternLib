@@ -28,6 +28,7 @@ public final class ConfigSyncEventHandler {
             FMLCommonHandler.instance().bus().register(instance);
         }
     }
+
     @SneakyThrows
     @SubscribeEvent
     public void onJoinWorld(EntityJoinWorldEvent e) {
