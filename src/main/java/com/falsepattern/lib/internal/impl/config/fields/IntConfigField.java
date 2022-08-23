@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -50,7 +50,7 @@ public class IntConfigField extends AConfigField<Integer> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class))
                                .map(Config.DefaultInt::value)
                                .orElseGet(() -> {
-                                   FalsePatternLib.getLog()
+                                   Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
                                                         " has no DefaultInt annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");

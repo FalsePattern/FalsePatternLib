@@ -22,7 +22,7 @@ package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
 import com.falsepattern.lib.toasts.SimpleToast;
@@ -123,7 +123,7 @@ public class ConfigValidationFailureEvent extends Event {
         }
         customText(errorString);
         for (val line: errorString.toString().split("\n")) {
-            FalsePatternLib.getLog().error(line);
+            Share.LOG.error(line);
         }
     }
 

@@ -20,9 +20,8 @@
  */
 package com.falsepattern.lib.internal.proxy;
 
-import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigSyncEventHandler;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
@@ -58,22 +57,22 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ConfigurationManagerImpl.registerBus();
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
-            FalsePatternLib.getLog().info("Launching asynchronous update check.");
+            Share.LOG.info("Launching asynchronous update check.");
             updatesFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
                 if (updates == null) {
                     updates = Collections.emptyList();
                 }
                 if (updates.isEmpty()) {
-                    FalsePatternLib.getLog().info("No updates found.");
+                    Share.LOG.info("No updates found.");
                 } else {
-                    FalsePatternLib.getLog().info("Found {} updates.", updates.size());
+                    Share.LOG.info("Found {} updates.", updates.size());
                     for (val update : updates) {
-                        update.log(FalsePatternLib.getLog());
+                        update.log(Share.LOG);
                     }
                 }
                 return updates;
             }).exceptionally(ex -> {
-                FalsePatternLib.getLog().error("Failed to check for updates!", ex);
+                Share.LOG.error("Failed to check for updates!", ex);
                 return Collections.emptyList();
             });
         } else {

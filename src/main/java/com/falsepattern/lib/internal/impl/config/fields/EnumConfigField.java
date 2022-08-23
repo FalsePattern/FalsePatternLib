@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.SneakyThrows;
@@ -61,7 +61,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
                                                                     "Default value \"" + defName +
                                                                     "\" was not found in enum " + enumClass.getName())))
                                .orElseGet(() -> {
-                                   FalsePatternLib.getLog()
+                                   Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
                                                         " has no DefaultEnum annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
@@ -103,7 +103,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
 
     private T getEnumByName(String name) {
         if (!enumNameMap.containsKey(name)) {
-            FalsePatternLib.getLog()
+            Share.LOG
                            .warn("Invalid value " + name + " for enum configuration field " + field.getName() +
                                  " of type " + enumClass.getName() + " in config class " +
                                  field.getDeclaringClass().getName() + "! Using default value of " +

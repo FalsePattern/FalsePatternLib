@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import lombok.SneakyThrows;
 
 import net.minecraftforge.common.config.Configuration;
@@ -44,7 +44,7 @@ public class BooleanConfigField extends AConfigField<Boolean> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class))
                                .map(Config.DefaultBoolean::value)
                                .orElseGet(() -> {
-                                   FalsePatternLib.getLog()
+                                   Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
                                                         " has no DefaultBoolean annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");

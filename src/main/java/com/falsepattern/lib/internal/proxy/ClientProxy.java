@@ -20,11 +20,8 @@
  */
 package com.falsepattern.lib.internal.proxy;
 
-import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.config.ConfigurationManager;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.internal.config.ToastConfig;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
@@ -84,7 +81,7 @@ public class ClientProxy extends CommonProxy {
             }
             chatFuture = null;
         } catch (Exception ex) {
-            FalsePatternLib.getLog().warn(ex);
+            Share.LOG.warn(ex);
         }
     }
 }

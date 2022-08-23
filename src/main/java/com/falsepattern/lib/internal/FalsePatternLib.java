@@ -22,8 +22,6 @@ package com.falsepattern.lib.internal;
 
 import com.falsepattern.lib.internal.proxy.CommonProxy;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Mod;
@@ -49,9 +47,6 @@ public class FalsePatternLib {
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 
     @Getter
-    private static final Logger log = LogManager.getLogger(Tags.MODNAME);
-
-    @Getter
     private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy",
@@ -59,7 +54,7 @@ public class FalsePatternLib {
     private static CommonProxy proxy;
 
     public FalsePatternLib() {
-        log.info("Version " + Tags.VERSION + " initialized!");
+        Share.LOG.info("Version " + Tags.VERSION + " initialized!");
     }
 
     @Mod.EventHandler

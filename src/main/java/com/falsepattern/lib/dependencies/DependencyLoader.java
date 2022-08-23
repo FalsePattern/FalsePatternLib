@@ -22,7 +22,7 @@ package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 import lombok.NonNull;
 
@@ -51,7 +51,7 @@ public class DependencyLoader {
     @DeprecationDetails(deprecatedSince = "0.10.0")
     @StableAPI.Expose
     public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
-        FalsePatternLib.getLog()
+        Share.LOG
                        .warn(DependencyLoader.class.getName() +
                              ".loadLibrary is deprecated and will be removed in FalsePatternLib 0.11! Use loadLibraries instead!");
         DependencyLoaderImpl.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,

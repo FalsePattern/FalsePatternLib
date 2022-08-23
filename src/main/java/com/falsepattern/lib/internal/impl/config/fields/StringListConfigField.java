@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -49,7 +49,7 @@ public class StringListConfigField extends AListConfigField<String[]> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class))
                                .map(Config.DefaultStringList::value)
                                .orElseGet(() -> {
-                                   FalsePatternLib.getLog()
+                                   Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
                                                         " has no DefaultStringList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");

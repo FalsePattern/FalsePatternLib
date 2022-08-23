@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -50,7 +50,7 @@ public class DoubleConfigField extends AConfigField<Double> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class))
                                .map(Config.DefaultDouble::value)
                                .orElseGet(() -> {
-                                   FalsePatternLib.getLog()
+                                   Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
                                                         " has no DefaultDouble annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");

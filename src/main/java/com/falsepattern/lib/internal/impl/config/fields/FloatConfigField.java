@@ -22,7 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -47,7 +47,7 @@ public class FloatConfigField extends AConfigField<Float> {
 
     public FloatConfigField(Field field, Configuration configuration, String category) {
         super(field, configuration, category, Property.Type.STRING);
-        FalsePatternLib.getLog()
+        Share.LOG
                        .warn("Warning: float configuration properties are DEPRECATED! Use doubles instead!\n" +
                              "Field name: " + field.getName() + ", location: " + field.getDeclaringClass().getName());
         primitive = field.getType().isPrimitive();

@@ -22,8 +22,8 @@ package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.ReflectionUtil;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -111,7 +111,7 @@ public class ConfigurationManager {
     @DeprecationDetails(deprecatedSince = "0.10.0")
     @StableAPI.Expose
     public static void registerConfig(Class<?> configClass) throws ConfigException {
-        FalsePatternLib.getLog()
+        Share.LOG
                        .warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.",
                              new Exception());
         ConfigurationManagerImpl.registerLoadSaveConfig(configClass);
