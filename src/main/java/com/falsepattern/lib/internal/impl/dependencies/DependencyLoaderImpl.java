@@ -23,8 +23,8 @@ package com.falsepattern.lib.internal.impl.dependencies;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.Version;
-import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Internet;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.util.FileUtil;
@@ -215,7 +215,7 @@ public class DependencyLoaderImpl {
         }
 
         private void setupLibraryNames() {
-            suffix = FalsePatternLib.isDeveloperEnvironment() ? devSuffix : regularSuffix;
+            suffix = Share.DEV_ENV ? devSuffix : regularSuffix;
             artifactLogName = String.format("%s:%s:%s%s", groupId, artifactId, preferredVersion,
                                             suffix != null ? "-" + suffix : "");
             log.info("Adding library {}, requested by mod {}", artifactLogName, loadingModId);

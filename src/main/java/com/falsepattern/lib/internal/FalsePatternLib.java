@@ -21,9 +21,7 @@
 package com.falsepattern.lib.internal;
 
 import com.falsepattern.lib.internal.proxy.CommonProxy;
-import lombok.Getter;
 
-import net.minecraft.launchwrapper.Launch;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
@@ -45,9 +43,6 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 public class FalsePatternLib {
     public static final String UPDATE_URL = "https://falsepattern.com/mc/versions.json";
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
-
-    @Getter
-    private static final boolean developerEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy",
                 serverSide = Tags.GROUPNAME + ".internal.proxy.CommonProxy")

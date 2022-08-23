@@ -26,7 +26,11 @@ import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.launchwrapper.Launch;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Share {
     public static final Logger LOG = LogManager.getLogger(Tags.MODNAME);
+
+    public static final boolean DEV_ENV = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 }
