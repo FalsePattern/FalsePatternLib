@@ -157,4 +157,14 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     default void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
+
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void preApply(String targetClassName, com.falsepattern.lib.mixin.stubpackage.org.spongepowered.asm.lib.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+
+    }
+
+    @StableAPI.Expose(since = "__INTERNAL__")
+    default void postApply(String targetClassName, com.falsepattern.lib.mixin.stubpackage.org.spongepowered.asm.lib.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+
+    }
 }

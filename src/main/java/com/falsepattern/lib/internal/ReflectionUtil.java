@@ -47,4 +47,9 @@ public class ReflectionUtil {
     public static void jailBreak(Method method) {
         method.setAccessible(true);
     }
+
+    @SneakyThrows
+    public static Class<?> getCallerClass() {
+        return Class.forName(Thread.currentThread().getStackTrace()[3].getClassName());
+    }
 }

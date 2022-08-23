@@ -26,6 +26,9 @@ import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.mixin.MixinInfo;
 import lombok.val;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import java.util.ArrayList;
 
 public class IMixinPluginTransformer implements IClassNodeTransformer {
     @Override
@@ -41,18 +44,21 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
     @Override
     public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
         val methods = cn.methods;
+        val remove = new ArrayList<MethodNode>();
+        String name;
         if (!MixinInfo.isMixinBooterLegacy()) {
-            FPTransformer.LOG.info("Could not detect MixinBooterLegacy. Converting IMixinPlugin to legacy compat mode.");
-            for (val method : methods) {
-                if (method.name.equals("preApply") || method.name.equals("postApply")) {
-                    method.desc = method.desc.replace("org/spongepowered/libraries/org/objectweb/asm/tree/ClassNode",
-                                                      "org/spongepowered/asm/lib/tree/ClassNode");
-                    for (val local: method.localVariables) {
-                        local.desc = local.desc.replace("org/spongepowered/libraries/org/objectweb/asm/tree/ClassNode",
-                                                        "org/spongepowered/asm/lib/tree/ClassNode");
-                    }
-                }
+            FPTransformer.LOG.info("Could not detect MixinBooterLegacy. Removing MBL compat code.");
+            name = "org/spongepowered/libraries/org/objectweb/asm/tree/ClassNode";
+        } else {
+            FPTransformer.LOG.info("Detected MixinBooterLegacy. Removing SpongeMixins compat code.");
+            name = "org/spongepowered/asm/lib/tree/ClassNode";
+        }
+        for (val method: methods) {
+            if ((method.name.equals("preApply") || method.name.equals("postApply")) &&
+                method.desc.contains(name)) {
+                remove.add(method);
             }
         }
+        methods.removeAll(remove);
     }
 }

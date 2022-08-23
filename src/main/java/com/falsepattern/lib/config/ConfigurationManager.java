@@ -23,9 +23,11 @@ package com.falsepattern.lib.config;
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.ReflectionUtil;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 
 import cpw.mods.fml.client.config.IConfigElement;
@@ -46,6 +48,15 @@ public class ConfigurationManager {
     @StableAPI.Expose(since = "0.10.0")
     public static void initialize(Class<?>... configClasses) throws ConfigException {
         initialize((a, b) -> {}, configClasses);
+    }
+
+    /**
+     * You can use this method in the static initializer of a config class to self-load it without extra effort.
+     */
+    @StableAPI.Expose(since = "0.10.3")
+    @SneakyThrows
+    public static void selfInit() {
+        initialize(ReflectionUtil.getCallerClass());
     }
 
     @StableAPI.Expose(since = "0.10.0")

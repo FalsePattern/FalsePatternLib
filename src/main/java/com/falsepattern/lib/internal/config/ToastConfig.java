@@ -22,6 +22,7 @@ package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.Tags;
 
 import cpw.mods.fml.relauncher.Side;
@@ -31,6 +32,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 @Config(modid = Tags.MODID,
         category = "toasts")
 public class ToastConfig {
+    static {
+        ConfigurationManager.selfInit();
+    }
     @Config.Comment("The maximum amount of toasts to show on the screen")
     @Config.LangKey("config.falsepatternlib.maxtoasts")
     @Config.DefaultInt(5)

@@ -22,10 +22,14 @@ package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.Tags;
 
 @Config(modid = Tags.MODID)
 public class LibraryConfig {
+    static {
+        ConfigurationManager.selfInit();
+    }
     @Config.Comment({"Used to control whether FalsePatternLib should check for outdated mods.",
                      "If you're building a public modpack, you should turn this off so that your users don't " +
                      "get nagged about outdated mods."})

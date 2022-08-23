@@ -57,11 +57,6 @@ public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent e) {
         ConfigurationManagerImpl.registerBus();
-        try {
-            ConfigurationManager.initialize(LibraryConfig.class);
-        } catch (ConfigException ex) {
-            throw new RuntimeException(ex);
-        }
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             FalsePatternLib.getLog().info("Launching asynchronous update check.");
             updatesFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {

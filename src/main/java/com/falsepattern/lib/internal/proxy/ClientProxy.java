@@ -58,11 +58,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
-        try {
-            ConfigurationManager.initialize(ToastConfig.class);
-        } catch (ConfigException ex) {
-            throw new RuntimeException(ex);
-        }
         MinecraftForge.EVENT_BUS.register(this);
     }
 
