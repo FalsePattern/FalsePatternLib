@@ -23,14 +23,26 @@ package com.falsepattern.lib.internal;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+
+import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Share {
     public static final Logger LOG = LogManager.getLogger(Tags.MODNAME);
 
-    public static final boolean DEV_ENV = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    public static final boolean DEV_ENV;
+
+    static {
+        try {
+            val bs = ((LaunchClassLoader) Share.class.getClassLoader()).getClassBytes("net.minecraft.world.World");
+            DEV_ENV = bs != null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
