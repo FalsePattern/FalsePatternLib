@@ -276,6 +276,19 @@ public class DependencyLoaderImpl {
                 return false;
             }
             try {
+                val status = validateChecksum(file);
+                if (status == ChecksumStatus.FAILED) {
+                    return false;
+                } else if (status == ChecksumStatus.MISSING) {
+                    log.debug("Library {} is missing checksum data! Either it was manually deleted, " +
+                              "or the source repo didn't have it in the first place", artifactLogName);
+                }
+            } catch (IOException e) {
+                log.error("Failed to execute validation check for " + artifactLogName, e);
+                checkedDelete(file);
+                return false;
+            }
+            try {
                 addToClasspath(file);
                 loadedLibraries.put(artifact, preferredVersion);
                 log.debug("Library {} successfully loaded from disk!", artifactLogName);
@@ -360,20 +373,34 @@ public class DependencyLoaderImpl {
                             success.set(true);
                         });
                 if (success.get()) {
-                    val fileHash = hash(checksumType, file);
-                    val referenceHash = new String(Files.readAllBytes(checksumFile.toPath()));
-                    if (!fileHash.equals(referenceHash)) {
-                        log.error("Failed {} checksum validation for {}. Retrying download...", checksumType,
-                                  artifactLogName);
-                        checkedDelete(file);
-                        checkedDelete(checksumFile);
-                        return ChecksumStatus.FAILED;
-                    }
-                    log.debug("Successfully validated {} checksum for {}", checksumType, artifactLogName);
-                    return ChecksumStatus.OK;
+                    return getChecksumStatus(file, checksumType, checksumFile);
                 }
             }
             return ChecksumStatus.MISSING;
+        }
+
+        private ChecksumStatus validateChecksum(File file) throws IOException {
+            for (val checksumType : CHECKSUM_TYPES) {
+                val checksumFile = new File(libDir, jarName + "." + checksumType);
+                log.debug("Attempting to read {} checksum from file...", checksumType);
+                if (checksumFile.exists()) {
+                    return getChecksumStatus(file, checksumType, checksumFile);
+                }
+            }
+            return ChecksumStatus.MISSING;
+        }
+
+        private ChecksumStatus getChecksumStatus(File file, String checksumType, File checksumFile) throws IOException {
+            val fileHash = hash(checksumType, file);
+            val referenceHash = new String(Files.readAllBytes(checksumFile.toPath()));
+            if (!fileHash.equals(referenceHash)) {
+                log.error("Failed {} checksum validation for {}.", checksumType, artifactLogName);
+                checkedDelete(file);
+                checkedDelete(checksumFile);
+                return ChecksumStatus.FAILED;
+            }
+            log.debug("Successfully validated {} checksum for {}.", checksumType, artifactLogName);
+            return ChecksumStatus.OK;
         }
 
         private enum ChecksumStatus {
