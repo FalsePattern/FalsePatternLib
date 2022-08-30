@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern38
+//version: 1656003793falsepattern40
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -727,6 +727,7 @@ if (curseForgeProjectId != "") {
             changelog = project.changelog.replace("{version}", modVersion)
             releaseType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
             addGameVersion project.minecraft.version
+            addGameVersion "Forge"
             mainArtifact(jar) {
                 displayName = "$modName version: $modVersion"
             }
@@ -749,7 +750,7 @@ if (curseForgeProjectId != "") {
         }
     }
     tasks.curseforge.dependsOn(build)
-    tasks.publish.dependsOn(curseforge)
+    tasks.publish.dependsOn(tasks.curseforge)
 }
 
 if (modrinthProjectId != "") {
@@ -779,7 +780,7 @@ if (modrinthProjectId != "") {
         }
     }
     tasks.modrinth.dependsOn(build)
-    tasks.publish.dependsOn(modrinth)
+    tasks.publish.dependsOn(tasks.modrinth)
 }
 
 def addModrinthDep(scope, type, name) {
