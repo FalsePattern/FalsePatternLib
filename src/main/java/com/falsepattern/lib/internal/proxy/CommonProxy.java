@@ -23,8 +23,8 @@ package com.falsepattern.lib.internal.proxy;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.config.LibraryConfig;
-import com.falsepattern.lib.internal.impl.config.ConfigSyncEventHandler;
-import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
+import com.falsepattern.lib.internal.impl.config.event.CommonEventHandlerPost;
+import com.falsepattern.lib.internal.impl.config.event.CommonEventHandlerPre;
 import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
 import com.falsepattern.lib.internal.impl.config.net.SyncPromptHandler;
 import com.falsepattern.lib.internal.impl.config.net.SyncReply;
@@ -55,7 +55,7 @@ public class CommonProxy {
     }
 
     public void preInit(FMLPreInitializationEvent e) {
-        ConfigurationManagerImpl.registerBus();
+        CommonEventHandlerPre.registerBus();
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             Share.LOG.info("Launching asynchronous update check.");
             updatesFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
@@ -81,7 +81,7 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-        ConfigSyncEventHandler.registerBus();
+        CommonEventHandlerPost.registerBus();
     }
 
 

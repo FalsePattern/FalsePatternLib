@@ -19,43 +19,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.impl.config;
+package com.falsepattern.lib.internal.impl.config.event;
 
 import com.falsepattern.lib.config.event.ConfigSyncRequestEvent;
-import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
+import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.val;
 
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ConfigSyncEventHandler {
-    private static ConfigSyncEventHandler instance;
+@SideOnly(Side.CLIENT)
+public final class ClientEventHandlerPost {
+    private static final ClientEventHandlerPost INSTANCE = new ClientEventHandlerPost();
 
     public static void registerBus() {
-        if (instance == null) {
-            instance = new ConfigSyncEventHandler();
-            MinecraftForge.EVENT_BUS.register(instance);
-            FMLCommonHandler.instance().bus().register(instance);
-        }
-    }
-
-    @SneakyThrows
-    @SubscribeEvent
-    public void onJoinWorld(EntityJoinWorldEvent e) {
-        if (e.world.isRemote && e.entity instanceof EntityClientPlayerMP) {
-            ConfigurationManagerImpl.sendSyncRequest();
-        }
+        FMLCommonHandler.instance().bus().register(INSTANCE);
     }
 
     @SideOnly(Side.CLIENT)
@@ -63,17 +46,5 @@ public final class ConfigSyncEventHandler {
     @SubscribeEvent
     public void onSyncRequestClient(ConfigSyncRequestEvent.Client e) {
         ConfigurationManagerImpl.sendSyncRequest();
-    }
-
-    @SubscribeEvent
-    public void onSyncRequestServer(ConfigSyncRequestEvent.Server e) {
-        val players = e.getPlayers();
-        if (players.size() == 0) {
-            FalsePatternLib.NETWORK.sendToAll(new SyncPrompt());
-        } else {
-            for (EntityPlayerMP player : e.getPlayers()) {
-                FalsePatternLib.NETWORK.sendTo(new SyncPrompt(), player);
-            }
-        }
     }
 }

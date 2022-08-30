@@ -20,19 +20,12 @@
  */
 package com.falsepattern.lib.internal.impl.config;
 
-import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.AllConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigSyncEvent;
-import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Share;
-import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
-import com.falsepattern.lib.text.FormattedText;
-import com.falsepattern.lib.toasts.GuiToast;
-import com.falsepattern.lib.toasts.SimpleToast;
-import com.falsepattern.lib.toasts.icon.ToastBG;
 import com.falsepattern.lib.util.FileUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -40,15 +33,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -74,12 +61,11 @@ import java.util.function.BiConsumer;
  * Do not read if you value your sanity.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ConfigurationManagerImpl {
+public final class ConfigurationManagerImpl {
     private static final Map<String, Configuration> configs = new HashMap<>();
     private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
     private static final Map<Class<?>, ParsedConfiguration> parsedConfigMap = new HashMap<>();
     private static final BiMap<String, Class<?>> serializedNames = HashBiMap.create();
-    private static final ConfigurationManagerImpl instance = new ConfigurationManagerImpl();
     private static boolean initialized = false;
     private static Path configDir;
 
@@ -256,19 +242,13 @@ public class ConfigurationManagerImpl {
         initialized = true;
     }
 
-    public static void registerBus() {
-        FMLCommonHandler.instance().bus().register(instance);
-        MinecraftForge.EVENT_BUS.register(instance);
-    }
-
-    static void sendSyncRequest() throws IOException {
+    public static void sendSyncRequest() throws IOException {
         val event = new SyncRequest();
         event.transmit();
         FalsePatternLib.NETWORK.sendToServer(event);
     }
 
-    @SubscribeEvent
-    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         init();
         val rawConfig = configs.get(event.modID);
         if (rawConfig == null) {
@@ -278,42 +258,6 @@ public class ConfigurationManagerImpl {
         for (val clazz : configClasses) {
             val config = parsedConfigMap.get(clazz);
             config.configChanged();
-        }
-    }
-
-    @SubscribeEvent
-    public void onValidationErrorLog(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOUDNESS != LibraryConfig.ValidationLogging.None) {
-            e.logWarn();
-        }
-    }
-
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onValidationErrorToast(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOUDNESS == LibraryConfig.ValidationLogging.LogAndToast) {
-            e.toast();
-        }
-    }
-
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onConfigSyncFinished(ConfigSyncEvent.End e) {
-        val cfg = e.configClass.getAnnotation(Config.class);
-        if (e.successful) {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
-                                         FormattedText.parse(EnumChatFormatting.GREEN + "Synced config")
-                                                      .toChatText()
-                                                      .get(0),
-                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false, 5000));
-        } else {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
-                                         FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config")
-                                                      .toChatText()
-                                                      .get(0),
-                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false, 5000));
         }
     }
 }

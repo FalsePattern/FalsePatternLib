@@ -22,6 +22,8 @@ package com.falsepattern.lib.internal.proxy;
 
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.impl.config.event.ClientEventHandlerPost;
+import com.falsepattern.lib.internal.impl.config.event.ClientEventHandlerPre;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
@@ -55,12 +57,14 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        ClientEventHandlerPre.registerBus();
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
+        ClientEventHandlerPost.registerBus();
         chatFuture = updatesFuture.handleAsync((updates, exception) -> {
             if (exception != null || updates.isEmpty()) {
                 return Collections.emptyList();
