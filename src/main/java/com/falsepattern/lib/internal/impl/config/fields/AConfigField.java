@@ -82,8 +82,9 @@ public abstract class AConfigField<T> {
     public void save() {
         if (!validateField()) {
             setToDefault();
+        } else {
+            putConfig(getField());
         }
-        putConfig(getField());
     }
 
     public void load() {

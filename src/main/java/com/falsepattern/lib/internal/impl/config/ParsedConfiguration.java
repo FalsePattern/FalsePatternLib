@@ -22,7 +22,6 @@ package com.falsepattern.lib.internal.impl.config;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
-import com.falsepattern.lib.internal.ReflectionUtil;
 import com.falsepattern.lib.internal.impl.config.fields.AConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.BooleanConfigField;
 import com.falsepattern.lib.internal.impl.config.fields.BooleanListConfigField;
@@ -38,7 +37,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import cpw.mods.fml.client.config.IConfigElement;
 
@@ -56,16 +54,9 @@ import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParsedConfiguration {
-    private static final Field propField;
     private static final Map<Class<?>, FieldRefConstructor> constructors = new HashMap<>();
 
     static {
-        try {
-            propField = ConfigElement.class.getDeclaredField("prop");
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-        ReflectionUtil.jailBreak(propField);
         constructors.put(Boolean.class, BooleanConfigField::new);
         constructors.put(boolean.class, BooleanConfigField::new);
         constructors.put(Integer.class, IntConfigField::new);
@@ -87,7 +78,7 @@ public class ParsedConfiguration {
     public final Configuration rawConfig;
     public final boolean sync;
     private final Map<String, AConfigField<?>> fields = new HashMap<>();
-    private final Map<String, ConfigElement<?>> elements = new HashMap<>();
+    private final Map<String, IConfigElement<?>> elements = new HashMap<>();
     private int maxFieldNameLength;
 
     public static ParsedConfiguration parseConfig(Class<?> configClass) throws ConfigException {
@@ -199,9 +190,11 @@ public class ParsedConfiguration {
             if (field.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
                 cat.setRequiresWorldRestart(true);
             }
-            val prop = fields.get(name).getProperty();
-            val configElement = elements.computeIfAbsent(name, (name2) -> new ConfigElement<>(prop));
-            propField.set(configElement, prop);
+            val configField = fields.get(name);
+            elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), () -> {
+                configField.load();
+                save();
+            }));
         }
     }
 
