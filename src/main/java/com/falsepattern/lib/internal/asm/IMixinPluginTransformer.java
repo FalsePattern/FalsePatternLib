@@ -32,7 +32,7 @@ import java.util.List;
 
 public class IMixinPluginTransformer implements IClassNodeTransformer {
     private static final String CLASSNODE_MIXINBOOTER = "org/spongepowered/libraries/org/objectweb/asm/tree/ClassNode";
-    private static final String CLASSNODE_SPONGEMIXINS = "org/spongepowered/asm/lib/tree/ClassNode";
+    private static final String CLASSNODE_REGULAR = "org/spongepowered/asm/lib/tree/ClassNode";
     private static final String IMIXINPLUGIN = Tags.GROUPNAME + ".mixin.IMixinPlugin";
     private static final String IMIXINPLUGIN_INTERNAL = IMIXINPLUGIN.replace('.', '/');
     private static final String IMIXINCONFIGPLUGIN_INTERNAL = "org/spongepowered/asm/mixin/extensibility/IMixinConfigPlugin";
@@ -57,18 +57,18 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
     }
 
     private static void transformIMixinPlugin(ClassNode cn) {
-        if (!MixinInfo.isMixinBooterLegacy()) {
-            FPTransformer.LOG.info("Could not detect MixinBooterLegacy. Converting IMixinPlugin to legacy compat mode.");
-            doRename(cn.methods, CLASSNODE_MIXINBOOTER, CLASSNODE_SPONGEMIXINS);
+        if (MixinInfo.isMixinBooterLegacy()) {
+            FPTransformer.LOG.info("Detected MixinBooterLegacy. Converting IMixinPlugin to compat mode.");
+            doRename(cn.methods, CLASSNODE_REGULAR, CLASSNODE_MIXINBOOTER);
         }
     }
 
     private static void transformPlugin(ClassNode cn, String transformedName) {
         FPTransformer.LOG.info("Transforming " + transformedName + " to fit current mixin environment.");
         if (!MixinInfo.isMixinBooterLegacy()) {
-            doRename(cn.methods, CLASSNODE_MIXINBOOTER, CLASSNODE_SPONGEMIXINS);
+            doRename(cn.methods, CLASSNODE_MIXINBOOTER, CLASSNODE_REGULAR);
         } else {
-            doRename(cn.methods, CLASSNODE_SPONGEMIXINS, CLASSNODE_MIXINBOOTER);
+            doRename(cn.methods, CLASSNODE_REGULAR, CLASSNODE_MIXINBOOTER);
         }
     }
 

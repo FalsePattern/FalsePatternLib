@@ -21,13 +21,13 @@
 package com.falsepattern.lib.mixin;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.mixin.stubpackage.org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.lib.tree.ClassNode;
+import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -146,14 +146,14 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return success;
     }
 
-    @Override
     @StableAPI.Expose(since = "__INTERNAL__")
+    @Override
     default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
-    @Override
     @StableAPI.Expose(since = "__INTERNAL__")
+    @Override
     default void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
