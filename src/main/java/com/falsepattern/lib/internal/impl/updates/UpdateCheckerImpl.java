@@ -99,7 +99,7 @@ public final class UpdateCheckerImpl {
             }
             if (!jsonLibraryLoaded.get()) {
                 try {
-                    DependencyLoader.addMavenRepo("https://maven.falsepattern.com/");
+                    DependencyLoader.addMavenRepo("https://mvn.falsepattern.com/releases/");
                     DependencyLoader.loadLibraries(Library.builder()
                                                           .loadingModId(Tags.MODID)
                                                           .groupId("com.falsepattern")
