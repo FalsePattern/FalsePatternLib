@@ -80,6 +80,11 @@ public final class MixinInfo {
             return MixinBootstrapperType.None;
         }
         try {
+            Class.forName("com.falsepattern.gasstation.core.GasStationCore");
+            return MixinBootstrapperType.GasStation;
+        } catch (ClassNotFoundException ignored) {
+        }
+        try {
             Class.forName("ru.timeconqueror.spongemixins.core.SpongeMixinsCore");
             return MixinBootstrapperType.SpongeMixins;
         } catch (ClassNotFoundException ignored) {
@@ -106,6 +111,7 @@ public final class MixinInfo {
     @StableAPI(since = "0.10.2")
     public enum MixinBootstrapperType {
         @StableAPI.Expose None,
+        @StableAPI.Expose(since = "0.10.9") GasStation,
         @StableAPI.Expose SpongeMixins,
         @StableAPI.Expose Grimoire,
         @StableAPI.Expose MixinBooterLegacy,
