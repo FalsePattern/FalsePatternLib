@@ -52,7 +52,7 @@ public class StringConfigField extends AConfigField<String> {
                                    Share.LOG
                                                   .warn("The field " + field.getName() + " in class " +
                                                         field.getDeclaringClass().getName() +
-                                                        " has no DefaultDouble annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                                        " has no DefaultString annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return (String) field.get(null);
                                    } catch (IllegalAccessException e) {
@@ -63,9 +63,6 @@ public class StringConfigField extends AConfigField<String> {
                             .map(Config.StringMaxLength::value)
                             .orElse(256);
         property.setDefaultValue(defaultValue);
-        if (!property.isDoubleValue()) {
-            setToDefault();
-        }
         property.comment +=
                 "\n[max length: " + maxLength + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "") +
                 ", default: \"" + defaultValue + "\"]";
