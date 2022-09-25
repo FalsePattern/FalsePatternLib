@@ -74,7 +74,7 @@ public final class ConfigurationManagerImpl {
         if (!parsedConfigMap.containsKey(configClass)) {
             val parsedConfig = ParsedConfiguration.parseConfig(configClass);
             configToClassMap.computeIfAbsent(parsedConfig.rawConfig, (ignored) -> new HashSet<>()).add(configClass);
-            parsedConfigMap.put(configClass, ParsedConfiguration.parseConfig(configClass));
+            parsedConfigMap.put(configClass, parsedConfig);
             serializedNames.put(parsedConfig.modid + "$" + parsedConfig.category, configClass);
         }
     }
