@@ -27,7 +27,7 @@ import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraft.launchwrapper.Launch;
 
 import java.io.IOException;
 
@@ -39,7 +39,7 @@ public final class Share {
 
     static {
         try {
-            val bs = ((LaunchClassLoader) Share.class.getClassLoader()).getClassBytes("net.minecraft.world.World");
+            val bs = Launch.classLoader.getClassBytes("net.minecraft.world.World");
             DEV_ENV = bs != null;
         } catch (IOException e) {
             throw new RuntimeException(e);
