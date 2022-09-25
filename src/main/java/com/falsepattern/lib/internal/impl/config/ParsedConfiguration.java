@@ -175,10 +175,11 @@ public class ParsedConfiguration {
             maxFieldNameLength = Math.max(maxFieldNameLength, field.getName().length());
             val fieldClass = field.getType();
             val name = field.getName();
+            AConfigField<?> configField;
             if (constructors.containsKey(fieldClass)) {
-                fields.put(name, constructors.get(fieldClass).construct(field, rawConfig, category));
+                fields.put(name, configField = constructors.get(fieldClass).construct(field, rawConfig, category));
             } else if (fieldClass.isEnum()) {
-                fields.put(name, new EnumConfigField<>(field, rawConfig, category));
+                fields.put(name, configField = new EnumConfigField<>(field, rawConfig, category));
             } else {
                 throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() +
                                           ": Unsupported type " + fieldClass.getName() +
@@ -190,7 +191,7 @@ public class ParsedConfiguration {
             if (field.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
                 cat.setRequiresWorldRestart(true);
             }
-            val configField = fields.get(name);
+            configField.init();
             elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), () -> {
                 configField.load();
                 save();

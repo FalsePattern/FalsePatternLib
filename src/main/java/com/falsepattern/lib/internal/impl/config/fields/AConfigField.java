@@ -21,6 +21,7 @@
 package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
+import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -41,6 +42,7 @@ public abstract class AConfigField<T> {
     protected final Property.Type type;
     protected final Property property;
     protected final String comment;
+    private boolean uninitialized;
 
     protected AConfigField(Field field, Configuration configuration, String category, Property.Type type) {
         this(field, configuration, category, type, false);
@@ -60,6 +62,8 @@ public abstract class AConfigField<T> {
         langKey =
                 Optional.ofNullable(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
         this.type = type;
+        val cat = configuration.getCategory(category);
+        uninitialized = !cat.containsKey(name);
         if (isList) {
             property = configuration.get(category, name, new String[0], comment, type);
         } else {
@@ -97,6 +101,14 @@ public abstract class AConfigField<T> {
     public void setToDefault() {
         putField(getDefault());
         putConfig(getDefault());
+    }
+
+    public void init() {
+        if (uninitialized) {
+            uninitialized = false;
+            putField(getDefault());
+            putConfig(getDefault());
+        }
     }
 
     public Property getProperty() {
