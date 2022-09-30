@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Map;
@@ -258,14 +259,40 @@ public class DependencyLoaderImpl {
                 }
             }
             val modsDir = Paths.get(homeDir, "mods").toFile();
+            val oldLibDir = new File(modsDir, "falsepattern");
+            libDir = new File(homeDir, "falsepattern");
             mavenJarName =
                     String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
             jarName = groupId + "-" + mavenJarName;
-            libDir = new File(modsDir, "falsepattern");
             if (!libDir.exists()) {
                 if (!libDir.mkdirs()) {
                     log.fatal("Failed to create directory {}", libDir);
                     throw new RuntimeException("Failed to create directory " + libDir);
+                }
+            }
+            if (oldLibDir.exists()) {
+                log.info("Migrating old library folder. From: " + oldLibDir.getAbsolutePath() + ", To: " + libDir.getAbsolutePath());
+                val oldFiles = oldLibDir.listFiles();
+                if (oldFiles != null) {
+                    for (val file: oldFiles) {
+                        try {
+                            Files.move(file.toPath(), libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())), StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            log.warn("Failed to move file " + file.getName() + " to new dir! Deleting instead.");
+                            try {
+                                Files.deleteIfExists(file.toPath());
+                            } catch (IOException ex) {
+                                log.warn("Failed to delete file " + file.getPath() + "!");
+                                file.deleteOnExit();
+                            }
+                        }
+                    }
+                }
+                try {
+                    Files.deleteIfExists(oldLibDir.toPath());
+                } catch (IOException e) {
+                    log.warn("Failed to delete old library directory!");
+                    oldLibDir.deleteOnExit();
                 }
             }
             file = new File(libDir, jarName);
