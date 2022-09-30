@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 @Accessors(fluent = true)
@@ -45,6 +45,6 @@ public class FPTransformer implements SmartTransformer {
     private final Logger logger = LOG;
 
     public FPTransformer() {
-        transformers = Collections.singletonList(new IMixinPluginTransformer());
+        transformers = Arrays.asList(new IMixinPluginTransformer(), new ITypeDiscovererTransformer());
     }
 }
