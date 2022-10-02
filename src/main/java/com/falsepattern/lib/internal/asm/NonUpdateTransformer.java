@@ -21,30 +21,31 @@
 
 package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.asm.IClassNodeTransformer;
-import com.falsepattern.lib.asm.SmartTransformer;
-import com.falsepattern.lib.internal.Tags;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.val;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 
-import java.util.Arrays;
-import java.util.List;
+public class NonUpdateTransformer implements IClassNodeTransformer {
+    @Override
+    public String getName() {
+        return "NonUpdateTransformer";
+    }
 
-@Accessors(fluent = true)
-@StableAPI(since = "__INTERNAL__")
-public class FPTransformer implements SmartTransformer {
-    static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " ASM");
+    @Override
+    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
+        return "moe.mickey.forge.nonupdate.NonUpdate".equals(transformedName);
+    }
 
-    @Getter
-    private final List<IClassNodeTransformer> transformers;
-
-    @Getter
-    private final Logger logger = LOG;
-
-    public FPTransformer() {
-        transformers = Arrays.asList(new IMixinPluginTransformer(), new ITypeDiscovererTransformer(), new NonUpdateTransformer());
+    @Override
+    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+        MethodNode toRemove = null;
+        for (val method: cn.methods) {
+            if (method.name.equals("init")) {
+                toRemove = method;
+                break;
+            }
+        }
+        cn.methods.remove(toRemove);
     }
 }
