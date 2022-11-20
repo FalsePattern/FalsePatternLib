@@ -24,6 +24,7 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.moveme.ThrowingBIFunction;
 import com.falsepattern.lib.mapping.storage.Lookup;
@@ -55,6 +56,7 @@ public class MappingManager {
         initialized = true;
         DependencyLoader.addMavenRepo("https://repo1.maven.org/maven2/");
         DependencyLoader.loadLibraries(Library.builder()
+                                              .loadingModId(Tags.MODID)
                                               .groupId("org.tukaani")
                                               .artifactId("xz")
                                               .minVersion(SemanticVersion.builder()
