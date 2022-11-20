@@ -31,7 +31,9 @@ import com.falsepattern.lib.mapping.types.*;
 import com.falsepattern.lib.util.ResourceUtil;
 import lombok.*;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.tukaani.xz.LZMA2Options;
 
 import java.io.DataInputStream;
@@ -175,11 +177,28 @@ public class MappingManager {
     }
 
     @StableAPI.Expose
+    public static UniversalField getField(String className, FieldNode fieldNode)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return ofUniversalClass(className,
+                                (universalClass, mappingType) -> universalClass.getField(mappingType,
+                                                                                         fieldNode.name));
+    }
+
+    @StableAPI.Expose
     public static UniversalMethod getMethod(MethodInsnNode instruction)
             throws ClassNotFoundException, NoSuchMethodException {
         return ofUniversalClass(instruction.owner,
                                 (universalClass, mappingType) -> universalClass.getMethod(mappingType,
                                                                                           instruction.name,
                                                                                           instruction.desc));
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(String className, MethodNode methodNode)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return ofUniversalClass(className,
+                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
+                                                                                          methodNode.name,
+                                                                                          methodNode.desc));
     }
 }
