@@ -104,37 +104,41 @@ public class MappingManager {
     }
 
     @StableAPI.Expose
-    public static UniversalField getField(FieldInsnNode instruction)
+    public static UniversalField getField(String className, String fieldName)
             throws ClassNotFoundException, NoSuchFieldException {
-        return ofUniversalClass(instruction.owner,
-                                (universalClass, mappingType) -> universalClass.getField(mappingType,
-                                                                                         instruction.name));
+        return ofUniversalClass(className, (universalClass, mappingType) ->
+                universalClass.getField(mappingType, fieldName));
+    }
+
+    @StableAPI.Expose
+    public static UniversalField getField(FieldInsnNode fieldInsnNode)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return getField(fieldInsnNode.owner, fieldInsnNode.name);
     }
 
     @StableAPI.Expose
     public static UniversalField getField(String className, FieldNode fieldNode)
             throws ClassNotFoundException, NoSuchFieldException {
-        return ofUniversalClass(className,
-                                (universalClass, mappingType) -> universalClass.getField(mappingType,
-                                                                                         fieldNode.name));
+        return getField(className, fieldNode.name);
     }
 
     @StableAPI.Expose
-    public static UniversalMethod getMethod(MethodInsnNode instruction)
+    public static UniversalMethod getMethod(String className, String methodName, String methodDesc)
             throws ClassNotFoundException, NoSuchMethodException {
-        return ofUniversalClass(instruction.owner,
-                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
-                                                                                          instruction.name,
-                                                                                          instruction.desc));
+        return ofUniversalClass(className, (universalClass, mappingType) ->
+                universalClass.getMethod(mappingType, methodName, methodDesc));
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(MethodInsnNode methodInsnNode)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return getMethod(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
     }
 
     @StableAPI.Expose
     public static UniversalMethod getMethod(String className, MethodNode methodNode)
             throws ClassNotFoundException, NoSuchMethodException {
-        return ofUniversalClass(className,
-                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
-                                                                                          methodNode.name,
-                                                                                          methodNode.desc));
+        return getMethod(className, methodNode.name, methodNode.desc);
     }
 
     @StableAPI.Expose
