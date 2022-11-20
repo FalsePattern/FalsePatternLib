@@ -104,6 +104,40 @@ public class MappingManager {
     }
 
     @StableAPI.Expose
+    public static UniversalField getField(FieldInsnNode instruction)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return ofUniversalClass(instruction.owner,
+                                (universalClass, mappingType) -> universalClass.getField(mappingType,
+                                                                                         instruction.name));
+    }
+
+    @StableAPI.Expose
+    public static UniversalField getField(String className, FieldNode fieldNode)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return ofUniversalClass(className,
+                                (universalClass, mappingType) -> universalClass.getField(mappingType,
+                                                                                         fieldNode.name));
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(MethodInsnNode instruction)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return ofUniversalClass(instruction.owner,
+                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
+                                                                                          instruction.name,
+                                                                                          instruction.desc));
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(String className, MethodNode methodNode)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return ofUniversalClass(className,
+                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
+                                                                                          methodNode.name,
+                                                                                          methodNode.desc));
+    }
+
+    @StableAPI.Expose
     public static UniversalClass classForName(NameType nameType, MappingType mappingType, String className)
             throws ClassNotFoundException {
         initialize();
@@ -166,39 +200,5 @@ public class MappingManager {
             default:
                 throw new IllegalArgumentException("Invalid enum value " + nameType);
         }
-    }
-
-    @StableAPI.Expose
-    public static UniversalField getField(FieldInsnNode instruction)
-            throws ClassNotFoundException, NoSuchFieldException {
-        return ofUniversalClass(instruction.owner,
-                                (universalClass, mappingType) -> universalClass.getField(mappingType,
-                                                                                         instruction.name));
-    }
-
-    @StableAPI.Expose
-    public static UniversalField getField(String className, FieldNode fieldNode)
-            throws ClassNotFoundException, NoSuchFieldException {
-        return ofUniversalClass(className,
-                                (universalClass, mappingType) -> universalClass.getField(mappingType,
-                                                                                         fieldNode.name));
-    }
-
-    @StableAPI.Expose
-    public static UniversalMethod getMethod(MethodInsnNode instruction)
-            throws ClassNotFoundException, NoSuchMethodException {
-        return ofUniversalClass(instruction.owner,
-                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
-                                                                                          instruction.name,
-                                                                                          instruction.desc));
-    }
-
-    @StableAPI.Expose
-    public static UniversalMethod getMethod(String className, MethodNode methodNode)
-            throws ClassNotFoundException, NoSuchMethodException {
-        return ofUniversalClass(className,
-                                (universalClass, mappingType) -> universalClass.getMethod(mappingType,
-                                                                                          methodNode.name,
-                                                                                          methodNode.desc));
     }
 }
