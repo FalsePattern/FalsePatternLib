@@ -24,19 +24,17 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
+import com.falsepattern.lib.mapping.moveme.ThrowingBIFunction;
 import com.falsepattern.lib.mapping.storage.Lookup;
-import com.falsepattern.lib.mapping.types.MappingType;
-import com.falsepattern.lib.mapping.types.NameType;
-import com.falsepattern.lib.mapping.types.UniversalClass;
-import com.falsepattern.lib.mapping.types.UniversalField;
-import com.falsepattern.lib.mapping.types.UniversalMethod;
+import com.falsepattern.lib.mapping.types.*;
 import com.falsepattern.lib.util.ResourceUtil;
-import lombok.SneakyThrows;
-import lombok.val;
-import lombok.var;
+import lombok.*;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.tukaani.xz.LZMA2Options;
 
 import java.io.DataInputStream;
@@ -58,6 +56,7 @@ public class MappingManager {
         initialized = true;
         DependencyLoader.addMavenRepo("https://repo1.maven.org/maven2/");
         DependencyLoader.loadLibraries(Library.builder()
+                                              .loadingModId(Tags.MODID)
                                               .groupId("org.tukaani")
                                               .artifactId("xz")
                                               .minVersion(SemanticVersion.builder()
@@ -107,6 +106,44 @@ public class MappingManager {
     }
 
     @StableAPI.Expose
+    public static UniversalField getField(String className, String fieldName)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return ofUniversalClass(className, (universalClass, mappingType) ->
+                universalClass.getField(mappingType, fieldName));
+    }
+
+    @StableAPI.Expose
+    public static UniversalField getField(FieldInsnNode fieldInsnNode)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return getField(fieldInsnNode.owner, fieldInsnNode.name);
+    }
+
+    @StableAPI.Expose
+    public static UniversalField getField(String className, FieldNode fieldNode)
+            throws ClassNotFoundException, NoSuchFieldException {
+        return getField(className, fieldNode.name);
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(String className, String methodName, String methodDesc)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return ofUniversalClass(className, (universalClass, mappingType) ->
+                universalClass.getMethod(mappingType, methodName, methodDesc));
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(MethodInsnNode methodInsnNode)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return getMethod(methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
+    }
+
+    @StableAPI.Expose
+    public static UniversalMethod getMethod(String className, MethodNode methodNode)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return getMethod(className, methodNode.name, methodNode.desc);
+    }
+
+    @StableAPI.Expose
     public static UniversalClass classForName(NameType nameType, MappingType mappingType, String className)
             throws ClassNotFoundException {
         initialize();
@@ -126,6 +163,39 @@ public class MappingManager {
         }
     }
 
+    //TODO: Should this be public and exposed instead?
+    private static <T, E extends Throwable> T ofUniversalClass(
+            String className, ThrowingBIFunction<UniversalClass, MappingType, T, E> elementGetter)
+            throws ClassNotFoundException, E {
+        UniversalClass universalClass;
+        MappingType mappingType;
+        if (!CoreLoadingPlugin.isObfuscated()) {
+            try {
+                mappingType = MappingType.MCP;
+                universalClass = classForName(NameType.Internal, MappingType.MCP, className);
+
+            } catch (ClassNotFoundException e) {
+                throw new ClassNotFoundException("Could not find the class " + className +
+                                                 " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
+            }
+        } else {
+            try {
+                mappingType = MappingType.SRG;
+                universalClass = classForName(NameType.Internal, mappingType, className);
+            } catch (ClassNotFoundException e) {
+                try {
+                    mappingType = MappingType.Notch;
+                    universalClass = classForName(NameType.Internal, mappingType, className);
+                } catch (ClassNotFoundException ex) {
+                    throw new ClassNotFoundException("Could not find the class " + className +
+                                                     " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
+                }
+            }
+        }
+
+        return elementGetter.apply(universalClass, mappingType);
+    }
+
     @StableAPI.Expose
     public static boolean containsClass(NameType nameType, MappingType mappingType, String className) {
         switch (nameType) {
@@ -135,62 +205,6 @@ public class MappingManager {
                 return regularLookup.containsKey(mappingType, className);
             default:
                 throw new IllegalArgumentException("Invalid enum value " + nameType);
-        }
-    }
-
-    @StableAPI.Expose
-    public static UniversalField getField(FieldInsnNode instruction)
-            throws ClassNotFoundException, NoSuchFieldException {
-        if (!CoreLoadingPlugin.isObfuscated()) {
-            try {
-                return classForName(NameType.Internal, MappingType.MCP, instruction.owner).getField(MappingType.MCP,
-                                                                                                    instruction.name);
-            } catch (ClassNotFoundException e) {
-                throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                 " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
-            }
-        } else {
-            try {
-                return classForName(NameType.Internal, MappingType.SRG, instruction.owner).getField(MappingType.SRG,
-                                                                                                    instruction.name);
-            } catch (ClassNotFoundException e) {
-                try {
-                    return classForName(NameType.Internal, MappingType.Notch, instruction.owner).getField(
-                            MappingType.Notch, instruction.name);
-                } catch (ClassNotFoundException ex) {
-                    throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                     " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
-                }
-            }
-        }
-    }
-
-    @StableAPI.Expose
-    public static UniversalMethod getMethod(MethodInsnNode instruction)
-            throws ClassNotFoundException, NoSuchMethodException {
-        if (!CoreLoadingPlugin.isObfuscated()) {
-            try {
-                return classForName(NameType.Internal, MappingType.MCP, instruction.owner).getMethod(MappingType.MCP,
-                                                                                                     instruction.name,
-                                                                                                     instruction.desc);
-            } catch (ClassNotFoundException e) {
-                throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                 " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
-            }
-        } else {
-            try {
-                return classForName(NameType.Internal, MappingType.SRG, instruction.owner).getMethod(MappingType.SRG,
-                                                                                                     instruction.name,
-                                                                                                     instruction.desc);
-            } catch (ClassNotFoundException e) {
-                try {
-                    return classForName(NameType.Internal, MappingType.Notch, instruction.owner).getMethod(
-                            MappingType.Notch, instruction.name, instruction.desc);
-                } catch (ClassNotFoundException ex) {
-                    throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                     " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
-                }
-            }
         }
     }
 }
