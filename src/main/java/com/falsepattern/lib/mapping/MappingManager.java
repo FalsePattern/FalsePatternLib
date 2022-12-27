@@ -24,6 +24,7 @@ import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.dependencies.DependencyLoader;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.types.MappingType;
@@ -49,13 +50,15 @@ public class MappingManager {
     private static final Lookup<UniversalClass> regularLookup = new Lookup<>();
     private static final Map<String, String> stringPool = new HashMap<>();
     private static boolean initialized = false;
-
+    private static final Object MUTEX = new Object();
     @SneakyThrows
-    private static synchronized void initialize() {
-        if (initialized) {
-            return;
+    public static void initialize() {
+        synchronized (MUTEX) {
+            if (initialized) {
+                return;
+            }
+            initialized = true;
         }
-        initialized = true;
         DependencyLoader.addMavenRepo("https://repo1.maven.org/maven2/");
         DependencyLoader.loadLibraries(Library.builder()
                                               .groupId("org.tukaani")
@@ -70,6 +73,7 @@ public class MappingManager {
                                                                                .minorVersion(9)
                                                                                .patchVersion(-1)
                                                                                .build())
+                                              .loadingModId(Tags.MODID)
                                               .build());
         val input = new DataInputStream(new LZMA2Options(6).getInputStream(
                 ResourceUtil.getResourceFromJar("/mappings.lzma2", CoreLoadingPlugin.class)));
@@ -128,6 +132,7 @@ public class MappingManager {
 
     @StableAPI.Expose
     public static boolean containsClass(NameType nameType, MappingType mappingType, String className) {
+        initialize();
         switch (nameType) {
             case Internal:
                 return internalLookup.containsKey(mappingType, className);
@@ -141,6 +146,7 @@ public class MappingManager {
     @StableAPI.Expose
     public static UniversalField getField(FieldInsnNode instruction)
             throws ClassNotFoundException, NoSuchFieldException {
+        initialize();
         if (!CoreLoadingPlugin.isObfuscated()) {
             try {
                 return classForName(NameType.Internal, MappingType.MCP, instruction.owner).getField(MappingType.MCP,
@@ -168,6 +174,7 @@ public class MappingManager {
     @StableAPI.Expose
     public static UniversalMethod getMethod(MethodInsnNode instruction)
             throws ClassNotFoundException, NoSuchMethodException {
+        initialize();
         if (!CoreLoadingPlugin.isObfuscated()) {
             try {
                 return classForName(NameType.Internal, MappingType.MCP, instruction.owner).getMethod(MappingType.MCP,
