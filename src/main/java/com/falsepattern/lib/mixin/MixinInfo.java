@@ -22,8 +22,12 @@
 package com.falsepattern.lib.mixin;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.val;
 import org.spongepowered.asm.launch.MixinBootstrap;
 
+import net.minecraft.launchwrapper.Launch;
+
+import java.io.IOException;
 import java.util.Optional;
 
 @StableAPI(since = "0.10.2")
@@ -59,6 +63,11 @@ public final class MixinInfo {
         return mixinBootstrapper == MixinBootstrapperType.MixinBooterLegacy;
     }
 
+    @StableAPI.Expose(since = "0.10.14")
+    public static boolean isGasStation() {
+        return mixinBootstrapper == MixinBootstrapperType.GasStation;
+    }
+
     @StableAPI.Expose
     public static MixinBootstrapperType bootstrapperType() {
         return mixinBootstrapper;
@@ -73,38 +82,29 @@ public final class MixinInfo {
         return MixinBootstrap.VERSION;
     }
 
-    private static MixinBootstrapperType detect() {
+    public static boolean isClassPresentSafe(String clazz) {
         try {
-            Class.forName("org.spongepowered.asm.launch.MixinBootstrap");
-        } catch (ClassNotFoundException ignored) {
-            return MixinBootstrapperType.None;
+            val bytes = Launch.classLoader.getClassBytes(clazz);
+            if (bytes == null || bytes.length == 0) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
         }
-        try {
-            Class.forName("com.falsepattern.gasstation.core.GasStationCore");
-            return MixinBootstrapperType.GasStation;
-        } catch (ClassNotFoundException ignored) {
-        }
-        try {
-            Class.forName("ru.timeconqueror.spongemixins.core.SpongeMixinsCore");
-            return MixinBootstrapperType.SpongeMixins;
-        } catch (ClassNotFoundException ignored) {
-        }
-        try {
-            Class.forName("io.github.crucible.grimoire.Grimoire");
-            return MixinBootstrapperType.Grimoire;
-        } catch (ClassNotFoundException ignored) {
-        }
-        try {
-            Class.forName("io.github.crucible.grimoire.common.GrimoireCore");
-            return MixinBootstrapperType.Grimoire;
-        } catch (ClassNotFoundException ignored) {
-        }
-        try {
-            Class.forName("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin");
-            return MixinBootstrapperType.MixinBooterLegacy;
-        } catch (ClassNotFoundException ignored) {
-        }
+        return true;
+    }
 
+    private static MixinBootstrapperType detect() {
+        if (!isClassPresentSafe("org.spongepowered.asm.launch.MixinBootstrap"))
+            return MixinBootstrapperType.None;
+        if (isClassPresentSafe("com.falsepattern.gasstation.GasStation"))
+            return MixinBootstrapperType.GasStation;
+        if (isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore"))
+            return MixinBootstrapperType.SpongeMixins;
+        if (isClassPresentSafe("io.github.crucible.grimoire.Grimoire") || isClassPresentSafe("io.github.crucible.grimoire.common.GrimoireCore"))
+            return MixinBootstrapperType.Grimoire;
+        if (isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin"))
+            return MixinBootstrapperType.MixinBooterLegacy;
         return MixinBootstrapperType.Other;
     }
 

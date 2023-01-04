@@ -1,5 +1,5 @@
 dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.22") {
+    compileOnly("org.projectlombok:lombok:1.18.24") {
         transitive = false
     }
     compileOnly("org.spongepowered:mixin:0.8.3-gasstation")
