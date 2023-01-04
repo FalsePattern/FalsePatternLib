@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern58
+//version: 1656003793falsepattern59
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -257,7 +257,9 @@ minecraft {
     runDir = "run"
 
     if (replaceGradleTokenInFile) {
-        replaceIn replaceGradleTokenInFile
+        for (file in replaceGradleTokenInFile.split(',')) {
+            replaceIn file
+        }
         if(gradleTokenModId) {
             replace gradleTokenModId, modId
         }
@@ -317,6 +319,12 @@ dependencies {
         runtime("org.spongepowered:mixin:0.8.5-gasstation_7")
         runtime("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
     }
+    // Latest LWJGL
+    compile "org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209"
+    compile "org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209"
+    minecraftNatives "org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209"
+    minecraftDeps "org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209"
+    minecraftDeps "org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209"
 }
 
 apply from: 'dependencies.gradle'
