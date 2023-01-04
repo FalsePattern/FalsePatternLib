@@ -35,15 +35,7 @@ public class GasStationValidatorTransformer implements IClassNodeTransformer {
     @Override
     public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
         if (transformedName.equals("com.falsepattern.gasstation.GasStation")) {
-            //Make sure everything is loaded correctly, crash if gasstation is bugged
-            if (!isClassPresentSafe("com.falsepattern.gasstation.core.GasStationCore") || //Validate core class
-                !isClassPresentSafe("makamys.mixingasm.api.TransformerInclusions") || //Validate the mixingasm compat
-                !isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore") || //Validate the spongemixins compat
-                !isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin") || //Validate the MBL compat
-                (!isClassPresentSafe("org.spongepowered.asm.lib.Opcodes") || isClassPresentSafe("org.spongepowered.libraries.org.objectweb.asm.Opcodes")) //Validate correct mixins class
-            ) {
-                throw new Error("Failed to validate your GasStation mixin plugin installation. Please make sure you have the latest GasStation installed from the official source: https://github.com/FalsePattern/GasStation");
-            }
+            CoreLoadingPlugin.validateGasStation();
         }
         return false;
     }

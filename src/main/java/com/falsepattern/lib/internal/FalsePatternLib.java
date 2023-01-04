@@ -20,8 +20,10 @@
  */
 package com.falsepattern.lib.internal;
 
+import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.internal.proxy.CommonProxy;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
@@ -64,6 +66,9 @@ public class FalsePatternLib {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
+        if (Loader.isModLoaded("gasstation")) {
+            CoreLoadingPlugin.validateGasStation();
+        }
         proxy.postInit(e);
     }
 
