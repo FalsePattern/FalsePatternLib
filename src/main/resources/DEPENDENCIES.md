@@ -2,7 +2,7 @@ FalsePatternLib JSON dependency file example
 Version 1
 
 An example JSON file that can be used to download dependencies using FalsePatternLib. This replaces the legacy
-DependencyLoader api.
+DependencyLoader api. This file needs to reside inside the META-INF directory.
 ```json
 {
   "identifier": "falsepatternlib_dependencies",

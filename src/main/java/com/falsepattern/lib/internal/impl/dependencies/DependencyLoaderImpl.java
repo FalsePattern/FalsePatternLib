@@ -280,7 +280,6 @@ public class DependencyLoaderImpl {
         val dependencySpecs = Stream.of(Launch.classLoader.getSources().stream(),
                                         grabSourceCandidatesFromFolder(modsDir),
                                         grabSourceCandidatesFromFolder(mods1710Dir))
-                                    .parallel()
                                     .flatMap((i) -> i)
                                     .flatMap(DependencyLoaderImpl::scanSourceMetaInf)
                                     .map((source) -> {
@@ -312,13 +311,13 @@ public class DependencyLoaderImpl {
         mavenRepositories.addAll(dependencySpecs.stream()
                                                 .flatMap((dep) -> dep.repositories().stream())
                                                 .collect(Collectors.toSet()));
-        val artifacts = dependencySpecs.parallelStream()
+        val artifacts = dependencySpecs.stream()
                                        .map((root) -> new Pair<>(root.source(), root.dependencies()))
-                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.of(dep.always(), Share.DEV_ENV ? dep.dev() : dep.obf()).parallel()))
-                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.concat(dep.common().parallelStream(),
+                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.of(dep.always(), Share.DEV_ENV ? dep.dev() : dep.obf())))
+                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.concat(dep.common().stream(),
                                                                                              FMLLaunchHandler.side().isClient() ?
-                                                                                             dep.client().parallelStream() :
-                                                                                             dep.server().parallelStream()).parallel()))
+                                                                                             dep.client().stream() :
+                                                                                             dep.server().stream())))
                                        .map((pair) -> {
                                            val source = pair.a;
                                            val dep = pair.b;
