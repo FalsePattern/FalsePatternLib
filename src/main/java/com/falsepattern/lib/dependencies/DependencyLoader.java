@@ -28,6 +28,13 @@ import lombok.NonNull;
 import java.util.concurrent.CompletableFuture;
 
 
+/**
+ * DEPRECATED. See the DEPENDENCIES.MD files in the root of the resources for more information.
+ * <p>
+ * This class will stay here for legacy compatibility
+ */
+@Deprecated
+@DeprecationDetails(deprecatedSince = "0.11.0")
 @StableAPI(since = "0.6.0")
 public class DependencyLoader {
 
@@ -64,8 +71,9 @@ public class DependencyLoader {
         return new VoidBuilder();
     }
 
-    @StableAPI(since = "0.6.0")
+    @Deprecated
     @DeprecationDetails(deprecatedSince = "0.10.0")
+    @StableAPI(since = "0.6.0")
     public static class VoidBuilder {
         private String loadingModId;
         private String groupId;

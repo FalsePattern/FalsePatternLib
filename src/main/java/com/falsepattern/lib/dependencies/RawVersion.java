@@ -19,20 +19,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib;
+package com.falsepattern.lib.dependencies;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Used together with {@link Deprecated} to specify when an API was marked stable, and when it was marked for deprecation.
- * Deprecated classes MAY be removed after a full deprecation cycle as described inside the {@link StableAPI} javadoc.
- */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@StableAPI(since = "0.10.0")
-public @interface DeprecationDetails {
-    @StableAPI.Expose String deprecatedSince();
-    @StableAPI.Expose(since = "0.11.0") String replacement() default "";
+public class RawVersion extends Version {
+    public final String versionString;
+    public RawVersion(String versionString) {
+        this.versionString = versionString;
+    }
+    @Override
+    public int compareTo(@NotNull Version o) {
+        if (o instanceof RawVersion) {
+            return versionString.compareTo(((RawVersion) o).versionString);
+        } else if (o instanceof SemanticVersion) {
+            return 1;
+        } else if (o instanceof ComplexVersion) {
+            return 1;
+        } else {
+            throw new IllegalArgumentException("Unknown version type: " + o.getClass().getName());
+        }
+    }
 }

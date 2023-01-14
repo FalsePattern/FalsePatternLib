@@ -11,4 +11,8 @@ repositories {
         name = "mvnpattern"
         url = "https://mvn.falsepattern.com/releases/"
     }
+    maven {
+        name = "repsy_ventooth"
+        url = "https://repo.repsy.io/mvn/ventooth/public/"
+    }
 }

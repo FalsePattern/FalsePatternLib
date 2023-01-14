@@ -56,7 +56,7 @@ public class ComplexVersion extends Version {
             }
         } else if (o instanceof SemanticVersion) {
             val other = (SemanticVersion) o;
-            val result = other.compareTo(versions[0]);
+            val result = versions[0].compareTo(other);
             if (result != 0) {
                 return result;
             }

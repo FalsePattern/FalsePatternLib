@@ -21,6 +21,7 @@
 package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 import com.falsepattern.lib.mapping.MappingManager;
 import lombok.Getter;
 import lombok.val;
@@ -51,6 +52,8 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
             throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
         } catch (ClassNotFoundException ignored) {
         }
+        //Scan for dependencies now
+        DependencyLoaderImpl.scanDeps();
         //Initializing the rest
         MappingManager.initialize();
     }

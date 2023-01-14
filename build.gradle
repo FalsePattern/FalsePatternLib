@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern59
+//version: 1656003793falsepattern60
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -282,9 +282,13 @@ if(file("addon.gradle").exists()) {
 apply from: 'repositories.gradle'
 
 configurations {
-    implementation.extendsFrom(shadowImplementation)  // TODO: remove after all uses are refactored
-    implementation.extendsFrom(shadowCompile)
-    implementation.extendsFrom(shadeCompile)
+    for (config in [shadowImplementation, shadowCompile, shadeCompile]) {
+        implementation.extendsFrom(shadeCompile)
+        compileClasspath.extendsFrom(config)
+        runtimeClasspath.extendsFrom(config)
+        testCompileClasspath.extendsFrom(config)
+        testRuntimeClasspath.extendsFrom(config)
+    }
 }
 
 repositories {
@@ -314,6 +318,8 @@ dependencies {
         compile("org.spongepowered:mixin:0.8.5-gasstation_7")
         compile("com.llamalad7:MixinExtras:0.1.1-gasstation")
         compile("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
+        runtimeClasspath('org.jetbrains:intellij-fernflower:1.2.1.16')
+        testRuntimeClasspath('org.jetbrains:intellij-fernflower:1.2.1.16')
     } else if(hasMixinDeps.toBoolean()) {
         runtime("com.llamalad7:MixinExtras:0.1.1-gasstation")
         runtime("org.spongepowered:mixin:0.8.5-gasstation_7")
@@ -668,8 +674,11 @@ publish.dependsOn(build)
 publishing {
     publications {
         maven(MavenPublication) {
+            from components.java
             artifact source: usesShadowedDependencies.toBoolean() ? shadowJar : jar, classifier: ""
-            artifact source: sourcesJar, classifier: "sources"
+            if (!project.hasProperty("noPublishedSources") || !noPublishedSources) {
+                artifact source: sourcesJar, classifier: "sources"
+            }
             artifact source: usesShadowedDependencies.toBoolean() ? shadowDevJar : devJar, classifier: "dev"
             if (apiPackage) {
                 artifact source: apiJar, classifier: "api"

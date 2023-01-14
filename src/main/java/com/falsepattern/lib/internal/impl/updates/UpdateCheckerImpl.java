@@ -21,16 +21,14 @@
 
 package com.falsepattern.lib.internal.impl.updates;
 
-import com.falsepattern.json.node.JsonNode;
-import com.falsepattern.lib.dependencies.DependencyLoader;
-import com.falsepattern.lib.dependencies.Library;
-import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.internal.Internet;
-import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateCheckException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import lombok.val;
 
 import net.minecraft.client.resources.I18n;
@@ -97,65 +95,49 @@ public final class UpdateCheckerImpl {
             } catch (MalformedURLException e) {
                 throw new CompletionException(new UpdateCheckException("Invalid URL: " + url, e));
             }
-            if (!jsonLibraryLoaded.get()) {
-                try {
-                    DependencyLoader.addMavenRepo("https://mvn.falsepattern.com/releases/");
-                    DependencyLoader.loadLibraries(Library.builder()
-                                                          .loadingModId(Tags.MODID)
-                                                          .groupId("com.falsepattern")
-                                                          .artifactId("json")
-                                                          .minVersion(new SemanticVersion(0, 4, 0))
-                                                          .maxVersion(new SemanticVersion(0, Integer.MAX_VALUE,
-                                                                                          Integer.MAX_VALUE))
-                                                          .preferredVersion(new SemanticVersion(0, 4, 1))
-                                                          .build());
-                } catch (Exception e) {
-                    throw new CompletionException(
-                            new UpdateCheckException("Failed to load json library for update checker!", e));
-                }
-                jsonLibraryLoaded.set(true);
-            }
             val result = new ArrayList<ModUpdateInfo>();
-            JsonNode parsed;
+            JsonElement parsed;
             try {
-                parsed = JsonNode.parse(Internet.download(URL).thenApply(String::new).join());
+                parsed = new JsonParser().parse(Internet.download(URL).thenApply(String::new).join());
             } catch (CompletionException e) {
                 throw new CompletionException(new UpdateCheckException("Failed to download update checker JSON file!",
                                                                        e.getCause() == null ? e : e.getCause()));
             }
-            List<JsonNode> modList;
-            if (parsed.isList()) {
-                modList = parsed.getJavaList();
+            JsonArray modList;
+            if (parsed.isJsonArray()) {
+                modList = parsed.getAsJsonArray();
             } else {
-                modList = Collections.singletonList(parsed);
+                modList = new JsonArray();
+                modList.add(parsed);
             }
             val installedMods = Loader.instance().getIndexedModList();
             for (val node : modList) {
-                if (!node.isObject()) {
+                if (!node.isJsonObject()) {
                     continue;
                 }
-                if (!node.containsKey("modid")) {
+                val obj = node.getAsJsonObject();
+                if (!obj.has("modid")) {
                     continue;
                 }
-                if (!node.containsKey("latestVersion")) {
+                if (!obj.has("latestVersion")) {
                     continue;
                 }
-                val modid = node.getString("modid");
+                val modid = obj.get("modid").getAsString();
                 if (!installedMods.containsKey(modid)) {
                     continue;
                 }
                 val mod = installedMods.get(modid);
-                val latestVersionsNode = node.get("latestVersion");
+                val latestVersionsNode = obj.get("latestVersion");
                 List<String> latestVersions;
-                if (latestVersionsNode.isString()) {
-                    latestVersions = Collections.singletonList(latestVersionsNode.stringValue());
-                } else if (latestVersionsNode.isList()) {
+                if (latestVersionsNode.isJsonPrimitive() && (latestVersionsNode.getAsJsonPrimitive().isString())) {
+                    latestVersions = Collections.singletonList(latestVersionsNode.getAsString());
+                } else if (latestVersionsNode.isJsonArray()) {
                     latestVersions = new ArrayList<>();
-                    for (val version : latestVersionsNode.getJavaList()) {
-                        if (!version.isString()) {
+                    for (val version : latestVersionsNode.getAsJsonArray()) {
+                        if (!version.isJsonPrimitive() || !version.getAsJsonPrimitive().isString()) {
                             continue;
                         }
-                        latestVersions.add(version.stringValue());
+                        latestVersions.add(version.getAsString());
                     }
                 } else {
                     continue;
@@ -164,9 +146,11 @@ public final class UpdateCheckerImpl {
                 if (latestVersions.contains(currentVersion)) {
                     continue;
                 }
-                val updateURL =
-                        node.containsKey("updateURL") && node.get("updateURL").isString() ? node.getString("updateURL")
-                                                                                          : "";
+                val updateURL = obj.has("updateURL") &&
+                                obj.get("updateURL").isJsonPrimitive() &&
+                                obj.get("updateURL").getAsJsonPrimitive().isString()
+                                ? obj.get("updateURL").getAsString()
+                                : "";
                 result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
             }
             return result;

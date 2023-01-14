@@ -21,10 +21,6 @@
 package com.falsepattern.lib.mapping;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.dependencies.DependencyLoader;
-import com.falsepattern.lib.dependencies.Library;
-import com.falsepattern.lib.dependencies.SemanticVersion;
-import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.types.MappingType;
@@ -38,9 +34,7 @@ import lombok.val;
 import lombok.var;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.tukaani.xz.LZMA2Options;
 
-import java.io.DataInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,54 +53,24 @@ public class MappingManager {
             }
             initialized = true;
         }
-        DependencyLoader.addMavenRepo("https://repo1.maven.org/maven2/");
-        DependencyLoader.loadLibraries(Library.builder()
-                                              .groupId("org.tukaani")
-                                              .artifactId("xz")
-                                              .minVersion(SemanticVersion.builder()
-                                                                         .majorVersion(1)
-                                                                         .minorVersion(9)
-                                                                         .patchVersion(-1)
-                                                                         .build())
-                                              .preferredVersion(SemanticVersion.builder()
-                                                                               .majorVersion(1)
-                                                                               .minorVersion(9)
-                                                                               .patchVersion(-1)
-                                                                               .build())
-                                              .loadingModId(Tags.MODID)
-                                              .build());
-        val input = new DataInputStream(new LZMA2Options(6).getInputStream(
-                ResourceUtil.getResourceFromJar("/mappings.lzma2", CoreLoadingPlugin.class)));
-        {
-            var classBytes = new byte[input.readInt()];
-            input.readFully(classBytes);
-            val classMappings = new String(classBytes).split("\n");
-            for (int i = 1; i < classMappings.length; i++) {
-                val line = classMappings[i].split(",");
-                val clazz = new UniversalClass(line, stringPool);
-                internalLookup.unwrap(clazz.internalName, clazz);
-                regularLookup.unwrap(clazz.regularName, clazz);
-            }
+        val classMappings = new String(ResourceUtil.getResourceBytesFromJar("/classes.csv", CoreLoadingPlugin.class)).split("\n");
+        for (int i = 1; i < classMappings.length; i++) {
+            val line = classMappings[i].split(",");
+            val clazz = new UniversalClass(line, stringPool);
+            internalLookup.unwrap(clazz.internalName, clazz);
+            regularLookup.unwrap(clazz.regularName, clazz);
         }
-        {
-            var fieldBytes = new byte[input.readInt()];
-            input.readFully(fieldBytes);
-            var fieldMappings = new String(fieldBytes).split("\n");
-            for (int i = 1; i < fieldMappings.length; i++) {
-                val line = fieldMappings[i].split(",");
-                val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
-                UniversalField.createAndAddToParent(clazz, line, stringPool);
-            }
+        var fieldMappings = new String(ResourceUtil.getResourceBytesFromJar("/fields.csv", CoreLoadingPlugin.class)).split("\n");
+        for (int i = 1; i < fieldMappings.length; i++) {
+            val line = fieldMappings[i].split(",");
+            val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
+            UniversalField.createAndAddToParent(clazz, line, stringPool);
         }
-        {
-            var methodBytes = new byte[input.readInt()];
-            input.readFully(methodBytes);
-            val methodMappings = new String(methodBytes).split("\n");
-            for (int i = 1; i < methodMappings.length; i++) {
-                val line = methodMappings[i].split(",");
-                val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
-                UniversalMethod.createAndAddToParent(clazz, line, stringPool);
-            }
+        val methodMappings = new String(ResourceUtil.getResourceBytesFromJar("/methods.csv", CoreLoadingPlugin.class)).split("\n");
+        for (int i = 1; i < methodMappings.length; i++) {
+            val line = methodMappings[i].split(",");
+            val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
+            UniversalMethod.createAndAddToParent(clazz, line, stringPool);
         }
     }
 

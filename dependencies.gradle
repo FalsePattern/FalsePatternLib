@@ -1,12 +1,14 @@
 dependencies {
+    //Dev-only deps
     compileOnly("org.projectlombok:lombok:1.18.24") {
         transitive = false
     }
-    compileOnly("org.spongepowered:mixin:0.8.3-gasstation")
-    compileOnly("com.llamalad7:MixinExtras:0.0.12-gasstation")
-    compileOnly("com.falsepattern:00gasstation-mc1.7.10:0.2.1:dev")
-    compileOnly("com.falsepattern:json:0.4.1")
-    compileOnly("org.tukaani:xz:1.9")
-    testCompile("org.tukaani:xz:1.9")
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.24")
+
+    compileOnly("org.jetbrains:annotations:23.1.0")
+
+    //Mod deps
+    compileOnly("org.spongepowered:mixin:0.8.5-gasstation_7")
+    compileOnly("com.llamalad7:MixinExtras:0.1.1-gasstation")
+    compileOnly("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
 }

@@ -20,17 +20,21 @@
  */
 package com.falsepattern.lib.internal;
 
+import lombok.Cleanup;
 import lombok.val;
 import lombok.var;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -53,18 +57,43 @@ public class Internet {
         }
     }
 
-    public static CompletableFuture<byte[]> download(URL URL) {
+    public static CompletableFuture<byte[]> download(URL... urls) {
         return CompletableFuture.supplyAsync(() -> {
             val result = new ByteArrayOutputStream();
-            AtomicReference<Exception> caught = new AtomicReference<>();
-            connect(URL, caught::set, (input) -> {
-                try {
-                    transferAndClose(input, result);
-                } catch (IOException e) {
-                    throw new CompletionException(e);
-                }
-            });
-            return result.toByteArray();
+            val caught = new AtomicReference<Exception>();
+            val success = new AtomicBoolean(false);
+            for (val url : urls) {
+                connect(url, caught::set, (input) -> {
+                    try {
+                        transferAndClose(input, result);
+                        success.set(true);
+                    } catch (IOException e) {
+                        throw new CompletionException(e);
+                    }
+                });
+                if (success.get()) return result.toByteArray();
+            }
+            throw new CompletionException(caught.get());
+        });
+    }
+
+    public static CompletableFuture<Void> downloadFile(File file, URL... urls) {
+        return CompletableFuture.runAsync(() -> {
+            val caught = new AtomicReference<Exception>();
+            val success = new AtomicBoolean(false);
+            for (val url : urls) {
+                connect(url, caught::set, (input) -> {
+                    try {
+                        @Cleanup val outputStream = Files.newOutputStream(file.toPath());
+                        transferAndClose(input, outputStream);
+                        success.set(true);
+                    } catch (IOException e) {
+                        throw new CompletionException(e);
+                    }
+                });
+                if (success.get()) return;
+            }
+            throw new CompletionException(caught.get());
         });
     }
 

@@ -19,20 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib;
+package com.falsepattern.lib.internal.impl.dependencies;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+public class Pair<A, B> {
+    public final A a;
+    public final B b;
 
-/**
- * Used together with {@link Deprecated} to specify when an API was marked stable, and when it was marked for deprecation.
- * Deprecated classes MAY be removed after a full deprecation cycle as described inside the {@link StableAPI} javadoc.
- */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@StableAPI(since = "0.10.0")
-public @interface DeprecationDetails {
-    @StableAPI.Expose String deprecatedSince();
-    @StableAPI.Expose(since = "0.11.0") String replacement() default "";
+    public Pair(A a, B b) {
+        this.a = a;
+        this.b = b;
+    }
 }
