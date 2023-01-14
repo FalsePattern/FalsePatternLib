@@ -22,7 +22,6 @@ package com.falsepattern.lib.internal.impl.dependencies;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.dependencies.Library;
-import com.falsepattern.lib.dependencies.RawVersion;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.dependencies.Version;
 import com.falsepattern.lib.internal.Internet;

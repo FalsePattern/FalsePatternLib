@@ -19,8 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.dependencies;
+package com.falsepattern.lib.internal.impl.dependencies;
 
+import com.falsepattern.lib.dependencies.ComplexVersion;
+import com.falsepattern.lib.dependencies.SemanticVersion;
+import com.falsepattern.lib.dependencies.Version;
 import org.jetbrains.annotations.NotNull;
 
 public class RawVersion extends Version {
