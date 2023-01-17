@@ -58,7 +58,7 @@ public class CommonProxy {
         CommonEventHandlerPre.registerBus();
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             Share.LOG.info("Launching asynchronous update check.");
-            updatesFuture = UpdateChecker.fetchUpdatesAsync(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
+            updatesFuture = UpdateChecker.fetchUpdatesAsyncV2(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
                 if (updates == null) {
                     updates = Collections.emptyList();
                 }

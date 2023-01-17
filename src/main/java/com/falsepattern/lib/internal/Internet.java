@@ -32,6 +32,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,13 +41,40 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class Internet {
+    private static final Map<String, String> NO_HEADERS = Collections.emptyMap();
     public static void connect(URL URL, Consumer<Exception> onError, Consumer<InputStream> onSuccess) {
+        connect(URL, NO_HEADERS, onError, onSuccess);
+    }
+
+    public static Map<String, String> constructHeaders(String... entries) {
+        if (entries.length % 2 != 0) {
+            throw new IllegalArgumentException("Entries must be in pairs");
+        }
+        val map = new java.util.HashMap<String, String>();
+        for (int i = 0; i < entries.length; i += 2) {
+            map.put(entries[i], entries[i + 1]);
+        }
+        return map;
+    }
+
+    public static void connect(URL URL, Map<String, String> headers, Consumer<Exception> onError, Consumer<InputStream> onSuccess) {
         try {
             val connection = (HttpURLConnection) URL.openConnection();
             connection.setConnectTimeout(3500);
             connection.setReadTimeout(5000);
             connection.setRequestProperty("User-Agent", Tags.MODNAME + " " + Tags.VERSION + " Internet Connector" +
                                                         " (https://github.com/FalsePattern/FalsePatternLib)");
+            for (val header: headers.entrySet()) {
+                val key = header.getKey();
+                val value = header.getValue();
+                if (key == null || value == null) {
+                    throw new IllegalArgumentException("Null key or value");
+                }
+                if (key.isEmpty()) {
+                    throw new IllegalArgumentException("Empty key");
+                }
+                connection.setRequestProperty(key, value);
+            }
             if (connection.getResponseCode() != 200) {
                 onError.accept(new Exception("HTTP response code " + connection.getResponseCode()));
             } else {

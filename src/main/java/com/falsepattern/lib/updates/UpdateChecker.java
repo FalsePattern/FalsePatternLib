@@ -31,36 +31,81 @@ import java.util.concurrent.CompletableFuture;
 @StableAPI(since = "0.8.0")
 public final class UpdateChecker {
     /**
-     * Checks for updates. The URL should be a JSON file that contains a list of mods, each with a mod ID, one or more
-     * versions, and a URL for the user to check for updates in case the current and latest versions are different.
-     * The JSON file must have the following format:
-     * <pre>{@code
-     *  [
-     *      {
-     *          "modID": "modid",
-     *          "latestVersion": ["1.0.0", "1.0.0-foo"],
-     *          "updateURL": "https://example.com/mods/mymod"
-     *      },
-     *      {
-     *          "modID": "modid2",
-     *          "latestVersion": ["0.2.0", "0.3.0-alpha"],
-     *          "updateURL": "https://example.com/mods/mymod2"
-     *      },
-     *      ...etc, one json object per mod.
-     *  ]
-     * }</pre>
-     *
-     * @param url The URL to check
-     *
-     * @return A list of mods that were both available on the URL and installed
+     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
      */
     @StableAPI.Expose
+    @Deprecated
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
         return UpdateCheckerImpl.fetchUpdatesAsync(url);
     }
 
     /**
-     * Same this as {@link #fetchUpdatesAsync(String)}, but returns the result in a blocking fashion.
+     * Checks for updates. The URL should be a JSON file that contains a list of mods, each with a mod ID, and one or more
+     * versions. The JSON file must have the following format:
+     * <pre>{@code
+     *  [
+     *      {
+     *          "modid": "modid",
+     *          "versions": [
+     *              {
+     *                  ...version object...
+     *              },
+     *              {
+     *                  ...version object...
+     *              }
+     *          ]
+     *      },
+     *      {
+     *          "modid": "modid2",
+     *          "versions": {
+     *              ...version object...
+     *          },
+     *          "updateURL": "https://example.com/mods/mymod2"
+     *      },
+     *      ...etc, one json object per mod.
+     *  ]
+     * }</pre>
+     * The currently supported version object formats are:
+     * <p>
+     * Raw version entry:
+     * <pre>{@code
+     * {
+     *     "type": "raw",
+     *     "version": "1.0.0",
+     *     "updateURL": "https://example.com/mods/mymod"
+     * }
+     * }</pre>
+     *
+     * GitHub version entry:
+     * <pre>{@code
+     * {
+     *    "type": "github",
+     *    "repo": "Example/ExampleMod"
+     * }
+     * }</pre>
+     *
+     * The GitHub version entry will automatically fetch the latest release from the specified repository using the GitHub API.
+     *
+     * @param url The URL to check
+     *
+     * @return A list of mods that were both available on the URL and installed
+     */
+    @StableAPI.Expose(since = "0.11.0")
+    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsyncV2(String url) {
+        return UpdateCheckerImpl.fetchUpdatesAsyncV2(url);
+    }
+
+    /**
+     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
+     */
+    @StableAPI.Expose
+    @Deprecated
+    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
+        return UpdateCheckerImpl.fetchUpdates(url);
+    }
+
+    /**
+     * Same this as {@link #fetchUpdatesAsyncV2(String)}, but returns the result in a blocking fashion.
      *
      * @param url The URL to check
      *
@@ -68,9 +113,9 @@ public final class UpdateChecker {
      *
      * @throws UpdateCheckException If the update checker is disabled in config, the URL is invalid, or
      */
-    @StableAPI.Expose
-    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
-        return UpdateCheckerImpl.fetchUpdates(url);
+    @StableAPI.Expose(since = "0.11.0")
+    public static List<ModUpdateInfo> fetchUpdatesV2(String url) throws UpdateCheckException {
+        return UpdateCheckerImpl.fetchUpdatesV2(url);
     }
 
     /**
