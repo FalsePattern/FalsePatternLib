@@ -45,9 +45,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class CommonProxy {
-
-    protected CompletableFuture<List<ModUpdateInfo>> updatesFuture;
-
     public void construct(FMLConstructionEvent e) {
         FalsePatternLib.NETWORK.registerMessage(SyncRequestHandler.class, SyncRequest.class, 0, Side.SERVER);
         FalsePatternLib.NETWORK.registerMessage(SyncReplyHandler.class, SyncReply.class, 1, Side.CLIENT);
@@ -58,7 +55,7 @@ public class CommonProxy {
         CommonEventHandlerPre.registerBus();
         if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
             Share.LOG.info("Launching asynchronous update check.");
-            updatesFuture = UpdateChecker.fetchUpdatesAsyncV2(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
+            UpdateChecker.fetchUpdatesAsyncV2(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
                 if (updates == null) {
                     updates = Collections.emptyList();
                 }
@@ -75,8 +72,6 @@ public class CommonProxy {
                 Share.LOG.error("Failed to check for updates!", ex);
                 return Collections.emptyList();
             });
-        } else {
-            updatesFuture = CompletableFuture.completedFuture(Collections.emptyList());
         }
     }
 
