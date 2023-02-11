@@ -33,8 +33,9 @@ import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,12 +56,29 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
 
     @StableAPI.Expose
     static File findJarOf(final ITargetedMod mod) {
+        File result = null;
         try (val stream = walk(MODS_DIRECTORY_PATH)) {
-            return stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
-        } catch (IOException e) {
+            result = stream.filter(mod::isMatchingJar)
+                           .map(Path::toFile)
+                           .findFirst()
+                           .orElse(null);
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        if (result == null) {
+            try {
+                result = Arrays.stream(Launch.classLoader.getURLs())
+                               .map(URL::getPath)
+                               .map(Paths::get)
+                               .filter(mod::isMatchingJar)
+                               .map(Path::toFile)
+                               .findFirst()
+                               .orElse(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     @StableAPI.Expose

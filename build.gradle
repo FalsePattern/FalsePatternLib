@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern60
+//version: 1656003793falsepattern62
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -670,12 +670,13 @@ def getCredentials = {
 }
 
 //Publishing
-publish.dependsOn(build)
 publishing {
     publications {
         maven(MavenPublication) {
             from components.java
-            artifact source: usesShadowedDependencies.toBoolean() ? shadowJar : jar, classifier: ""
+            if (usesShadowedDependencies.toBoolean()) {
+                artifact source: shadowJar, classifier: ""
+            }
             if (!project.hasProperty("noPublishedSources") || !noPublishedSources) {
                 artifact source: sourcesJar, classifier: "sources"
             }
@@ -723,6 +724,12 @@ publishing {
         }
     }
 }
+
+tasks.withType(PublishToMavenRepository) { task ->
+    dependsOn("build")
+}
+
+publishToMavenLocal.dependsOn("build")
 
 if (project.changelog == "") {
     File changelogFile = new File(System.getenv("CHANGELOG_FILE") ?: "CHANGELOG.md")

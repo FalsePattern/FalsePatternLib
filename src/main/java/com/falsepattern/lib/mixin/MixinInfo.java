@@ -33,7 +33,12 @@ import java.util.Optional;
 @StableAPI(since = "0.10.2")
 public final class MixinInfo {
     @StableAPI.Expose
-    public static final MixinBootstrapperType mixinBootstrapper = detect();
+    public static final MixinBootstrapperType mixinBootstrapper;
+
+    static {
+        MixinInfoCompatCompanion.mixinInfoClassLoaded = true;
+        mixinBootstrapper = detect();
+    }
 
     @StableAPI.Expose
     public static boolean isMixinsInstalled() {
@@ -68,6 +73,11 @@ public final class MixinInfo {
         return mixinBootstrapper == MixinBootstrapperType.GasStation;
     }
 
+    @StableAPI.Expose(since = "0.10.15")
+    public static boolean isUniMixin() {
+        return mixinBootstrapper == MixinBootstrapperType.UniMixin;
+    }
+
     @StableAPI.Expose
     public static MixinBootstrapperType bootstrapperType() {
         return mixinBootstrapper;
@@ -97,6 +107,11 @@ public final class MixinInfo {
     private static MixinBootstrapperType detect() {
         if (!isClassPresentSafe("org.spongepowered.asm.launch.MixinBootstrap"))
             return MixinBootstrapperType.None;
+        for (val candidate: MixinInfoCompatCompanion.UNIMIXIN_CANDIDATES) {
+            if (isClassPresentSafe(candidate)) {
+                return MixinBootstrapperType.UniMixin;
+            }
+        }
         if (isClassPresentSafe("com.falsepattern.gasstation.GasStation"))
             return MixinBootstrapperType.GasStation;
         if (isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore"))
@@ -115,6 +130,7 @@ public final class MixinInfo {
         @StableAPI.Expose SpongeMixins,
         @StableAPI.Expose Grimoire,
         @StableAPI.Expose MixinBooterLegacy,
-        @StableAPI.Expose Other
+        @StableAPI.Expose Other,
+        @StableAPI.Expose(since = "0.10.15") UniMixin
     }
 }
