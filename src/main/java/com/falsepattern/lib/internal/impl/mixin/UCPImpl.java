@@ -22,7 +22,6 @@
 package com.falsepattern.lib.internal.impl.mixin;
 
 import lombok.val;
-import sun.misc.URLClassPath;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 
 public final class UCPImpl {
-    private static final URLClassPath ucp;
     private static final boolean GRIMOIRE;
 
     static {
@@ -49,24 +47,14 @@ public final class UCPImpl {
             }
         }
         GRIMOIRE = grimoire;
-        if (!GRIMOIRE) {
-            try {
-                val ucpField = LaunchClassLoader.class.getSuperclass().getDeclaredField("ucp");
-                ucpField.setAccessible(true);
-
-                ucp = (URLClassPath) ucpField.get(Launch.classLoader);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        } else {
-            ucp = null;
-            System.err.println("Grimoire detected, disabling jar loading utility");
-        }
     }
 
     public static void addJar(File pathToJar) throws Exception {
         if (!GRIMOIRE) {
-            ucp.addURL(pathToJar.toURI().toURL());
+            final LaunchClassLoader loader = Launch.classLoader;
+            loader.addURL(pathToJar.toURI().toURL());
+            // Act as-if we only added the mod to ucp
+            loader.getSources().remove(loader.getSources().size() - 1);
         }
     }
 }
