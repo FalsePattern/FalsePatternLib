@@ -24,6 +24,8 @@ import lombok.Cleanup;
 import lombok.val;
 import lombok.var;
 
+import net.minecraft.launchwrapper.Launch;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -82,6 +84,15 @@ public class Internet {
             }
             connection.disconnect();
         } catch (Exception e) {
+            //Check if NonUpdate is present
+            try {
+                if (Launch.classLoader.getClassBytes("moe.mickey.forge.nonupdate.NonUpdate") != null) {
+                    e.addSuppressed(new Exception("NonUpdate is present, it's possible that it's blocking a library download." +
+                                                  " Please disable it for a single run to allow mod dependencies to download."));
+                }
+            } catch (IOException ex) {
+                e.addSuppressed(ex);
+            }
             onError.accept(e);
         }
     }

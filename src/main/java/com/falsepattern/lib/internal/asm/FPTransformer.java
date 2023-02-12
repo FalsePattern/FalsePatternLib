@@ -45,6 +45,6 @@ public class FPTransformer implements SmartTransformer {
     private final Logger logger = LOG;
 
     public FPTransformer() {
-        transformers = Arrays.asList(new IMixinPluginTransformer(), new ITypeDiscovererTransformer(), new NonUpdateTransformer(), new GasStationValidatorTransformer());
+        transformers = Arrays.asList(new IMixinPluginTransformer(), new ITypeDiscovererTransformer(), new GasStationValidatorTransformer());
     }
 }
