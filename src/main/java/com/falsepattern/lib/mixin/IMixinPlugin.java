@@ -66,17 +66,18 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
             e.printStackTrace();
         }
         if (result == null) {
-            try {
-                result = Arrays.stream(Launch.classLoader.getURLs())
-                               .map(URL::getPath)
-                               .map(Paths::get)
-                               .filter(mod::isMatchingJar)
-                               .map(Path::toFile)
-                               .findFirst()
-                               .orElse(null);
-            } catch (Exception e) {
-                e.printStackTrace();
+            File found = null;
+            for (URL url : Launch.classLoader.getURLs()) {
+                try {
+                    String file = url.getFile();
+                    Path path = Paths.get(file);
+                    if (mod.isMatchingJar(path)) {
+                        found = path.toFile();
+                        break;
+                    }
+                } catch (Exception ignored) {}
             }
+            result = found;
         }
         return result;
     }
