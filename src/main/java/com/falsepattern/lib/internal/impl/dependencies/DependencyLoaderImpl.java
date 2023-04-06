@@ -284,9 +284,12 @@ public class DependencyLoaderImpl {
                                     .map((source) -> {
                                         //Convert source to GSON json
                                         try (val is = source.openStream()) {
-                                            val json = new JsonParser().parse(new InputStreamReader(is)).getAsJsonObject();
-                                            if (!(json.isJsonObject() &&
-                                                  json.has("identifier") &&
+                                            val jsonRaw = new JsonParser().parse(new InputStreamReader(is));
+                                            if (!jsonRaw.isJsonObject()) {
+                                                return null;
+                                            }
+                                            val json = jsonRaw.getAsJsonObject();
+                                            if (!(json.has("identifier") &&
                                                   json.get("identifier")
                                                       .getAsString()
                                                       .equals("falsepatternlib_dependencies")
@@ -300,7 +303,7 @@ public class DependencyLoaderImpl {
                                             val root = gson.fromJson(json, DepRoot.class);
                                             root.source(source.toString());
                                             return root;
-                                        } catch (IOException e) {
+                                        } catch (Exception e) {
                                             LOG.error("Failed to read json from source {}: {}", source, e);
                                             return null;
                                         }
