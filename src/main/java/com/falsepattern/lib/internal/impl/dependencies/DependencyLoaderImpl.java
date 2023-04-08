@@ -69,11 +69,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 public class DependencyLoaderImpl {
 
@@ -191,14 +191,13 @@ public class DependencyLoaderImpl {
             return Stream.empty();
         }
         LOG.debug("Scanning {} for dependencies", source);
-        val path = source.getPath();
+        val fileName = source.getFile();
         val output = new ArrayList<URL>();
-        if (path.endsWith(".jar") || path.endsWith(".zip")) {
+        if (fileName.endsWith(".jar")) {
             //Scan jar file for json in META-INF, add them to the list
-            try (val jarFile = (ZipFile)(path.endsWith("jar") ? new JarFile(path) : new ZipFile(path))) {
-                val entries = jarFile.entries();
-                while (entries.hasMoreElements()) {
-                    val entry = entries.nextElement();
+            try (val inputStream = source.openStream(); val jarFile = new JarInputStream(inputStream)) {
+                ZipEntry entry;
+                while ((entry = jarFile.getNextEntry()) != null) {
                     if (!entry.getName().startsWith("META-INF") || !entry.getName().endsWith(".json")) {
                         continue;
                     }
@@ -209,12 +208,12 @@ public class DependencyLoaderImpl {
                     }
                 }
             } catch (IOException e) {
-                LOG.error("Failed to open jar file {}", path);
+                LOG.error("Failed to open jar file {}", source.getPath());
             }
         } else {
-            val dir = new File(path);
+            val dir = new File(fileName);
             if (!dir.exists() || !dir.isDirectory()) {
-                LOG.warn("Skipping non-directory, nor jar, nor zip source: {}", source);
+                LOG.warn("Skipping non-directory, nor jar source: {}", source);
                 return Stream.empty();
             }
             //Scan directory for json in META-INF, add them to the list
