@@ -236,10 +236,8 @@ public class DependencyLoaderImpl {
 
     private static boolean scanForDepSpecs(URL source, List<URL> output) {
         if (!source.getProtocol().equals("file")) {
-            LOG.warn("Skipping non-file source: {}", source);
             return false;
         }
-        LOG.debug("Scanning {} for dependencies", source);
         val fileName = source.getFile();
         boolean found = false;
         if (fileName.endsWith(".jar")) {
@@ -300,10 +298,8 @@ public class DependencyLoaderImpl {
             } else {
                 return Arrays.stream(files).map(file -> {
                     try {
-                        LOG.trace("Adding {} to dependency source list", file);
                         return file.toURI().toURL();
                     } catch (MalformedURLException e) {
-                        LOG.error("Failed to add mod file {} to dependency source list: {}", file.getName(), e);
                         return null;
                     }
                 }).filter(Objects::nonNull);
