@@ -45,6 +45,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +60,8 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -93,6 +96,52 @@ public class DependencyLoaderImpl {
         thread.setName("Dependency Download Thread " + counter.incrementAndGet());
         return thread;
     });
+    private static final File libDir;
+
+    static {
+
+        var homeDir = System.getProperty("minecraft.sharedDataDir");
+        if (homeDir == null) {
+            homeDir = System.getenv("MINECRAFT_SHARED_DATA_DIR");
+            if (homeDir == null) {
+                homeDir = FileUtil.getMinecraftHome().getAbsolutePath();
+            }
+        }
+        val modsDir = Paths.get(homeDir, "mods").toFile();
+        val oldLibDir = new File(modsDir, "falsepattern");
+        libDir = new File(homeDir, "falsepattern");
+        if (!libDir.exists()) {
+            if (!libDir.mkdirs()) {
+                LOG.fatal("Failed to create directory {}", libDir);
+                throw new RuntimeException("Failed to create directory " + libDir);
+            }
+        }
+        if (oldLibDir.exists()) {
+            LOG.info("Migrating old library folder. From: " + oldLibDir.getAbsolutePath() + ", To: " + libDir.getAbsolutePath());
+            val oldFiles = oldLibDir.listFiles();
+            if (oldFiles != null) {
+                for (val file: oldFiles) {
+                    try {
+                        Files.move(file.toPath(), libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        LOG.warn("Failed to move file " + file.getName() + " to new dir! Deleting instead.");
+                        try {
+                            Files.deleteIfExists(file.toPath());
+                        } catch (IOException ex) {
+                            LOG.warn("Failed to delete file " + file.getPath() + "!");
+                            file.deleteOnExit();
+                        }
+                    }
+                }
+            }
+            try {
+                Files.deleteIfExists(oldLibDir.toPath());
+            } catch (IOException e) {
+                LOG.warn("Failed to delete old library directory!");
+                oldLibDir.deleteOnExit();
+            }
+        }
+    }
 
     public static void addMavenRepo(String url) {
         mavenRepositories.add(url);
@@ -185,17 +234,17 @@ public class DependencyLoaderImpl {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
-    private static Stream<URL> scanSourceMetaInf(URL source) {
+    private static boolean scanForDepSpecs(URL source, List<URL> output) {
         if (!source.getProtocol().equals("file")) {
             LOG.warn("Skipping non-file source: {}", source);
-            return Stream.empty();
+            return false;
         }
         LOG.debug("Scanning {} for dependencies", source);
         val fileName = source.getFile();
-        val output = new ArrayList<URL>();
+        boolean found = false;
         if (fileName.endsWith(".jar")) {
             //Scan jar file for json in META-INF, add them to the list
-            try (val inputStream = source.openStream(); val jarFile = new JarInputStream(inputStream)) {
+            try (val inputStream = new BufferedInputStream(source.openStream(), 65536); val jarFile = new JarInputStream(inputStream)) {
                 ZipEntry entry;
                 while ((entry = jarFile.getNextEntry()) != null) {
                     if (!entry.getName().startsWith("META-INF") || !entry.getName().endsWith(".json")) {
@@ -203,6 +252,7 @@ public class DependencyLoaderImpl {
                     }
                     try {
                         output.add(new URL("jar:" + source + "!/" + entry.getName()));
+                        found = true;
                     } catch (MalformedURLException e) {
                         LOG.error("Failed to add json source {} to dependency source list: {}", entry.getName(), e);
                     }
@@ -214,16 +264,16 @@ public class DependencyLoaderImpl {
             val dir = new File(fileName);
             if (!dir.exists() || !dir.isDirectory()) {
                 LOG.warn("Skipping non-directory, nor jar source: {}", source);
-                return Stream.empty();
+                return false;
             }
             //Scan directory for json in META-INF, add them to the list
             val metaInf = new File(dir, "META-INF");
             if (!metaInf.exists() || !metaInf.isDirectory()) {
-                return Stream.empty();
+                return false;
             }
             val files = metaInf.listFiles();
             if (files == null) {
-                return Stream.empty();
+                return false;
             }
             for (val file : files) {
                 if (!file.getName().endsWith(".json")) {
@@ -231,12 +281,13 @@ public class DependencyLoaderImpl {
                 }
                 try {
                     output.add(file.toURI().toURL());
+                    found = true;
                 } catch (MalformedURLException e) {
                     LOG.error("Failed to add json source {} to dependency source list: {}", file.getName(), e);
                 }
             }
         }
-        return output.stream();
+        return found;
     }
 
     private static Stream<URL> grabSourceCandidatesFromFolder(File folder) {
@@ -275,40 +326,67 @@ public class DependencyLoaderImpl {
         LOG.debug("Discovering dependency source candidates...");
         val modsDir = new File(FileUtil.getMinecraftHome(), "mods");
         val mods1710Dir = new File(modsDir, "1.7.10");
-        val dependencySpecs = Stream.of(Launch.classLoader.getSources().stream(),
-                                        grabSourceCandidatesFromFolder(modsDir),
-                                        grabSourceCandidatesFromFolder(mods1710Dir))
-                                    .flatMap((i) -> i)
-                                    .flatMap(DependencyLoaderImpl::scanSourceMetaInf)
-                                    .map((source) -> {
-                                        //Convert source to GSON json
-                                        try (val is = source.openStream()) {
-                                            val jsonRaw = new JsonParser().parse(new InputStreamReader(is));
-                                            if (!jsonRaw.isJsonObject()) {
-                                                return null;
-                                            }
-                                            val json = jsonRaw.getAsJsonObject();
-                                            if (!(json.has("identifier") &&
-                                                  json.get("identifier")
-                                                      .getAsString()
-                                                      .equals("falsepatternlib_dependencies")
-                                            )) {
-                                                return null;
-                                            }
-                                            val builder = new GsonBuilder();
-                                            builder.excludeFieldsWithoutExposeAnnotation();
-                                            val gson = builder.create();
-                                            json.remove("identifier");
-                                            val root = gson.fromJson(json, DepRoot.class);
-                                            root.source(source.toString());
-                                            return root;
-                                        } catch (Exception e) {
-                                            LOG.error("Failed to read json from source {}: {}", source, e);
-                                            return null;
-                                        }
-                                    })
-                                    .filter(Objects::nonNull)
-                                    .collect(Collectors.toSet());
+        long start = System.currentTimeMillis();
+        val urlsWithoutDeps = new HashSet<String>();
+        val depCache = new File(libDir, ".depscan_cache");
+        if (depCache.exists()) {
+            try {
+                urlsWithoutDeps.addAll(Files.readAllLines(depCache.toPath()));
+            } catch (IOException e) {
+                LOG.error("Could not read dependency scanner cache", e);
+            }
+        }
+        val candidates = Stream.of(Launch.classLoader.getSources().stream(),
+                                   grabSourceCandidatesFromFolder(modsDir),
+                                   grabSourceCandidatesFromFolder(mods1710Dir))
+                               .flatMap((i) -> i)
+                               .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
+                               .collect(Collectors.toList());
+        val urls = new ArrayList<URL>();
+        for (val candidate: candidates) {
+            if (!scanForDepSpecs(candidate, urls)) {
+                urlsWithoutDeps.add(candidate.toString());
+            }
+        }
+        try (val out = Files.newBufferedWriter(depCache.toPath())) {
+            for (val noDep: urlsWithoutDeps) {
+                out.append(noDep).append(System.lineSeparator());
+            }
+        } catch (IOException e) {
+            LOG.error("Could not write dependency scanner cache", e);
+        }
+        val dependencySpecs = urls.stream()
+                                  .map((source) -> {
+                                      //Convert source to GSON json
+                                      try (val is = new BufferedInputStream(source.openStream())) {
+                                          val jsonRaw = new JsonParser().parse(new InputStreamReader(is));
+                                          if (!jsonRaw.isJsonObject()) {
+                                              return null;
+                                          }
+                                          val json = jsonRaw.getAsJsonObject();
+                                          if (!(json.has("identifier") &&
+                                                json.get("identifier")
+                                                    .getAsString()
+                                                    .equals("falsepatternlib_dependencies")
+                                          )) {
+                                              return null;
+                                          }
+                                          val builder = new GsonBuilder();
+                                          builder.excludeFieldsWithoutExposeAnnotation();
+                                          val gson = builder.create();
+                                          json.remove("identifier");
+                                          val root = gson.fromJson(json, DepRoot.class);
+                                          root.source(source.toString());
+                                          return root;
+                                      } catch (Exception e) {
+                                          LOG.error("Failed to read json from source {}: {}", source, e);
+                                          return null;
+                                      }
+                                  })
+                                  .filter(Objects::nonNull)
+                                  .collect(Collectors.toSet());
+        long end = System.currentTimeMillis();
+        LOG.debug("Discovered {} dependency source candidates in {}ms", dependencySpecs.size(), end - start);
         mavenRepositories.addAll(dependencySpecs.stream()
                                                 .flatMap((dep) -> dep.repositories().stream())
                                                 .collect(Collectors.toSet()));
@@ -407,7 +485,6 @@ public class DependencyLoaderImpl {
         private String artifact;
         private String mavenJarName;
         private String jarName;
-        private File libDir;
         private File file;
 
         private void load() {
@@ -477,50 +554,9 @@ public class DependencyLoaderImpl {
         }
 
         private void setupPaths() {
-            var homeDir = System.getProperty("minecraft.sharedDataDir");
-            if (homeDir == null) {
-                homeDir = System.getenv("MINECRAFT_SHARED_DATA_DIR");
-                if (homeDir == null) {
-                    homeDir = FileUtil.getMinecraftHome().getAbsolutePath();
-                }
-            }
-            val modsDir = Paths.get(homeDir, "mods").toFile();
-            val oldLibDir = new File(modsDir, "falsepattern");
-            libDir = new File(homeDir, "falsepattern");
             mavenJarName =
                     String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
             jarName = groupId + "-" + mavenJarName;
-            if (!libDir.exists()) {
-                if (!libDir.mkdirs()) {
-                    LOG.fatal("Failed to create directory {}", libDir);
-                    throw new RuntimeException("Failed to create directory " + libDir);
-                }
-            }
-            if (oldLibDir.exists()) {
-                LOG.info("Migrating old library folder. From: " + oldLibDir.getAbsolutePath() + ", To: " + libDir.getAbsolutePath());
-                val oldFiles = oldLibDir.listFiles();
-                if (oldFiles != null) {
-                    for (val file: oldFiles) {
-                        try {
-                            Files.move(file.toPath(), libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())), StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            LOG.warn("Failed to move file " + file.getName() + " to new dir! Deleting instead.");
-                            try {
-                                Files.deleteIfExists(file.toPath());
-                            } catch (IOException ex) {
-                                LOG.warn("Failed to delete file " + file.getPath() + "!");
-                                file.deleteOnExit();
-                            }
-                        }
-                    }
-                }
-                try {
-                    Files.deleteIfExists(oldLibDir.toPath());
-                } catch (IOException e) {
-                    LOG.warn("Failed to delete old library directory!");
-                    oldLibDir.deleteOnExit();
-                }
-            }
             file = new File(libDir, jarName);
         }
 
