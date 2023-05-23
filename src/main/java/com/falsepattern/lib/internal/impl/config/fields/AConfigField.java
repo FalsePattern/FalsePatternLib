@@ -21,6 +21,7 @@
 package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.internal.impl.config.DeclOrderInternal;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -34,10 +35,11 @@ import java.util.Optional;
 
 public abstract class AConfigField<T> {
     public final boolean noSync;
+    public final int order;
+    public final String name;
     protected final Field field;
     protected final Configuration configuration;
     protected final String category;
-    protected final String name;
     protected final String langKey;
     protected final Property.Type type;
     protected final Property property;
@@ -71,6 +73,7 @@ public abstract class AConfigField<T> {
         }
         property.setLanguageKey(langKey);
         noSync = field.isAnnotationPresent(Config.NoSync.class);
+        order = Optional.ofNullable(field.getAnnotation(DeclOrderInternal.class)).map(DeclOrderInternal::value).orElse(-1);
     }
 
     protected abstract T getField();

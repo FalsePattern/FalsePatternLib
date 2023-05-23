@@ -46,11 +46,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParsedConfiguration {
@@ -197,11 +200,16 @@ public class ParsedConfiguration {
                 save();
             }));
         }
+        rawConfig.setCategoryPropertyOrder(category, fieldsSorted().map((prop) -> prop.name).collect(Collectors.toList()));
+    }
+
+    private Stream<AConfigField<?>> fieldsSorted() {
+        return fields.values().stream().sorted(Comparator.comparingInt((prop) -> prop.order));
     }
 
     @SuppressWarnings("rawtypes")
     public List<IConfigElement> getConfigElements() {
-        return new ArrayList<>(elements.values());
+        return fieldsSorted().map((field) -> elements.get(field.name)).collect(Collectors.toList());
     }
 
     public boolean validate(BiConsumer<Class<?>, Field> invalidFieldHandler, boolean resetInvalid) {

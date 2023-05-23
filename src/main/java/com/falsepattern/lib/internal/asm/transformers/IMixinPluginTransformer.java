@@ -19,10 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.asm;
+package com.falsepattern.lib.internal.asm.transformers;
 
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.internal.asm.FPTransformer;
 import lombok.val;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;

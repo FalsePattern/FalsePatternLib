@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.asm;
+package com.falsepattern.lib.internal.asm.transformers;
 
 import com.falsepattern.lib.asm.IClassNodeTransformer;
 import lombok.val;
