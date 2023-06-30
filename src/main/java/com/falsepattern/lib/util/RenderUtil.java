@@ -41,6 +41,13 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
 
+    /**
+     * Sets the OpenGL translation, relative to the player's position.
+     * <p>
+     * This is useful for rendering things that are not part of the world mesh, but should be rendered as if they were.
+     * <p>
+     * It's good practice to make this call inside a {@link GL11#glPushMatrix() push}/{@link GL11#glPopMatrix() pop} matrix block.
+     */
     @StableAPI.Expose(since = "0.12.0")
     public static void setGLTranslationRelativeToPlayer() {
         val player = getMinecraft().thePlayer;
@@ -53,6 +60,16 @@ public final class RenderUtil {
         GL11.glTranslatef(-offsetX, -offsetY, -offsetZ);
     }
 
+    /**
+     * Provides a texture icon with the given name and dimensions.
+     * <p>
+     * This is useful for rendering textures that are not part of the Minecraft texture atlas.
+     *
+     * @param iconName The icon name
+     * @param width    The icon width in pixels
+     * @param height   The icon height in pixels
+     * @return The full resolution texture icon.
+     */
     @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
         return new IIcon() {
@@ -103,6 +120,13 @@ public final class RenderUtil {
         };
     }
 
+    /**
+     * Provides the partial tick between the last and next client tick, in the range of 0 to 1.
+     * <p>
+     * Sometimes referred to as 'subTick', it is used mostly for interpolation in rendering.
+     *
+     * @return The current partial tick
+     */
     @StableAPI.Expose
     public static float partialTick() {
         return MINECRAFT_TIMER.renderPartialTicks;
