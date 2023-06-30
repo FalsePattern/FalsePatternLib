@@ -21,17 +21,21 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.render.ClampedIcon;
 import com.falsepattern.lib.internal.render.FullTextureIcon;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.Timer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+
+import java.util.Collections;
 
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static net.minecraft.client.Minecraft.getMinecraft;
@@ -74,6 +78,20 @@ public final class RenderUtil {
     @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
         return new FullTextureIcon(iconName, width, height);
+    }
+
+    /**
+     * Wraps the given icon as a clamped icon.
+     * <p>
+     * A clamped icon will clamp the coordinates given to {@link IIcon#getInterpolatedU(double)} and {@link IIcon#getInterpolatedV(double)} to the range of 0 to 16.
+     * <p>
+     * This is helpful when using {@link RenderBlocks} but having different bounds.
+     *
+     * @param icon The icon to clamp
+     */
+    @StableAPI.Expose(since = "0.10.0")
+    public static IIcon wrapAsClampedIcon(IIcon icon) {
+        return new ClampedIcon(icon);
     }
 
     /**
