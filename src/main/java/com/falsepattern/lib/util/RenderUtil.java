@@ -21,7 +21,6 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -31,9 +30,9 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.Timer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import static cpw.mods.fml.relauncher.Side.CLIENT;
-import static lombok.AccessLevel.PRIVATE;
 import static net.minecraft.client.Minecraft.getMinecraft;
 
 @SideOnly(CLIENT)
@@ -41,6 +40,18 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 @StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
+
+    @StableAPI.Expose(since = "0.12.0")
+    public static void setGLTranslationRelativeToPlayer() {
+        val player = getMinecraft().thePlayer;
+        val partialTick = partialTick();
+
+        val offsetX = (float) (player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTick);
+        val offsetY = (float) (player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTick);
+        val offsetZ = (float) (player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTick);
+
+        GL11.glTranslatef(-offsetX, -offsetY, -offsetZ);
+    }
 
     @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
