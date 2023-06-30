@@ -23,6 +23,7 @@ package com.falsepattern.lib.util;
 import com.falsepattern.lib.StableAPI;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import net.minecraft.client.Minecraft;
@@ -36,7 +37,7 @@ import static lombok.AccessLevel.PRIVATE;
 import static net.minecraft.client.Minecraft.getMinecraft;
 
 @SideOnly(CLIENT)
-@NoArgsConstructor(access = PRIVATE)
+@UtilityClass
 @StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();

@@ -21,6 +21,7 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.io.ByteArrayOutputStream;
@@ -34,8 +35,9 @@ import java.nio.charset.StandardCharsets;
 /**
  * A utility class for reading resources in many ways.
  */
+@UtilityClass
 @StableAPI(since = "0.6.0")
-public class ResourceUtil {
+public final class ResourceUtil {
 
     /**
      * Reads a resource as a string, using the {@link StandardCharsets#UTF_8} charset, from a specific jar file. See

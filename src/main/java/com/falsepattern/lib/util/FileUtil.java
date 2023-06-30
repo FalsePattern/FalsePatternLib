@@ -22,12 +22,14 @@ package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
 
+import lombok.experimental.UtilityClass;
 import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;
 
+@UtilityClass
 @StableAPI(since = "0.8.2")
-public class FileUtil {
+public final class FileUtil {
     @StableAPI.Expose
     public static File getMinecraftHome() {
         return Launch.minecraftHome == null ? new File(".") : Launch.minecraftHome;
