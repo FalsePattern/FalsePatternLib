@@ -21,6 +21,7 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.render.FullTextureIcon;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -72,52 +73,7 @@ public final class RenderUtil {
      */
     @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
-        return new IIcon() {
-            @Override
-            public int getIconWidth() {
-                return width;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return height;
-            }
-
-            @Override
-            public float getMinU() {
-                return 0;
-            }
-
-            @Override
-            public float getMaxU() {
-                return 1;
-            }
-
-            @Override
-            public float getInterpolatedU(double u) {
-                return (float) (u / 16D);
-            }
-
-            @Override
-            public float getMinV() {
-                return 0;
-            }
-
-            @Override
-            public float getMaxV() {
-                return 1;
-            }
-
-            @Override
-            public float getInterpolatedV(double v) {
-                return (float) (v / 16D);
-            }
-
-            @Override
-            public String getIconName() {
-                return iconName;
-            }
-        };
+        return new FullTextureIcon(iconName, width, height);
     }
 
     /**
