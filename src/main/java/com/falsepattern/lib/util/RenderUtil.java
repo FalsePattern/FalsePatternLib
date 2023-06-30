@@ -39,15 +39,7 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 @NoArgsConstructor(access = PRIVATE)
 @StableAPI(since = "0.8.0")
 public final class RenderUtil {
-    private final static Timer MINECRAFT_TIMER = getMinecraftTimer();
-
-    @StableAPI.Expose
-    @SneakyThrows
-    private static Timer getMinecraftTimer() {
-        val timerField = ReflectionHelper.findField(Minecraft.class, "timer", "field_71428_T");
-        timerField.setAccessible(true);
-        return (Timer) timerField.get(getMinecraft());
-    }
+    private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
 
     @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
@@ -102,5 +94,13 @@ public final class RenderUtil {
     @StableAPI.Expose
     public static float partialTick() {
         return MINECRAFT_TIMER.renderPartialTicks;
+    }
+
+    @StableAPI.Expose
+    @SneakyThrows
+    private static Timer getMinecraftTimer() {
+        val timerField = ReflectionHelper.findField(Minecraft.class, "timer", "field_71428_T");
+        timerField.setAccessible(true);
+        return (Timer) timerField.get(getMinecraft());
     }
 }
