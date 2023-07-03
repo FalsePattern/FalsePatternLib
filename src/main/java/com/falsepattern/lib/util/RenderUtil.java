@@ -89,7 +89,7 @@ public final class RenderUtil {
      *
      * @param icon The icon to clamp
      */
-    @StableAPI.Expose(since = "0.10.0")
+    @StableAPI.Expose(since = "0.12.0")
     public static IIcon wrapAsClampedIcon(IIcon icon) {
         return new ClampedIcon(icon);
     }
