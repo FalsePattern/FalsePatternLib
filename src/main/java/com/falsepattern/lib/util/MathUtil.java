@@ -22,12 +22,14 @@ package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.compat.Vec3i;
+import lombok.experimental.UtilityClass;
 
 import java.util.Random;
 import java.util.UUID;
 
+@UtilityClass
 @StableAPI(since = "0.10.0")
-public class MathUtil {
+public final class MathUtil {
     @StableAPI.Expose
     public static final float SQRT_2 = sqrt(2.0F);
     /**

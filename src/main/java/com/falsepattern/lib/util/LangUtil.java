@@ -23,6 +23,7 @@ package com.falsepattern.lib.util;
 import com.falsepattern.lib.StableAPI;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -32,7 +33,7 @@ import java.util.Map;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@NoArgsConstructor(access = PRIVATE)
+@UtilityClass
 @StableAPI(since = "0.8.0")
 public final class LangUtil {
     @StableAPI.Expose
