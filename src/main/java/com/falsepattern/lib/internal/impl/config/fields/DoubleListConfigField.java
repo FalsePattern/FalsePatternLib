@@ -48,18 +48,7 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDoubleList.class))
                                .map(Config.DefaultDoubleList::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultDoubleList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return (double[]) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultDoubleList"));
         property.setDefaultValues(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);

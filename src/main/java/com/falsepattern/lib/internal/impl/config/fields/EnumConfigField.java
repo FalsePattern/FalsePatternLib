@@ -62,18 +62,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
                                                                     + defName
                                                                     + "\" was not found in enum "
                                                                     + enumClass.getName())))
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultEnum annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return enumClass.cast(field.get(null));
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultEnum"));
         maxLength = enumNameMap.keySet().stream().mapToInt(String::length).max().orElse(0);
         property.setDefaultValue(defaultValue.name());
         property.setValidValues(enumNameMap.keySet().toArray(new String[0]));

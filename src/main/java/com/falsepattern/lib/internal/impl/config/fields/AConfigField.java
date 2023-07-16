@@ -46,6 +46,16 @@ public abstract class AConfigField<T> {
     protected final String comment;
     private boolean uninitialized;
 
+    public static RuntimeException noDefault(Field field, String annotation) {
+        return new RuntimeException("The field "
+                                    + field.getName()
+                                    + " in class "
+                                    + field.getDeclaringClass().getName()
+                                    + " has no "
+                                    + annotation
+                                    + " annotation!");
+    }
+
     protected AConfigField(Field field, Configuration configuration, String category, Property.Type type) {
         this(field, configuration, category, type, false);
     }

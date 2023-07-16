@@ -49,19 +49,7 @@ public class DoubleConfigField extends AConfigField<Double> {
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class))
                                .map(Config.DefaultDouble::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultDouble annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return field.getType().isPrimitive() ? field.getInt(null)
-                                                                            : (Double) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultDouble"));
         property.setDefaultValue(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);

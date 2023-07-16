@@ -48,18 +48,7 @@ public class StringConfigField extends AConfigField<String> {
                           .orElse(null);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class))
                                .map(Config.DefaultString::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultString annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return (String) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultString"));
         maxLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                             .map(Config.StringMaxLength::value)
                             .orElse(256);

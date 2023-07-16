@@ -49,19 +49,7 @@ public class IntConfigField extends AConfigField<Integer> {
         max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class))
                                .map(Config.DefaultInt::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultInt annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return field.getType().isPrimitive() ? field.getInt(null)
-                                                                            : (Integer) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultInt"));
         property.setDefaultValue(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);

@@ -42,18 +42,7 @@ public class BooleanListConfigField extends AListConfigField<boolean[]> {
         super(field, configuration, category, Property.Type.BOOLEAN);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBooleanList.class))
                                .map(Config.DefaultBooleanList::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultBooleanList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return (boolean[]) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultBooleanList"));
         property.setDefaultValues(defaultValue);
         if (!property.isBooleanList()) {
             setToDefault();

@@ -48,18 +48,7 @@ public class StringListConfigField extends AListConfigField<String[]> {
                           .orElse(null);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class))
                                .map(Config.DefaultStringList::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultStringList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return (String[]) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultStringList"));
         maxStringLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                                   .map(Config.StringMaxLength::value)
                                   .orElse(256);

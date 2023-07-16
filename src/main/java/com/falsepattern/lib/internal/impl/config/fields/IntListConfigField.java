@@ -48,18 +48,7 @@ public class IntListConfigField extends AListConfigField<int[]> {
         max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultIntList.class))
                                .map(Config.DefaultIntList::value)
-                               .orElseGet(() -> {
-                                   Share.LOG.warn("The field "
-                                                  + field.getName()
-                                                  + " in class "
-                                                  + field.getDeclaringClass().getName()
-                                                  + " has no DefaultIntList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
-                                   try {
-                                       return (int[]) field.get(null);
-                                   } catch (IllegalAccessException e) {
-                                       throw new RuntimeException(e);
-                                   }
-                               });
+                               .orElseThrow(() -> noDefault(field, "DefaultIntList"));
         property.setDefaultValues(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
