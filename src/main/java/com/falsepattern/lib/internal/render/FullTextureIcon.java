@@ -23,6 +23,7 @@ package com.falsepattern.lib.internal.render;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import net.minecraft.util.IIcon;
 
 @Getter

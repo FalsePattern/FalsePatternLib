@@ -20,7 +20,6 @@
  */
 package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 
 import java.lang.annotation.Documented;

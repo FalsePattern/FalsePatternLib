@@ -21,7 +21,6 @@
 
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 

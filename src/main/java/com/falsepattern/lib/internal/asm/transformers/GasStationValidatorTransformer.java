@@ -25,8 +25,6 @@ import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import org.objectweb.asm.tree.ClassNode;
 
-import static com.falsepattern.lib.mixin.MixinInfo.isClassPresentSafe;
-
 public class GasStationValidatorTransformer implements IClassNodeTransformer {
     @Override
     public String getName() {

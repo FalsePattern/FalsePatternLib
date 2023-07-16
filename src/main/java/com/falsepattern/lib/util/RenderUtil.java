@@ -26,6 +26,7 @@ import com.falsepattern.lib.internal.render.FullTextureIcon;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -33,9 +34,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.Timer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
-
-import java.util.Collections;
 
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static net.minecraft.client.Minecraft.getMinecraft;

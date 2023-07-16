@@ -20,10 +20,8 @@
  */
 package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.ReflectionUtil;
-import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -27,12 +27,7 @@ import com.falsepattern.lib.internal.impl.config.DeclOrderInternal;
 import lombok.val;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
 
 public class ConfigOrderTransformer implements IClassNodeTransformer {
     private static final String DESC_CONFIG = Type.getDescriptor(Config.class);

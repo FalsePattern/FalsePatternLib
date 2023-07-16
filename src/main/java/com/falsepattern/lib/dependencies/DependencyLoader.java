@@ -20,10 +20,8 @@
  */
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
-import lombok.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 

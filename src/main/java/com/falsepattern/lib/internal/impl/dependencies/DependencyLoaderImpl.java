@@ -20,7 +20,6 @@
  */
 package com.falsepattern.lib.internal.impl.dependencies;
 
-import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.dependencies.Version;
@@ -42,7 +41,6 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
 import java.io.BufferedInputStream;

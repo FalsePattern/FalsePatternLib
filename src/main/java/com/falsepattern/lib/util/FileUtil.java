@@ -21,8 +21,8 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
-
 import lombok.experimental.UtilityClass;
+
 import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;

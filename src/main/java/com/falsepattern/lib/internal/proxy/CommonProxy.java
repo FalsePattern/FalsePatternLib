@@ -31,7 +31,6 @@ import com.falsepattern.lib.internal.impl.config.net.SyncReply;
 import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequestHandler;
-import com.falsepattern.lib.updates.ModUpdateInfo;
 import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
 
@@ -41,8 +40,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class CommonProxy {
     public void construct(FMLConstructionEvent e) {
