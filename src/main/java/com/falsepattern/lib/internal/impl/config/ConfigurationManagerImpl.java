@@ -110,13 +110,6 @@ public final class ConfigurationManagerImpl {
         return parsed.validate(invalidFieldHandler, resetInvalid);
     }
 
-    @Deprecated
-    public static void registerLoadSaveConfig(Class<?> configClass) throws ConfigException {
-        register(configClass);
-        load(configClass);
-        save(configClass);
-    }
-
     public static void sendRequest(DataOutput output) throws IOException {
         val synced = new ArrayList<Class<?>>();
         val inv = serializedNames.inverse();

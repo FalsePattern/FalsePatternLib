@@ -147,12 +147,6 @@ public class DependencyLoaderImpl {
         mavenRepositories.add(url);
     }
 
-    @Deprecated
-    public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
-        new DependencyLoadTask(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
-                               regularSuffix, devSuffix).load();
-    }
-
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (byte b : hash) {

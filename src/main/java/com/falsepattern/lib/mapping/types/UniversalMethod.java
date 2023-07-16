@@ -173,16 +173,6 @@ public class UniversalMethod {
         return invoke(null, arguments);
     }
 
-    /**
-     * This is only here for completeness' sake, given that MethodInsnNode itself also has a deprecated yet functional constructor.
-     */
-    @Deprecated
-    @StableAPI.Expose
-    public MethodInsnNode asInstruction(int opcode, MappingType mapping) {
-        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
-                                  getDescriptor(mapping));
-    }
-
     @StableAPI.Expose
     public MethodInsnNode asInstruction(int opcode, MappingType mapping, boolean itf) {
         return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
