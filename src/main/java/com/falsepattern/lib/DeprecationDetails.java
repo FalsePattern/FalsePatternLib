@@ -35,4 +35,14 @@ import java.lang.annotation.RetentionPolicy;
 public @interface DeprecationDetails {
     @StableAPI.Expose String deprecatedSince();
     @StableAPI.Expose(since = "0.11.0") String replacement() default "";
+
+    /**
+     * This marks an API for removal in a future version.
+     */
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @StableAPI(since = "0.12.0")
+    @interface RemovedInVersion {
+        String value();
+    }
 }
