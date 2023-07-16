@@ -82,14 +82,19 @@ public class ParsedConfiguration {
 
     public static ParsedConfiguration parseConfig(Class<?> configClass) throws ConfigException {
         val cfg = Optional.ofNullable(configClass.getAnnotation(Config.class))
-                          .orElseThrow(() -> new ConfigException(
-                                  "Class " + configClass.getName() + " does not have a @Config annotation!"));
+                          .orElseThrow(() -> new ConfigException("Class "
+                                                                 + configClass.getName()
+                                                                 + " does not have a @Config annotation!"));
         val category = Optional.of(cfg.category().trim())
                                .map((cat) -> cat.length() == 0 ? null : cat)
-                               .orElseThrow(() -> new ConfigException(
-                                       "Config class " + configClass.getName() + " has an empty category!"));
+                               .orElseThrow(() -> new ConfigException("Config class "
+                                                                      + configClass.getName()
+                                                                      + " has an empty category!"));
         val rawConfig = ConfigurationManagerImpl.getForgeConfig(cfg.modid());
-        val parsedConfig = new ParsedConfiguration(configClass, cfg.modid(), category, rawConfig,
+        val parsedConfig = new ParsedConfiguration(configClass,
+                                                   cfg.modid(),
+                                                   category,
+                                                   rawConfig,
                                                    configClass.isAnnotationPresent(Config.Synchronize.class));
         try {
             parsedConfig.reloadFields();
@@ -133,8 +138,10 @@ public class ParsedConfiguration {
                 val fieldName =
                         StringConfigField.receiveString(input, maxFieldNameLength, "field name", configClass.getName());
                 if (!syncFields.containsKey(fieldName)) {
-                    throw new IOException("Invalid sync field name received: " + fieldName + " for config class " +
-                                          configClass.getName());
+                    throw new IOException("Invalid sync field name received: "
+                                          + fieldName
+                                          + " for config class "
+                                          + configClass.getName());
                 }
                 syncFields.remove(fieldName).receive(input);
             }
@@ -180,9 +187,13 @@ public class ParsedConfiguration {
             } else if (fieldClass.isEnum()) {
                 fields.put(name, configField = new EnumConfigField<>(field, rawConfig, category));
             } else {
-                throw new ConfigException("Illegal config field: " + field.getName() + " in " + configClass.getName() +
-                                          ": Unsupported type " + fieldClass.getName() +
-                                          "! Did you forget an @Ignore annotation?");
+                throw new ConfigException("Illegal config field: "
+                                          + field.getName()
+                                          + " in "
+                                          + configClass.getName()
+                                          + ": Unsupported type "
+                                          + fieldClass.getName()
+                                          + "! Did you forget an @Ignore annotation?");
             }
             if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
                 cat.setRequiresMcRestart(true);
@@ -196,7 +207,8 @@ public class ParsedConfiguration {
                 save();
             }));
         }
-        rawConfig.setCategoryPropertyOrder(category, fieldsSorted().map((prop) -> prop.name).collect(Collectors.toList()));
+        rawConfig.setCategoryPropertyOrder(category,
+                                           fieldsSorted().map((prop) -> prop.name).collect(Collectors.toList()));
     }
 
     private Stream<AConfigField<?>> fieldsSorted() {

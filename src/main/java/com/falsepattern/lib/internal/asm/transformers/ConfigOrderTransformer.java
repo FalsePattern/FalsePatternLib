@@ -33,6 +33,7 @@ public class ConfigOrderTransformer implements IClassNodeTransformer {
     private static final String DESC_CONFIG = Type.getDescriptor(Config.class);
     private static final String DESC_CONFIG_IGNORE = Type.getDescriptor(Config.Ignore.class);
     private static final String DESC_ORDER = Type.getDescriptor(DeclOrderInternal.class);
+
     @Override
     public String getName() {
         return "ConfigOrderTransformer";
@@ -54,11 +55,11 @@ public class ConfigOrderTransformer implements IClassNodeTransformer {
     public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
         int order = 0;
         outer:
-        for (val field: cn.fields) {
-            if ((field.access & Opcodes.ACC_PUBLIC) == 0 ||
-                (field.access & Opcodes.ACC_STATIC) == 0 ||
-                (field.access & Opcodes.ACC_FINAL) != 0) {
-                    continue;
+        for (val field : cn.fields) {
+            if ((field.access & Opcodes.ACC_PUBLIC) == 0
+                || (field.access & Opcodes.ACC_STATIC) == 0
+                || (field.access & Opcodes.ACC_FINAL) != 0) {
+                continue;
             } else if (field.visibleAnnotations != null) {
                 for (val ann : field.visibleAnnotations) {
                     if (DESC_CONFIG_IGNORE.equals(ann.desc)) {

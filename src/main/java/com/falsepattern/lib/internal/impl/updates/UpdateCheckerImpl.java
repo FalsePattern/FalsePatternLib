@@ -100,30 +100,33 @@ public final class UpdateCheckerImpl {
                     continue;
                 }
                 val latest = parsedVersions.get(0).getAsJsonObject();
-                result.add(new ModUpdateInfo(modid, currentVersion, latest.get("version").getAsString(), latest.get("url").getAsString()));
+                result.add(new ModUpdateInfo(modid,
+                                             currentVersion,
+                                             latest.get("version").getAsString(),
+                                             latest.get("url").getAsString()));
             }
             return result;
         } catch (Exception e) {
             throw new UpdateCheckException("Failed to check for updates!", e);
         }
     }
+
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
         if (updates == null || updates.size() == 0) {
             return null;
         }
-        val updateText = new ArrayList<IChatComponent>(
-                FormattedText.parse(I18n.format("falsepatternlib.chat.updatesavailable", initiator)).toChatText());
+        val updateText = new ArrayList<IChatComponent>(FormattedText.parse(I18n.format(
+                "falsepatternlib.chat.updatesavailable",
+                initiator)).toChatText());
         val mods = Loader.instance().getIndexedModList();
         for (val update : updates) {
             val mod = mods.get(update.modID);
-            updateText.addAll(
-                    FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName())).toChatText());
-            updateText.addAll(
-                    FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion", update.currentVersion))
-                                 .toChatText());
-            updateText.addAll(
-                    FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion", update.latestVersion))
-                                 .toChatText());
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.modname", mod.getName()))
+                                           .toChatText());
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.currentversion",
+                                                              update.currentVersion)).toChatText());
+            updateText.addAll(FormattedText.parse(I18n.format("falsepatternlib.chat.latestversion",
+                                                              update.latestVersion)).toChatText());
             if (!update.updateURL.isEmpty()) {
                 val pre = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurlpre")).toChatText();
                 val link = FormattedText.parse(I18n.format("falsepatternlib.chat.updateurl")).toChatText();
@@ -184,7 +187,7 @@ public final class UpdateCheckerImpl {
     private static CompletableFuture<JsonArray> parseVersionSpecs(JsonArray versions) {
         return CompletableFuture.supplyAsync(() -> {
             val result = new JsonArray();
-            for (val entry: versions) {
+            for (val entry : versions) {
                 if (!entry.isJsonObject()) {
                     continue;
                 }
@@ -238,17 +241,20 @@ public final class UpdateCheckerImpl {
         val response = new AtomicReference<JsonObject>();
         val result = new JsonObject();
         Internet.connect(new URL("https://api.github.com/repos/" + owner + "/" + name + "/releases/latest"),
-                         Internet.constructHeaders("Accept", "application/vnd.github+json",
-                                                   "X-GitHub-Api-Version", "2022-11-28"),
-                         (e) -> {throw new CompletionException(e);
+                         Internet.constructHeaders("Accept",
+                                                   "application/vnd.github+json",
+                                                   "X-GitHub-Api-Version",
+                                                   "2022-11-28"),
+                         (e) -> {
+                             throw new CompletionException(e);
                          },
                          (stream) -> {
-            val parser = new JsonParser();
-            val json = parser.parse(new InputStreamReader(stream));
-            if (!json.isJsonObject()) {
-                return;
-            }
-            response.set(json.getAsJsonObject());
+                             val parser = new JsonParser();
+                             val json = parser.parse(new InputStreamReader(stream));
+                             if (!json.isJsonObject()) {
+                                 return;
+                             }
+                             response.set(json.getAsJsonObject());
                          });
         if (response.get() == null) {
             return null;
@@ -306,11 +312,10 @@ public final class UpdateCheckerImpl {
                 if (latestVersions.contains(currentVersion)) {
                     continue;
                 }
-                val updateURL = obj.has("updateURL") &&
-                                obj.get("updateURL").isJsonPrimitive() &&
-                                obj.get("updateURL").getAsJsonPrimitive().isString()
-                                ? obj.get("updateURL").getAsString()
-                                : "";
+                val updateURL = obj.has("updateURL") && obj.get("updateURL").isJsonPrimitive() && obj.get("updateURL")
+                                                                                                     .getAsJsonPrimitive()
+                                                                                                     .isString()
+                                ? obj.get("updateURL").getAsString() : "";
                 result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
             }
             return result;

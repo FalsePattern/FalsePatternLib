@@ -61,10 +61,11 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
 
     @Override
     public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return IMIXINPLUGIN.equals(transformedName) ||
-               IMIXINCONFIGPLUGIN.equals(transformedName) ||
-               cn.interfaces.stream().anyMatch((i) -> IMIXINPLUGIN_INTERNAL.equals(i) ||
-                                                      IMIXINCONFIGPLUGIN_INTERNAL.equals(i));
+        return IMIXINPLUGIN.equals(transformedName)
+               || IMIXINCONFIGPLUGIN.equals(transformedName)
+               || cn.interfaces.stream()
+                               .anyMatch((i) -> IMIXINPLUGIN_INTERNAL.equals(i)
+                                                || IMIXINCONFIGPLUGIN_INTERNAL.equals(i));
     }
 
     @Override
@@ -89,7 +90,7 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
                     continue;
             }
             if (CLASSNODE_REAL != null) {
-                for (val local: method.localVariables) {
+                for (val local : method.localVariables) {
                     if (local.desc.contains("ClassNode;")) {
                         local.desc = local.desc.replaceAll("L[a-zA-Z/$]+[a-zA-Z$]+/ClassNode;", CLASSNODE_REAL);
                     }
@@ -119,10 +120,10 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
     }
 
     private static String extractMethodWithReflection(String m) {
-        for (val method: IMixinConfigPlugin.class.getDeclaredMethods()) {
+        for (val method : IMixinConfigPlugin.class.getDeclaredMethods()) {
             if (method.getName().equals(m)) {
                 StringBuilder b = new StringBuilder("(");
-                for (val param: method.getParameterTypes()) {
+                for (val param : method.getParameterTypes()) {
                     if (param.getName().contains("ClassNode")) {
                         CLASSNODE_REAL = "L" + param.getName().replace('.', '/') + ";";
                     }

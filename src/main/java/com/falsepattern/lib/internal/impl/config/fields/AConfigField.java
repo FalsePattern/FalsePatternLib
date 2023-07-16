@@ -73,7 +73,9 @@ public abstract class AConfigField<T> {
         }
         property.setLanguageKey(langKey);
         noSync = field.isAnnotationPresent(Config.NoSync.class);
-        order = Optional.ofNullable(field.getAnnotation(DeclOrderInternal.class)).map(DeclOrderInternal::value).orElse(-1);
+        order = Optional.ofNullable(field.getAnnotation(DeclOrderInternal.class))
+                        .map(DeclOrderInternal::value)
+                        .orElse(-1);
     }
 
     protected abstract T getField();

@@ -63,12 +63,16 @@ public class ASMUtil {
     public static FieldNode findFieldFromMCP(ClassNode cn, String fieldName, boolean optional) {
         val classMapping = discoverClassMappingType(cn);
         if (classMapping == null) {
-            throw new AsmClassNotFoundException("The class " + cn + " is not from Minecraft, or the mapping manager" +
-                                                "doesn't have it, cannot use findFieldFromMCP! Use findFieldStandard instead!");
+            throw new AsmClassNotFoundException("The class "
+                                                + cn
+                                                + " is not from Minecraft, or the mapping manager"
+                                                + "doesn't have it, cannot use findFieldFromMCP! Use findFieldStandard instead!");
         }
-        return findFieldStandard(cn, MappingManager.classForName(NameType.Internal, classMapping, cn.name)
-                                                   .getField(MappingType.MCP, fieldName)
-                                                   .getName(classMapping), optional);
+        return findFieldStandard(cn,
+                                 MappingManager.classForName(NameType.Internal, classMapping, cn.name)
+                                               .getField(MappingType.MCP, fieldName)
+                                               .getName(classMapping),
+                                 optional);
     }
 
     @StableAPI.Expose
@@ -106,8 +110,10 @@ public class ASMUtil {
     public static MethodNode findMethodFromMCP(ClassNode cn, String mcpName, String mcpDescriptor, boolean optional) {
         val classMapping = discoverClassMappingType(cn);
         if (classMapping == null) {
-            throw new AsmClassNotFoundException("The class " + cn + " is not from Minecraft, or the mapping manager" +
-                                                "doesn't have it, cannot use findMethodFromMCP! Use findFieldStandard instead!");
+            throw new AsmClassNotFoundException("The class "
+                                                + cn
+                                                + " is not from Minecraft, or the mapping manager"
+                                                + "doesn't have it, cannot use findMethodFromMCP! Use findFieldStandard instead!");
         }
         val method = MappingManager.classForName(NameType.Internal, classMapping, cn.name)
                                    .getMethod(MappingType.MCP, mcpName, mcpDescriptor);

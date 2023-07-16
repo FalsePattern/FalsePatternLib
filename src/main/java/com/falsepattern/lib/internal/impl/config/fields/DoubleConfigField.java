@@ -50,10 +50,11 @@ public class DoubleConfigField extends AConfigField<Double> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class))
                                .map(Config.DefaultDouble::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultDouble annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultDouble annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return field.getType().isPrimitive() ? field.getInt(null)
                                                                             : (Double) field.get(null);
@@ -112,8 +113,11 @@ public class DoubleConfigField extends AConfigField<Double> {
         if (value >= min && value <= max) {
             return true;
         }
-        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Double.toString(value),
-                                                                 Double.toString(min), Double.toString(max));
+        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field,
+                                                                 -1,
+                                                                 Double.toString(value),
+                                                                 Double.toString(min),
+                                                                 Double.toString(max));
         return false;
     }
 

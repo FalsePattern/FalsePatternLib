@@ -39,10 +39,11 @@ public class MixinInfoCompatCompanion {
      * This is used to determine if a mixin plugin is unimixins. Once MixinInfo is classloaded, this list has no effect.
      */
     @StableAPI.Expose
-    public static final List<String> UNIMIXIN_CANDIDATES = new ArrayList<>(Arrays.asList("io.github.legacymoddingmc.unimixins.compat.CompatCore",
-                                                                                         "io.github.legacymoddingmc.unimixins.devcompat.DevCompatCore",
-                                                                                         "io.github.legacymoddingmc.unimixins.all.AllCore",
-                                                                                         "io.github.legacymoddingmc.unimixins.mixin.MixinModule"));
+    public static final List<String> UNIMIXIN_CANDIDATES = new ArrayList<>(Arrays.asList(
+            "io.github.legacymoddingmc.unimixins.compat.CompatCore",
+            "io.github.legacymoddingmc.unimixins.devcompat.DevCompatCore",
+            "io.github.legacymoddingmc.unimixins.all.AllCore",
+            "io.github.legacymoddingmc.unimixins.mixin.MixinModule"));
 
     @Getter(onMethod_ = @StableAPI.Expose)
     static boolean mixinInfoClassLoaded = false;

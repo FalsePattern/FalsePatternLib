@@ -46,7 +46,9 @@ public class ToastBG extends ToastTexture {
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator.png"), 160, 32, 0xFFAAAA00);
     @StableAPI.Expose
     public static final ToastBG TOAST_NARRATOR_ROUNDED =
-            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator_rounded.png"), 160, 32,
+            new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator_rounded.png"),
+                        160,
+                        32,
                         0xFFAAAA00);
     @StableAPI.Expose
     public static final ToastBG TOAST_WHITE =

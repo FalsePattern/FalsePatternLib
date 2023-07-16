@@ -58,10 +58,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     static File findJarOf(final ITargetedMod mod) {
         File result = null;
         try (val stream = walk(MODS_DIRECTORY_PATH)) {
-            result = stream.filter(mod::isMatchingJar)
-                           .map(Path::toFile)
-                           .findFirst()
-                           .orElse(null);
+            result = stream.filter(mod::isMatchingJar).map(Path::toFile).findFirst().orElse(null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +72,8 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
                         found = path.toFile();
                         break;
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
             result = found;
         }

@@ -80,8 +80,7 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface Ignore {
-    }
+    @interface Ignore {}
 
     /**
      * The default value for a boolean field. Not having a default is deprecated since 0.10, and will be strongly
@@ -253,8 +252,7 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface ListFixedLength {
-    }
+    @interface ListFixedLength {}
 
     /**
      * This annotation limits the maximum number of elements present in an array configuration. Only effective if
@@ -290,8 +288,7 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
-    @interface RequiresMcRestart {
-    }
+    @interface RequiresMcRestart {}
 
     /**
      * Whether the specific configuration needs a world/server rejoin to be applied.
@@ -300,8 +297,7 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
-    @interface RequiresWorldRestart {
-    }
+    @interface RequiresWorldRestart {}
 
     /**
      * Signals that this configuration class should be synchronized between the client and the server when
@@ -314,8 +310,7 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    @interface Synchronize {
-    }
+    @interface Synchronize {}
 
     /**
      * Use this to mark config fields you don't want to synchronize in a class marked with {@link Synchronize}.
@@ -324,6 +319,5 @@ public @interface Config {
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface NoSync {
-    }
+    @interface NoSync {}
 }

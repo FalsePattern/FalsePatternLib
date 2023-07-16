@@ -78,7 +78,8 @@ public class Vec3i implements Comparable<Vec3i> {
      */
     @StableAPI.Expose
     public Vec3i crossProduct(@NonNull Vec3i vec) {
-        return new Vec3i(y * vec.getZ() - z * vec.getY(), z * vec.getX() - x * vec.getZ(),
+        return new Vec3i(y * vec.getZ() - z * vec.getY(),
+                         z * vec.getX() - x * vec.getZ(),
                          x * vec.getY() - y * vec.getX());
     }
 

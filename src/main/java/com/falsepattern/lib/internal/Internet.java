@@ -44,6 +44,7 @@ import java.util.function.Consumer;
 
 public class Internet {
     private static final Map<String, String> NO_HEADERS = Collections.emptyMap();
+
     public static void connect(URL URL, Consumer<Exception> onError, Consumer<InputStream> onSuccess) {
         connect(URL, NO_HEADERS, onError, onSuccess);
     }
@@ -64,9 +65,13 @@ public class Internet {
             val connection = (HttpURLConnection) URL.openConnection();
             connection.setConnectTimeout(3500);
             connection.setReadTimeout(5000);
-            connection.setRequestProperty("User-Agent", Tags.MODNAME + " " + Tags.VERSION + " Internet Connector" +
-                                                        " (https://github.com/FalsePattern/FalsePatternLib)");
-            for (val header: headers.entrySet()) {
+            connection.setRequestProperty("User-Agent",
+                                          Tags.MODNAME
+                                          + " "
+                                          + Tags.VERSION
+                                          + " Internet Connector"
+                                          + " (https://github.com/FalsePattern/FalsePatternLib)");
+            for (val header : headers.entrySet()) {
                 val key = header.getKey();
                 val value = header.getValue();
                 if (key == null || value == null) {
@@ -87,8 +92,9 @@ public class Internet {
             //Check if NonUpdate is present
             try {
                 if (Launch.classLoader.getClassBytes("moe.mickey.forge.nonupdate.NonUpdate") != null) {
-                    e.addSuppressed(new Exception("NonUpdate is present, it's possible that it's blocking a library download." +
-                                                  " Please disable it for a single run to allow mod dependencies to download."));
+                    e.addSuppressed(new Exception(
+                            "NonUpdate is present, it's possible that it's blocking a library download."
+                            + " Please disable it for a single run to allow mod dependencies to download."));
                 }
             } catch (IOException ex) {
                 e.addSuppressed(ex);
@@ -111,7 +117,9 @@ public class Internet {
                         throw new CompletionException(e);
                     }
                 });
-                if (success.get()) return result.toByteArray();
+                if (success.get()) {
+                    return result.toByteArray();
+                }
             }
             throw new CompletionException(caught.get());
         });
@@ -131,7 +139,9 @@ public class Internet {
                         throw new CompletionException(e);
                     }
                 });
-                if (success.get()) return;
+                if (success.get()) {
+                    return;
+                }
             }
             throw new CompletionException(caught.get());
         });

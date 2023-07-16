@@ -47,9 +47,11 @@ public abstract class AListConfigField<T> extends AConfigField<T> {
                             .map(Config.ListMaxLength::value)
                             .orElse(256);
         if (maxLength < 0) {
-            throw new ConfigException(
-                    "Negative length list configurations are not supported!\n" + "Field name: " + field.getName() +
-                    ", class: " + field.getDeclaringClass().getName());
+            throw new ConfigException("Negative length list configurations are not supported!\n"
+                                      + "Field name: "
+                                      + field.getName()
+                                      + ", class: "
+                                      + field.getDeclaringClass().getName());
         }
         property.setIsListLengthFixed(fixedLength);
         property.setMaxListLength(maxLength);
@@ -105,8 +107,12 @@ public abstract class AListConfigField<T> extends AConfigField<T> {
     public void receive(DataInput input) throws IOException {
         int length = input.readInt();
         if (length > maxLength || fixedLength && length(getDefault()) != length) {
-            throw new IOException("Error while retrieving config value for field " + field.getName() + " in class " +
-                                  field.getDeclaringClass().getName() + ":\n" + "Illegal array length received!");
+            throw new IOException("Error while retrieving config value for field "
+                                  + field.getName()
+                                  + " in class "
+                                  + field.getDeclaringClass().getName()
+                                  + ":\n"
+                                  + "Illegal array length received!");
         }
         val arr = createArray(length);
         receiveElements(input, arr);

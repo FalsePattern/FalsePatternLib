@@ -68,7 +68,7 @@ public final class UpdateChecker {
      *     "updateURL": "https://example.com/mods/mymod"
      * }
      * }</pre>
-     *
+     * <p>
      * GitHub version entry:
      * <pre>{@code
      * {
@@ -76,7 +76,7 @@ public final class UpdateChecker {
      *    "repo": "Example/ExampleMod"
      * }
      * }</pre>
-     *
+     * <p>
      * The GitHub version entry will automatically fetch the latest release from the specified repository using the GitHub API.
      *
      * @param url The URL to check
@@ -116,6 +116,7 @@ public final class UpdateChecker {
     }
 
     //region deprecated
+
     /**
      * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
      */

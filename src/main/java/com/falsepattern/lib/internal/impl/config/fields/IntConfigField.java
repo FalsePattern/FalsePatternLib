@@ -50,10 +50,11 @@ public class IntConfigField extends AConfigField<Integer> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class))
                                .map(Config.DefaultInt::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultInt annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultInt annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return field.getType().isPrimitive() ? field.getInt(null)
                                                                             : (Integer) field.get(null);
@@ -112,8 +113,11 @@ public class IntConfigField extends AConfigField<Integer> {
         if (value >= min && value <= max) {
             return true;
         }
-        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, -1, Integer.toString(value),
-                                                                 Integer.toString(min), Integer.toString(max));
+        ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field,
+                                                                 -1,
+                                                                 Integer.toString(value),
+                                                                 Integer.toString(min),
+                                                                 Integer.toString(max));
         return false;
     }
 

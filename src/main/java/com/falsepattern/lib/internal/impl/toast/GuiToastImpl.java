@@ -99,8 +99,9 @@ public class GuiToastImpl extends Gui {
     @Nullable
     public <T extends IToast> T getToast(Class<? extends T> toastClass, Object type) {
         for (val toast : this.visible) {
-            if (toast != null && toastClass.isAssignableFrom(toast.getToast().getClass()) &&
-                toast.getToast().getType().equals(type)) {
+            if (toast != null && toastClass.isAssignableFrom(toast.getToast().getClass()) && toast.getToast()
+                                                                                                  .getType()
+                                                                                                  .equals(type)) {
                 return toastClass.cast(toast);
             }
         }

@@ -83,7 +83,8 @@ public class SimpleToast implements IToast {
         if (hasProgressBar) {
             val bgWidth = background.getIcon().getIconWidth();
             Gui.drawRect(3, bgHeight - 4, bgWidth - 3, bgHeight - 3, 0xFFFFFFFF);
-            float f = (float) MathUtil.clampedLerp(displayedProgress, currentProgress,
+            float f = (float) MathUtil.clampedLerp(displayedProgress,
+                                                   currentProgress,
                                                    (float) (delta - lastDelta) / 100.0F);
             int i;
 

@@ -45,6 +45,7 @@ public class MappingManager {
     private static final Map<String, String> stringPool = new HashMap<>();
     private static boolean initialized = false;
     private static final Object MUTEX = new Object();
+
     @SneakyThrows
     public static void initialize() {
         synchronized (MUTEX) {
@@ -53,20 +54,23 @@ public class MappingManager {
             }
             initialized = true;
         }
-        val classMappings = new String(ResourceUtil.getResourceBytesFromJar("/classes.csv", CoreLoadingPlugin.class)).split("\n");
+        val classMappings =
+                new String(ResourceUtil.getResourceBytesFromJar("/classes.csv", CoreLoadingPlugin.class)).split("\n");
         for (int i = 1; i < classMappings.length; i++) {
             val line = classMappings[i].split(",");
             val clazz = new UniversalClass(line, stringPool);
             internalLookup.unwrap(clazz.internalName, clazz);
             regularLookup.unwrap(clazz.regularName, clazz);
         }
-        var fieldMappings = new String(ResourceUtil.getResourceBytesFromJar("/fields.csv", CoreLoadingPlugin.class)).split("\n");
+        var fieldMappings =
+                new String(ResourceUtil.getResourceBytesFromJar("/fields.csv", CoreLoadingPlugin.class)).split("\n");
         for (int i = 1; i < fieldMappings.length; i++) {
             val line = fieldMappings[i].split(",");
             val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
             UniversalField.createAndAddToParent(clazz, line, stringPool);
         }
-        val methodMappings = new String(ResourceUtil.getResourceBytesFromJar("/methods.csv", CoreLoadingPlugin.class)).split("\n");
+        val methodMappings =
+                new String(ResourceUtil.getResourceBytesFromJar("/methods.csv", CoreLoadingPlugin.class)).split("\n");
         for (int i = 1; i < methodMappings.length; i++) {
             val line = methodMappings[i].split(",");
             val clazz = internalLookup.get(MappingType.Notch, line[0].substring(0, line[0].lastIndexOf('/')));
@@ -88,9 +92,14 @@ public class MappingManager {
                     throw new IllegalArgumentException("Invalid enum value " + nameType);
             }
         } catch (Lookup.LookupException e) {
-            throw new ClassNotFoundException(
-                    "Could not find class \"" + className + "\" with " + nameType.name().toLowerCase() +
-                    " name in the " + mappingType.name() + " mapping.");
+            throw new ClassNotFoundException("Could not find class \""
+                                             + className
+                                             + "\" with "
+                                             + nameType.name()
+                                                       .toLowerCase()
+                                             + " name in the "
+                                             + mappingType.name()
+                                             + " mapping.");
         }
     }
 
@@ -116,8 +125,9 @@ public class MappingManager {
                 return classForName(NameType.Internal, MappingType.MCP, instruction.owner).getField(MappingType.MCP,
                                                                                                     instruction.name);
             } catch (ClassNotFoundException e) {
-                throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                 " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
+                throw new ClassNotFoundException("Could not find the class "
+                                                 + instruction.owner
+                                                 + " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
             }
         } else {
             try {
@@ -125,11 +135,13 @@ public class MappingManager {
                                                                                                     instruction.name);
             } catch (ClassNotFoundException e) {
                 try {
-                    return classForName(NameType.Internal, MappingType.Notch, instruction.owner).getField(
-                            MappingType.Notch, instruction.name);
+                    return classForName(NameType.Internal,
+                                        MappingType.Notch,
+                                        instruction.owner).getField(MappingType.Notch, instruction.name);
                 } catch (ClassNotFoundException ex) {
-                    throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                     " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
+                    throw new ClassNotFoundException("Could not find the class "
+                                                     + instruction.owner
+                                                     + " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
                 }
             }
         }
@@ -145,8 +157,9 @@ public class MappingManager {
                                                                                                      instruction.name,
                                                                                                      instruction.desc);
             } catch (ClassNotFoundException e) {
-                throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                 " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
+                throw new ClassNotFoundException("Could not find the class "
+                                                 + instruction.owner
+                                                 + " in the MCP mappings. Are you sure it's a Minecraft class? (we're in dev, cannot use SRG or Notch here).");
             }
         } else {
             try {
@@ -155,11 +168,15 @@ public class MappingManager {
                                                                                                      instruction.desc);
             } catch (ClassNotFoundException e) {
                 try {
-                    return classForName(NameType.Internal, MappingType.Notch, instruction.owner).getMethod(
-                            MappingType.Notch, instruction.name, instruction.desc);
+                    return classForName(NameType.Internal,
+                                        MappingType.Notch,
+                                        instruction.owner).getMethod(MappingType.Notch,
+                                                                     instruction.name,
+                                                                     instruction.desc);
                 } catch (ClassNotFoundException ex) {
-                    throw new ClassNotFoundException("Could not find the class " + instruction.owner +
-                                                     " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
+                    throw new ClassNotFoundException("Could not find the class "
+                                                     + instruction.owner
+                                                     + " neither in the SRG nor in the Notch mappings. Are you sure it's a Minecraft class? (we're in obf, cannot use MCP here)");
                 }
             }
         }

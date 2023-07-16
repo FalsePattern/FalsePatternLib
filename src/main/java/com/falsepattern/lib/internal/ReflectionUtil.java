@@ -39,12 +39,10 @@ public class ReflectionUtil {
     }
 
     // ref: https://github.com/prestodb/presto/pull/15240/files#diff-8bf996e5c1d4fb088b84ae0528bc42686b0724bcf5a2692a1e7b5eff32c90cce
-    private static Field getModifiersField() throws NoSuchFieldException
-    {
+    private static Field getModifiersField() throws NoSuchFieldException {
         try {
             return Field.class.getDeclaredField("modifiers");
-        }
-        catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException e) {
             try {
                 Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
                 getDeclaredFields0.setAccessible(true);
@@ -54,8 +52,7 @@ public class ReflectionUtil {
                         return field;
                     }
                 }
-            }
-            catch (ReflectiveOperationException ex) {
+            } catch (ReflectiveOperationException ex) {
                 e.addSuppressed(ex);
             }
             throw e;

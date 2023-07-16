@@ -43,8 +43,9 @@ public interface IMixin {
 
     default boolean shouldLoad(List<ITargetedMod> loadedMods) {
         val side = getSide();
-        return (side == Side.COMMON || side == Side.SERVER && FMLLaunchHandler.side().isServer() ||
-                side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
+        return (side == Side.COMMON
+                || side == Side.SERVER && FMLLaunchHandler.side().isServer()
+                || side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
     }
 
     @StableAPI(since = "0.10.0")

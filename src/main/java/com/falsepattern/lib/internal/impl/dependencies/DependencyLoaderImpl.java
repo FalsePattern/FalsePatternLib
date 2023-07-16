@@ -115,12 +115,17 @@ public class DependencyLoaderImpl {
             }
         }
         if (oldLibDir.exists()) {
-            LOG.info("Migrating old library folder. From: " + oldLibDir.getAbsolutePath() + ", To: " + libDir.getAbsolutePath());
+            LOG.info("Migrating old library folder. From: "
+                     + oldLibDir.getAbsolutePath()
+                     + ", To: "
+                     + libDir.getAbsolutePath());
             val oldFiles = oldLibDir.listFiles();
             if (oldFiles != null) {
-                for (val file: oldFiles) {
+                for (val file : oldFiles) {
                     try {
-                        Files.move(file.toPath(), libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())), StandardCopyOption.REPLACE_EXISTING);
+                        Files.move(file.toPath(),
+                                   libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())),
+                                   StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         LOG.warn("Failed to move file " + file.getName() + " to new dir! Deleting instead.");
                         try {
@@ -214,9 +219,14 @@ public class DependencyLoaderImpl {
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         val futures = new ArrayList<CompletableFuture<Void>>();
         for (val library : libraries) {
-            val task = new DependencyLoadTask(library.loadingModId, library.groupId, library.artifactId,
-                                              library.minVersion, library.maxVersion, library.preferredVersion,
-                                              library.regularSuffix, library.devSuffix);
+            val task = new DependencyLoadTask(library.loadingModId,
+                                              library.groupId,
+                                              library.artifactId,
+                                              library.minVersion,
+                                              library.maxVersion,
+                                              library.preferredVersion,
+                                              library.regularSuffix,
+                                              library.devSuffix);
             futures.add(CompletableFuture.runAsync(task::load, executor));
         }
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
@@ -230,7 +240,8 @@ public class DependencyLoaderImpl {
         boolean found = false;
         if (fileName.endsWith(".jar")) {
             //Scan jar file for json in META-INF, add them to the list
-            try (val inputStream = new BufferedInputStream(source.openStream(), 65536); val jarFile = new JarInputStream(inputStream)) {
+            try (val inputStream = new BufferedInputStream(source.openStream(), 65536);
+                 val jarFile = new JarInputStream(inputStream)) {
                 ZipEntry entry;
                 while ((entry = jarFile.getNextEntry()) != null) {
                     if (!entry.getName().startsWith("META-INF") || !entry.getName().endsWith(".json")) {
@@ -301,11 +312,12 @@ public class DependencyLoaderImpl {
         return mapper.apply(pair.b).map(b -> new Pair<>(a, b));
     }
 
-    private static final Pattern VERSION_PATTERN = Pattern.compile(""
-                                                                   + "(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?"
-                                                                   + "(?:-((?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0)"
-                                                                   + "(?:\\.(?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0))*))?"
-                                                                   + "(?:\\+([\\w-]+(\\.[\\w-]+)*))?");
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?"
+                            + "(?:-((?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0)"
+                            + "(?:\\.(?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0))*))?"
+                            + "(?:\\+([\\w-]+(\\.[\\w-]+)*))?");
+
     public static void scanDeps() {
         LOG.debug("Discovering dependency source candidates...");
         val modsDir = new File(FileUtil.getMinecraftHome(), "mods");
@@ -327,48 +339,43 @@ public class DependencyLoaderImpl {
                                .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
                                .collect(Collectors.toList());
         val urls = new ArrayList<URL>();
-        for (val candidate: candidates) {
+        for (val candidate : candidates) {
             if (!scanForDepSpecs(candidate, urls)) {
                 urlsWithoutDeps.add(candidate.toString());
             }
         }
         try (val out = Files.newBufferedWriter(depCache.toPath())) {
-            for (val noDep: urlsWithoutDeps) {
+            for (val noDep : urlsWithoutDeps) {
                 out.append(noDep).append(System.lineSeparator());
             }
         } catch (IOException e) {
             LOG.error("Could not write dependency scanner cache", e);
         }
-        val dependencySpecs = urls.stream()
-                                  .map((source) -> {
-                                      //Convert source to GSON json
-                                      try (val is = new BufferedInputStream(source.openStream())) {
-                                          val jsonRaw = new JsonParser().parse(new InputStreamReader(is));
-                                          if (!jsonRaw.isJsonObject()) {
-                                              return null;
-                                          }
-                                          val json = jsonRaw.getAsJsonObject();
-                                          if (!(json.has("identifier") &&
-                                                json.get("identifier")
+        val dependencySpecs = urls.stream().map((source) -> {
+            //Convert source to GSON json
+            try (val is = new BufferedInputStream(source.openStream())) {
+                val jsonRaw = new JsonParser().parse(new InputStreamReader(is));
+                if (!jsonRaw.isJsonObject()) {
+                    return null;
+                }
+                val json = jsonRaw.getAsJsonObject();
+                if (!(json.has("identifier") && json.get("identifier")
                                                     .getAsString()
-                                                    .equals("falsepatternlib_dependencies")
-                                          )) {
-                                              return null;
-                                          }
-                                          val builder = new GsonBuilder();
-                                          builder.excludeFieldsWithoutExposeAnnotation();
-                                          val gson = builder.create();
-                                          json.remove("identifier");
-                                          val root = gson.fromJson(json, DepRoot.class);
-                                          root.source(source.toString());
-                                          return root;
-                                      } catch (Exception e) {
-                                          LOG.error("Failed to read json from source {}: {}", source, e);
-                                          return null;
-                                      }
-                                  })
-                                  .filter(Objects::nonNull)
-                                  .collect(Collectors.toSet());
+                                                    .equals("falsepatternlib_dependencies"))) {
+                    return null;
+                }
+                val builder = new GsonBuilder();
+                builder.excludeFieldsWithoutExposeAnnotation();
+                val gson = builder.create();
+                json.remove("identifier");
+                val root = gson.fromJson(json, DepRoot.class);
+                root.source(source.toString());
+                return root;
+            } catch (Exception e) {
+                LOG.error("Failed to read json from source {}: {}", source, e);
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toSet());
         long end = System.currentTimeMillis();
         LOG.debug("Discovered {} dependency source candidates in {}ms", dependencySpecs.size(), end - start);
         mavenRepositories.addAll(dependencySpecs.stream()
@@ -376,11 +383,16 @@ public class DependencyLoaderImpl {
                                                 .collect(Collectors.toSet()));
         val artifacts = dependencySpecs.stream()
                                        .map((root) -> new Pair<>(root.source(), root.dependencies()))
-                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.of(dep.always(), Share.DEV_ENV ? dep.dev() : dep.obf())))
-                                       .flatMap(pair -> flatMap(pair, (dep) -> Stream.concat(dep.common().stream(),
-                                                                                             FMLLaunchHandler.side().isClient() ?
-                                                                                             dep.client().stream() :
-                                                                                             dep.server().stream())))
+                                       .flatMap(pair -> flatMap(pair,
+                                                                (dep) -> Stream.of(dep.always(),
+                                                                                   Share.DEV_ENV ? dep.dev()
+                                                                                                 : dep.obf())))
+                                       .flatMap(pair -> flatMap(pair,
+                                                                (dep) -> Stream.concat(dep.common().stream(),
+                                                                                       FMLLaunchHandler.side()
+                                                                                                       .isClient()
+                                                                                       ? dep.client().stream()
+                                                                                       : dep.server().stream())))
                                        .map((pair) -> {
                                            val source = pair.a;
                                            val dep = pair.b;
@@ -398,38 +410,57 @@ public class DependencyLoaderImpl {
                                                    throw new IllegalArgumentException("Invalid version: " + parts[2]);
                                                }
                                                val major = Integer.parseInt(matcher.group(1));
-                                               val minor = matcher.group(2) == null ? -1 : Integer.parseInt(matcher.group(2));
-                                               val patch = matcher.group(3) == null ? -1 : Integer.parseInt(matcher.group(3));
+                                               val minor = matcher.group(2) == null ? -1
+                                                                                    : Integer.parseInt(matcher.group(2));
+                                               val patch = matcher.group(3) == null ? -1
+                                                                                    : Integer.parseInt(matcher.group(3));
                                                val preRelease = matcher.group(4);
                                                val build = matcher.group(5);
                                                version = new SemanticVersion(major, minor, patch, preRelease, build);
                                            } catch (IllegalArgumentException e) {
-                                               LOG.warn("Unparseable dependency version {}:{}:{} from {}", groupId, artifactId, parts[2], source);
+                                               LOG.warn("Unparseable dependency version {}:{}:{} from {}",
+                                                        groupId,
+                                                        artifactId,
+                                                        parts[2],
+                                                        source);
                                                version = new RawVersion(parts[2]);
                                            }
                                            final String classifier = parts.length > 3 ? parts[3] : null;
                                            if (classifier != null) {
-                                               LOG.info("Found dependency: {}:{}:{}:{} from {}", groupId, artifactId,
-                                                        version, classifier, source);
+                                               LOG.info("Found dependency: {}:{}:{}:{} from {}",
+                                                        groupId,
+                                                        artifactId,
+                                                        version,
+                                                        classifier,
+                                                        source);
                                            } else {
-                                               LOG.info("Found dependency: {}:{}:{} from {}", groupId, artifactId,
-                                                        version, source);
+                                               LOG.info("Found dependency: {}:{}:{} from {}",
+                                                        groupId,
+                                                        artifactId,
+                                                        version,
+                                                        source);
                                            }
-                                           return new DependencyLoadTask(source, groupId, artifactId,
-                                                                         version, null, version,
-                                                                         classifier, classifier);
+                                           return new DependencyLoadTask(source,
+                                                                         groupId,
+                                                                         artifactId,
+                                                                         version,
+                                                                         null,
+                                                                         version,
+                                                                         classifier,
+                                                                         classifier);
                                        })
                                        .filter(Objects::nonNull)
                                        .collect(Collectors.toSet());
         val artifactMap = new HashMap<String, DependencyLoadTask>();
-        for (val artifact: artifacts) {
+        for (val artifact : artifacts) {
             val id = artifact.getGroupArtifact();
             if (artifactMap.containsKey(id)) {
                 val otherArtifact = artifactMap.get(id);
                 //TODO: Check for conflicts
                 if (artifact.preferredVersion.compareTo(otherArtifact.preferredVersion) > 0) {
                     LOG.info("Replacing dependency {}:{} from {} with version {} from {}",
-                             otherArtifact.getGroupArtifact(), otherArtifact.preferredVersion,
+                             otherArtifact.getGroupArtifact(),
+                             otherArtifact.preferredVersion,
                              otherArtifact.loadingModId,
                              artifact.preferredVersion,
                              artifact.loadingModId);
@@ -495,16 +526,18 @@ public class DependencyLoaderImpl {
         }
 
         private void crashCouldNotDownload() {
-            val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion +
-                               ((suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " +
-                               loadingModId;
+            val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + (
+                    (suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " + loadingModId;
             LOG.fatal(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
 
         private void setupLibraryNames() {
             suffix = Share.DEV_ENV ? devSuffix : regularSuffix;
-            artifactLogName = String.format("%s:%s:%s%s", groupId, artifactId, preferredVersion,
+            artifactLogName = String.format("%s:%s:%s%s",
+                                            groupId,
+                                            artifactId,
+                                            preferredVersion,
                                             suffix != null ? "-" + suffix : "");
             LOG.info("Adding library {}, requested by mod {}", artifactLogName, loadingModId);
             artifact = groupId + ":" + artifactId + ":" + suffix;
@@ -520,19 +553,31 @@ public class DependencyLoaderImpl {
                 for (int i = 0; i < 16; i++) {
                     LOG.fatal("ALERT VVVVVVVVVVVV ALERT");
                 }
-                LOG.fatal("Library {}:{}{} already loaded with version {}, " +
-                          "but a version in the range {} was requested! Thing may go horribly wrong! " +
-                          "Requested by mod: {}, previously loaded by mod: {}", groupId, artifactId,
-                          suffix != null ? ":" + suffix : "", currentVer, rangeString, loadingModId,
+                LOG.fatal("Library {}:{}{} already loaded with version {}, "
+                          + "but a version in the range {} was requested! Thing may go horribly wrong! "
+                          + "Requested by mod: {}, previously loaded by mod: {}",
+                          groupId,
+                          artifactId,
+                          suffix != null ? ":" + suffix : "",
+                          currentVer,
+                          rangeString,
+                          loadingModId,
                           loadedLibraryMods.get(artifact));
                 for (int i = 0; i < 16; i++) {
                     LOG.fatal("ALERT ^^^^^^^^^^^^ ALERT");
                 }
             } else {
-                LOG.info("Attempted loading of library {}:{}{} with preferred version {}, " +
-                         "but version {} was already loaded, which matched the range {}. This is not an " + "error. " +
-                         "Requested by mod: {}, previously loaded by mod: {}", groupId, artifactId,
-                         suffix != null ? ":" + suffix : "", preferredVersion, currentVer, rangeString, loadingModId,
+                LOG.info("Attempted loading of library {}:{}{} with preferred version {}, "
+                         + "but version {} was already loaded, which matched the range {}. This is not an "
+                         + "error. "
+                         + "Requested by mod: {}, previously loaded by mod: {}",
+                         groupId,
+                         artifactId,
+                         suffix != null ? ":" + suffix : "",
+                         preferredVersion,
+                         currentVer,
+                         rangeString,
+                         loadingModId,
                          loadedLibraryMods.get(artifact));
             }
         }
@@ -553,8 +598,8 @@ public class DependencyLoaderImpl {
                 if (status == ChecksumStatus.FAILED) {
                     return false;
                 } else if (status == ChecksumStatus.MISSING) {
-                    LOG.debug("Library {} is missing checksum data! Either it was manually deleted, " +
-                              "or the source repo didn't have it in the first place", artifactLogName);
+                    LOG.debug("Library {} is missing checksum data! Either it was manually deleted, "
+                              + "or the source repo didn't have it in the first place", artifactLogName);
                 }
             } catch (IOException e) {
                 LOG.error("Failed to execute validation check for " + artifactLogName, e);
@@ -575,10 +620,18 @@ public class DependencyLoaderImpl {
 
         private void validateDownloadsAllowed() {
             if (!LibraryConfig.ENABLE_LIBRARY_DOWNLOADS) {
-                val errorMessage = "Failed to load library " + groupId + ":" + artifactId + ":" + preferredVersion +
-                                   ((suffix != null) ? ":" + suffix : "") + ": " + Tags.MODNAME +
-                                   " library downloading has been disabled in the config, and the library is not present " +
-                                   "on disk! Requested by mod: " + loadingModId;
+                val errorMessage = "Failed to load library "
+                                   + groupId
+                                   + ":"
+                                   + artifactId
+                                   + ":"
+                                   + preferredVersion
+                                   + ((suffix != null) ? ":" + suffix : "")
+                                   + ": "
+                                   + Tags.MODNAME
+                                   + " library downloading has been disabled in the config, and the library is not present "
+                                   + "on disk! Requested by mod: "
+                                   + loadingModId;
                 LOG.fatal(errorMessage);
                 throw new IllegalStateException(errorMessage);
             }
@@ -589,7 +642,11 @@ public class DependencyLoaderImpl {
                 if (!repo.endsWith("/")) {
                     repo = repo + "/";
                 }
-                val url = String.format("%s%s/%s/%s/%s", repo, groupId.replace('.', '/'), artifactId, preferredVersion,
+                val url = String.format("%s%s/%s/%s/%s",
+                                        repo,
+                                        groupId.replace('.', '/'),
+                                        artifactId,
+                                        preferredVersion,
                                         mavenJarName);
                 String finalRepo = repo;
                 int retryCount = 0;
@@ -601,12 +658,15 @@ public class DependencyLoaderImpl {
                     val success = new AtomicBoolean(false);
                     Internet.connect(new URL(url),
                                      (ex) -> LOG.debug("Artifact {} could not be downloaded from repo {}: {}",
-                                                       artifactLogName, finalRepo, ex.getMessage()), (input) -> {
-                                LOG.debug("Downloading {} from {}", artifactLogName, finalRepo);
-                                download(input, file);
-                                LOG.debug("Downloaded {} from {}", artifactLogName, finalRepo);
-                                success.set(true);
-                            });
+                                                       artifactLogName,
+                                                       finalRepo,
+                                                       ex.getMessage()),
+                                     (input) -> {
+                                         LOG.debug("Downloading {} from {}", artifactLogName, finalRepo);
+                                         download(input, file);
+                                         LOG.debug("Downloaded {} from {}", artifactLogName, finalRepo);
+                                         success.set(true);
+                                     });
                     if (success.get()) {
                         LOG.debug("Validating checksum for {}", artifactLogName);
                         val hadChecksum = validateChecksum(url);
@@ -616,9 +676,9 @@ public class DependencyLoaderImpl {
                             case OK:
                                 break;
                             case MISSING:
-                                LOG.warn("The library {} had no checksum available on the repository.\n" +
-                                         "There's a chance it might have gotten corrupted during download,\n" +
-                                         "but we're loading it anyways.", artifactLogName);
+                                LOG.warn("The library {} had no checksum available on the repository.\n"
+                                         + "There's a chance it might have gotten corrupted during download,\n"
+                                         + "but we're loading it anyways.", artifactLogName);
                         }
                         loadedLibraries.put(artifact, preferredVersion);
                         loadedLibraryMods.put(artifact, loadingModId);
@@ -638,13 +698,16 @@ public class DependencyLoaderImpl {
                 LOG.debug("Attempting to get {} checksum...", checksumType);
                 val success = new AtomicBoolean(false);
                 Internet.connect(new URL(checksumURL),
-                                 (ex) -> LOG.debug("Could not get {} checksum for {}: {}", checksumType,
-                                                   artifactLogName, ex.getMessage()), (input) -> {
-                            LOG.debug("Downloading {} checksum for {}", checksumType, artifactLogName);
-                            download(input, checksumFile);
-                            LOG.debug("Downloaded {} checksum for {}", checksumType, artifactLogName);
-                            success.set(true);
-                        });
+                                 (ex) -> LOG.debug("Could not get {} checksum for {}: {}",
+                                                   checksumType,
+                                                   artifactLogName,
+                                                   ex.getMessage()),
+                                 (input) -> {
+                                     LOG.debug("Downloading {} checksum for {}", checksumType, artifactLogName);
+                                     download(input, checksumFile);
+                                     LOG.debug("Downloaded {} checksum for {}", checksumType, artifactLogName);
+                                     success.set(true);
+                                 });
                 if (success.get()) {
                     return getChecksumStatus(file, checksumType, checksumFile);
                 }

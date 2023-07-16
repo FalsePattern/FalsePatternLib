@@ -49,10 +49,11 @@ public class StringListConfigField extends AListConfigField<String[]> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class))
                                .map(Config.DefaultStringList::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultStringList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultStringList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return (String[]) field.get(null);
                                    } catch (IllegalAccessException e) {
@@ -66,9 +67,13 @@ public class StringListConfigField extends AListConfigField<String[]> {
         if (!property.isList()) {
             setToDefault();
         }
-        property.comment += "\n[max string length: " + maxLength +
-                            (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "") + ", default: \"" +
-                            stringify(defaultValue) + "\"]";
+        property.comment +=
+                "\n[max string length: "
+                + maxLength
+                + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "")
+                + ", default: \""
+                + stringify(defaultValue)
+                + "\"]";
     }
 
     private static String stringify(String[] arr) {
@@ -102,7 +107,9 @@ public class StringListConfigField extends AListConfigField<String[]> {
     @Override
     protected void receiveElements(DataInput input, String[] arr) throws IOException {
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = StringConfigField.receiveString(input, maxStringLength, field.getName(),
+            arr[i] = StringConfigField.receiveString(input,
+                                                     maxStringLength,
+                                                     field.getName(),
                                                      field.getDeclaringClass().getName());
         }
     }

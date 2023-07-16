@@ -85,6 +85,5 @@ public @interface StableAPI {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
     @StableAPI(since = "0.10.0")
-    @interface Internal {
-    }
+    @interface Internal {}
 }

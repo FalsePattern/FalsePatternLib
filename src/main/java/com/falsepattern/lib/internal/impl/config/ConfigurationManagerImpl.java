@@ -171,23 +171,20 @@ public final class ConfigurationManagerImpl {
             val opt = serializedNames.keySet().stream().filter((key) -> key.equals(serializedName)).findFirst();
             if (!opt.isPresent()) {
                 input.skipBytes(dataSize);
-                Share.LOG
-                               .warn("Server tried to sync config not registered on our side: " + serializedName);
+                Share.LOG.warn("Server tried to sync config not registered on our side: " + serializedName);
                 continue;
             }
             val clazz = serializedNames.get(opt.get());
             val config = parsedConfigMap.get(clazz);
             if (!config.sync) {
                 input.skipBytes(dataSize);
-                Share.LOG
-                               .warn("Server tried to sync config without @Synchronize annotation on our side: " +
-                                     serializedName);
+                Share.LOG.warn("Server tried to sync config without @Synchronize annotation on our side: "
+                               + serializedName);
                 continue;
             }
             if (!ConfigSyncEvent.postStart(clazz)) {
                 input.skipBytes(dataSize);
-                Share.LOG.warn(
-                        "Config synchronization was cancelled by event for: " + serializedName);
+                Share.LOG.warn("Config synchronization was cancelled by event for: " + serializedName);
                 continue;
             }
             val bytes = new byte[dataSize];

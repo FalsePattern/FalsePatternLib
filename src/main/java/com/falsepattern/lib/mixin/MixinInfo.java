@@ -105,21 +105,27 @@ public final class MixinInfo {
     }
 
     private static MixinBootstrapperType detect() {
-        if (!isClassPresentSafe("org.spongepowered.asm.launch.MixinBootstrap"))
+        if (!isClassPresentSafe("org.spongepowered.asm.launch.MixinBootstrap")) {
             return MixinBootstrapperType.None;
-        for (val candidate: MixinInfoCompatCompanion.UNIMIXIN_CANDIDATES) {
+        }
+        for (val candidate : MixinInfoCompatCompanion.UNIMIXIN_CANDIDATES) {
             if (isClassPresentSafe(candidate)) {
                 return MixinBootstrapperType.UniMixin;
             }
         }
-        if (isClassPresentSafe("com.falsepattern.gasstation.GasStation"))
+        if (isClassPresentSafe("com.falsepattern.gasstation.GasStation")) {
             return MixinBootstrapperType.GasStation;
-        if (isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore"))
+        }
+        if (isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore")) {
             return MixinBootstrapperType.SpongeMixins;
-        if (isClassPresentSafe("io.github.crucible.grimoire.Grimoire") || isClassPresentSafe("io.github.crucible.grimoire.common.GrimoireCore"))
+        }
+        if (isClassPresentSafe("io.github.crucible.grimoire.Grimoire") || isClassPresentSafe(
+                "io.github.crucible.grimoire.common.GrimoireCore")) {
             return MixinBootstrapperType.Grimoire;
-        if (isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin"))
+        }
+        if (isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin")) {
             return MixinBootstrapperType.MixinBooterLegacy;
+        }
         return MixinBootstrapperType.Other;
     }
 

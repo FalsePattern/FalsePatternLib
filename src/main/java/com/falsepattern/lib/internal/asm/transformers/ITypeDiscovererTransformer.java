@@ -39,7 +39,7 @@ public class ITypeDiscovererTransformer implements IClassNodeTransformer {
 
     @Override
     public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
-        for (val method: cn.methods) {
+        for (val method : cn.methods) {
             if (!method.name.equals("<clinit>")) {
                 continue;
             }

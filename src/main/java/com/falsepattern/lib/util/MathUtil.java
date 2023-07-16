@@ -603,9 +603,12 @@ public final class MathUtil {
                 f6 = f2;
                 break;
             default:
-                throw new RuntimeException(
-                        "Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation +
-                        ", " + value);
+                throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was "
+                                           + hue
+                                           + ", "
+                                           + saturation
+                                           + ", "
+                                           + value);
         }
 
         int j = clamp((int) (f4 * 255.0F), 0, 255);

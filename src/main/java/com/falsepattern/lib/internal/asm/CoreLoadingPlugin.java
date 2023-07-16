@@ -116,15 +116,20 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     public static void validateGasStation() {
         Share.LOG.info("Got any gas?");
         //Make sure everything is loaded correctly, crash if gasstation is bugged
-        if (!isClassPresentSafe("com.falsepattern.gasstation.core.GasStationCore") || //Validate core class
-            !isClassPresentSafe("makamys.mixingasm.api.TransformerInclusions") || //Validate the mixingasm compat
-            !isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore") || //Validate the spongemixins compat
-            !isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin") || //Validate the MBL compat
-            (!isClassPresentSafe("org.spongepowered.asm.lib.Opcodes") || isClassPresentSafe("org.spongepowered.libraries.org.objectweb.asm.Opcodes")) //Validate correct mixins class
+        // @formatter:off
+        if (!isClassPresentSafe("com.falsepattern.gasstation.core.GasStationCore") //Validate core class
+            || !isClassPresentSafe("makamys.mixingasm.api.TransformerInclusions") //Validate the mixingasm compat
+            || !isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore") //Validate the spongemixins compat
+            || !isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin") //Validate the MBL compat
+            || !isClassPresentSafe("org.spongepowered.asm.lib.Opcodes") //Validate correct mixins class
+            || isClassPresentSafe("org.spongepowered.libraries.org.objectweb.asm.Opcodes")
         ) {
             Share.LOG.fatal("Somebody put diesel in my gas tank!");
-            throw new Error("Failed to validate your GasStation mixin plugin installation. Please make sure you have the latest GasStation installed from the official source: https://github.com/FalsePattern/GasStation");
+            throw new Error("Failed to validate your GasStation mixin plugin installation. "
+                            + "Please make sure you have the latest GasStation installed from the official source: "
+                            + "https://github.com/FalsePattern/GasStation");
         }
+        // @formatter:on
     }
 
     @Override

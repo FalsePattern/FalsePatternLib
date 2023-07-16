@@ -30,9 +30,10 @@ public class LibraryConfig {
     static {
         ConfigurationManager.selfInit();
     }
+
     @Config.Comment({"Used to control whether FalsePatternLib should check for outdated mods.",
-                     "If you're building a public modpack, you should turn this off so that your users don't " +
-                     "get nagged about outdated mods."})
+                     "If you're building a public modpack, you should turn this off so that your users don't "
+                     + "get nagged about outdated mods."})
     @Config.LangKey("config.falsepatternlib.updatecheck")
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_UPDATE_CHECKER;

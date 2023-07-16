@@ -130,16 +130,35 @@ public class Library {
 
         @StableAPI.Expose
         public Library build() {
-            return new Library(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
-                               regularSuffix, devSuffix);
+            return new Library(loadingModId,
+                               groupId,
+                               artifactId,
+                               minVersion,
+                               maxVersion,
+                               preferredVersion,
+                               regularSuffix,
+                               devSuffix);
         }
 
         @Override
         public String toString() {
-            return "Library.LibraryBuilder(loadingModId=" + this.loadingModId + ", groupId=" + this.groupId +
-                   ", artifactId=" + this.artifactId + ", minVersion=" + this.minVersion + ", maxVersion=" +
-                   this.maxVersion + ", preferredVersion=" + this.preferredVersion + ", regularSuffix=" +
-                   this.regularSuffix + ", devSuffix=" + this.devSuffix + ")";
+            return "Library.LibraryBuilder(loadingModId="
+                   + this.loadingModId
+                   + ", groupId="
+                   + this.groupId
+                   + ", artifactId="
+                   + this.artifactId
+                   + ", minVersion="
+                   + this.minVersion
+                   + ", maxVersion="
+                   + this.maxVersion
+                   + ", preferredVersion="
+                   + this.preferredVersion
+                   + ", regularSuffix="
+                   + this.regularSuffix
+                   + ", devSuffix="
+                   + this.devSuffix
+                   + ")";
         }
     }
 }

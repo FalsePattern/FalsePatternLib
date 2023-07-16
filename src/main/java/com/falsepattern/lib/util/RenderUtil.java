@@ -71,6 +71,7 @@ public final class RenderUtil {
      * @param iconName The icon name
      * @param width    The icon width in pixels
      * @param height   The icon height in pixels
+     *
      * @return The full resolution texture icon.
      */
     @StableAPI.Expose(since = "0.10.0")

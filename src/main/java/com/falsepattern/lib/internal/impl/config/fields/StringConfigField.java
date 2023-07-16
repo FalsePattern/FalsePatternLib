@@ -49,10 +49,11 @@ public class StringConfigField extends AConfigField<String> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultString.class))
                                .map(Config.DefaultString::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultString annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultString annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return (String) field.get(null);
                                    } catch (IllegalAccessException e) {
@@ -63,9 +64,12 @@ public class StringConfigField extends AConfigField<String> {
                             .map(Config.StringMaxLength::value)
                             .orElse(256);
         property.setDefaultValue(defaultValue);
-        property.comment +=
-                "\n[max length: " + maxLength + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "") +
-                ", default: \"" + defaultValue + "\"]";
+        property.comment += "\n[max length: "
+                            + maxLength
+                            + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "")
+                            + ", default: \""
+                            + defaultValue
+                            + "\"]";
     }
 
     public static boolean validateString(String value, int maxLength, Pattern pattern, Field field, int listIndex) {
@@ -93,8 +97,12 @@ public class StringConfigField extends AConfigField<String> {
             throws IOException {
         val length = input.readInt();
         if (length > maxLength || length < 0) {
-            throw new IOException("Error while retrieving value for " + valueName + " in class " + className + ":\n" +
-                                  "Illegal string length received!");
+            throw new IOException("Error while retrieving value for "
+                                  + valueName
+                                  + " in class "
+                                  + className
+                                  + ":\n"
+                                  + "Illegal string length received!");
         }
         val arr = new char[length];
         for (int i = 0; i < arr.length; i++) {

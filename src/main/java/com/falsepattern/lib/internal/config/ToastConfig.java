@@ -35,6 +35,7 @@ public class ToastConfig {
     static {
         ConfigurationManager.selfInit();
     }
+
     @Config.Comment("The maximum amount of toasts to show on the screen")
     @Config.LangKey("config.falsepatternlib.maxtoasts")
     @Config.DefaultInt(5)

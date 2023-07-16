@@ -115,9 +115,12 @@ public class BlockPos extends Vec3i {
      */
     @StableAPI.Expose
     public static Iterable<BlockPos> getAllInBox(@NonNull BlockPos from, @NonNull BlockPos to) {
-        return getAllInBox(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
-                           Math.min(from.getZ(), to.getZ()), Math.max(from.getX(), to.getX()),
-                           Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+        return getAllInBox(Math.min(from.getX(), to.getX()),
+                           Math.min(from.getY(), to.getY()),
+                           Math.min(from.getZ(), to.getZ()),
+                           Math.max(from.getX(), to.getX()),
+                           Math.max(from.getY(), to.getY()),
+                           Math.max(from.getZ(), to.getZ()));
     }
 
     /**
@@ -192,9 +195,12 @@ public class BlockPos extends Vec3i {
      */
     @StableAPI.Expose
     public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(@NonNull BlockPos from, @NonNull BlockPos to) {
-        return getAllInBoxMutable(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
-                                  Math.min(from.getZ(), to.getZ()), Math.max(from.getX(), to.getX()),
-                                  Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+        return getAllInBoxMutable(Math.min(from.getX(), to.getX()),
+                                  Math.min(from.getY(), to.getY()),
+                                  Math.min(from.getZ(), to.getZ()),
+                                  Math.max(from.getX(), to.getX()),
+                                  Math.max(from.getY(), to.getY()),
+                                  Math.max(from.getZ(), to.getZ()));
     }
 
     /**
@@ -304,7 +310,8 @@ public class BlockPos extends Vec3i {
         if (blocks == 0) {
             return this;
         }
-        return new BlockPos(x + facing.getFrontOffsetX() * blocks, y + facing.getFrontOffsetY() * blocks,
+        return new BlockPos(x + facing.getFrontOffsetX() * blocks,
+                            y + facing.getFrontOffsetY() * blocks,
                             z + facing.getFrontOffsetZ() * blocks);
     }
 
@@ -380,7 +387,8 @@ public class BlockPos extends Vec3i {
 
     @Override
     public BlockPos crossProduct(@NonNull Vec3i vec) {
-        return new BlockPos(y * vec.getZ() - z * vec.getY(), z * vec.getX() - x * vec.getZ(),
+        return new BlockPos(y * vec.getZ() - z * vec.getY(),
+                            z * vec.getX() - x * vec.getZ(),
                             x * vec.getY() - y * vec.getX());
     }
 
@@ -479,7 +487,8 @@ public class BlockPos extends Vec3i {
 
         @StableAPI.Expose
         public BlockPos.MutableBlockPos move(@NonNull EnumFacing facing, int blocks) {
-            return this.setPos(x + facing.getFrontOffsetX() * blocks, y + facing.getFrontOffsetY() * blocks,
+            return this.setPos(x + facing.getFrontOffsetX() * blocks,
+                               y + facing.getFrontOffsetY() * blocks,
                                z + facing.getFrontOffsetZ() * blocks);
         }
     }

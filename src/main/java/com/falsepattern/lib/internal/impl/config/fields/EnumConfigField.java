@@ -58,13 +58,16 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
                                                             .filter((e) -> e.name().equals(defName))
                                                             .findAny()
                                                             .orElseThrow(() -> new IllegalArgumentException(
-                                                                    "Default value \"" + defName +
-                                                                    "\" was not found in enum " + enumClass.getName())))
+                                                                    "Default value \""
+                                                                    + defName
+                                                                    + "\" was not found in enum "
+                                                                    + enumClass.getName())))
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultEnum annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultEnum annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return enumClass.cast(field.get(null));
                                    } catch (IllegalAccessException e) {
@@ -77,8 +80,12 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
         if (!enumNameMap.containsValue(getConfig())) {
             setToDefault();
         }
-        property.comment += "\n[default: " + defaultValue + ", possible values: " +
-                            Arrays.toString(enumNameMap.keySet().toArray(new String[0])) + "]";
+        property.comment += "\n[default: "
+                            + defaultValue
+                            + ", possible values: "
+                            + Arrays.toString(enumNameMap.keySet()
+                                                         .toArray(new String[0]))
+                            + "]";
     }
 
     public static void transmitString(DataOutput output, String value) throws IOException {
@@ -90,9 +97,12 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
             throws IOException {
         val length = input.readInt();
         if (length > maxLength || length < 0) {
-            throw new IOException(
-                    "Error while retrieving config value for field " + fieldName + " in class " + className + ":\n" +
-                    "Illegal string length received!");
+            throw new IOException("Error while retrieving config value for field "
+                                  + fieldName
+                                  + " in class "
+                                  + className
+                                  + ":\n"
+                                  + "Illegal string length received!");
         }
         val arr = new char[length];
         for (int i = 0; i < arr.length; i++) {
@@ -103,11 +113,17 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
 
     private T getEnumByName(String name) {
         if (!enumNameMap.containsKey(name)) {
-            Share.LOG
-                           .warn("Invalid value " + name + " for enum configuration field " + field.getName() +
-                                 " of type " + enumClass.getName() + " in config class " +
-                                 field.getDeclaringClass().getName() + "! Using default value of " +
-                                 defaultValue.name() + "!");
+            Share.LOG.warn("Invalid value "
+                           + name
+                           + " for enum configuration field "
+                           + field.getName()
+                           + " of type "
+                           + enumClass.getName()
+                           + " in config class "
+                           + field.getDeclaringClass().getName()
+                           + "! Using default value of "
+                           + defaultValue.name()
+                           + "!");
             return defaultValue;
         }
         return enumNameMap.get(name);

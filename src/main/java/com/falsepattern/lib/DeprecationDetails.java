@@ -34,6 +34,7 @@ import java.lang.annotation.RetentionPolicy;
 @StableAPI(since = "0.10.0")
 public @interface DeprecationDetails {
     @StableAPI.Expose String deprecatedSince();
+
     @StableAPI.Expose(since = "0.11.0") String replacement() default "";
 
     /**

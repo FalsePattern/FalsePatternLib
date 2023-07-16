@@ -44,10 +44,11 @@ public class BooleanConfigField extends AConfigField<Boolean> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class))
                                .map(Config.DefaultBoolean::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultBoolean annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultBoolean annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return field.getType().isPrimitive() ? field.getBoolean(null)
                                                                             : (Boolean) field.get(null);

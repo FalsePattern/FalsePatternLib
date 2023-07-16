@@ -150,8 +150,8 @@ public class UniversalMethod {
             return javaMethodCache;
         }
         val parentClass = parent.asJavaClass();
-        javaMethodCache = parentClass.getDeclaredMethod(getName(parent.realClassMapping()), decodeMethodDescriptor(
-                getDescriptor(parent.realClassMapping())));
+        javaMethodCache = parentClass.getDeclaredMethod(getName(parent.realClassMapping()),
+                                                        decodeMethodDescriptor(getDescriptor(parent.realClassMapping())));
         ReflectionUtil.jailBreak(javaMethodCache);
         return javaMethodCache;
     }
@@ -175,7 +175,10 @@ public class UniversalMethod {
 
     @StableAPI.Expose
     public MethodInsnNode asInstruction(int opcode, MappingType mapping, boolean itf) {
-        return new MethodInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping),
-                                  getDescriptor(mapping), itf);
+        return new MethodInsnNode(opcode,
+                                  parent.getName(NameType.Internal, mapping),
+                                  getName(mapping),
+                                  getDescriptor(mapping),
+                                  itf);
     }
 }

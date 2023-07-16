@@ -63,23 +63,34 @@ public class ConfigValidationFailureEvent extends Event {
     public static void postNumericRangeOutOfBounds(Field field, int listIndex, String value, String min, String max) {
         FMLCommonHandler.instance()
                         .bus()
-                        .post(new NumericRangeOutOfBounds(field.getDeclaringClass(), field.getName(), listIndex, value,
-                                                          min, max));
+                        .post(new NumericRangeOutOfBounds(field.getDeclaringClass(),
+                                                          field.getName(),
+                                                          listIndex,
+                                                          value,
+                                                          min,
+                                                          max));
     }
 
     @StableAPI.Internal
     public static void postSize(Field field, int requestedSize, boolean fixedSize, int maxSize, int defaultSize) {
         FMLCommonHandler.instance()
                         .bus()
-                        .post(new ListSizeOutOfBounds(field.getDeclaringClass(), field.getName(), requestedSize,
-                                                      fixedSize, maxSize, defaultSize));
+                        .post(new ListSizeOutOfBounds(field.getDeclaringClass(),
+                                                      field.getName(),
+                                                      requestedSize,
+                                                      fixedSize,
+                                                      maxSize,
+                                                      defaultSize));
     }
 
     @StableAPI.Internal
     public static void postStringSizeOutOfBounds(Field field, int listIndex, String text, int maxSize) {
         FMLCommonHandler.instance()
                         .bus()
-                        .post(new StringSizeOutOfBounds(field.getDeclaringClass(), field.getName(), listIndex, text,
+                        .post(new StringSizeOutOfBounds(field.getDeclaringClass(),
+                                                        field.getName(),
+                                                        listIndex,
+                                                        text,
                                                         maxSize));
     }
 
@@ -92,7 +103,10 @@ public class ConfigValidationFailureEvent extends Event {
     public static void postStringPatternMismatch(Field field, int listIndex, String text, String pattern) {
         FMLCommonHandler.instance()
                         .bus()
-                        .post(new StringPatternMismatch(field.getDeclaringClass(), field.getName(), listIndex, text,
+                        .post(new StringPatternMismatch(field.getDeclaringClass(),
+                                                        field.getName(),
+                                                        listIndex,
+                                                        text,
                                                         pattern));
     }
 
@@ -100,11 +114,13 @@ public class ConfigValidationFailureEvent extends Event {
     @StableAPI.Internal
     public void toast() {
         val ann = configClass.getAnnotation(Config.class);
-        val toast = new SimpleToast(ToastBG.TOAST_DARK, null,
+        val toast = new SimpleToast(ToastBG.TOAST_DARK,
+                                    null,
                                     FormattedText.parse(EnumChatFormatting.RED + "Config validation failed")
                                                  .toChatText()
                                                  .get(0),
-                                    FormattedText.parse(ann.modid() + ":" + ann.category()).toChatText().get(0), false,
+                                    FormattedText.parse(ann.modid() + ":" + ann.category()).toChatText().get(0),
+                                    false,
                                     2000);
         GuiToast.add(toast);
     }
@@ -122,7 +138,7 @@ public class ConfigValidationFailureEvent extends Event {
             errorString.append("\nArray index: ").append(listIndex);
         }
         customText(errorString);
-        for (val line: errorString.toString().split("\n")) {
+        for (val line : errorString.toString().split("\n")) {
             Share.LOG.error(line);
         }
     }

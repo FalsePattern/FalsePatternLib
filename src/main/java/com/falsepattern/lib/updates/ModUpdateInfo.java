@@ -46,8 +46,11 @@ public class ModUpdateInfo {
 
     @StableAPI.Expose
     public void log(Logger logger) {
-        logger.info("Updates are available for mod {}: Currently installed version is {}, " +
-                    "latest available version is {}. Update URL: {}", modID, currentVersion, latestVersion,
+        logger.info("Updates are available for mod {}: Currently installed version is {}, "
+                    + "latest available version is {}. Update URL: {}",
+                    modID,
+                    currentVersion,
+                    latestVersion,
                     updateURL.isEmpty() ? "unavailable" : updateURL);
     }
 }

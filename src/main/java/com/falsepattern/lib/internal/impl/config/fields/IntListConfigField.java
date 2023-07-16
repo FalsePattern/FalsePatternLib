@@ -49,10 +49,11 @@ public class IntListConfigField extends AListConfigField<int[]> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultIntList.class))
                                .map(Config.DefaultIntList::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultIntList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultIntList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return (int[]) field.get(null);
                                    } catch (IllegalAccessException e) {
@@ -107,8 +108,11 @@ public class IntListConfigField extends AListConfigField<int[]> {
         for (int j = 0; j < ints.length; j++) {
             int i = ints[j];
             if (i < min || i > max) {
-                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Integer.toString(i),
-                                                                         Integer.toString(min), Integer.toString(max));
+                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field,
+                                                                         j,
+                                                                         Integer.toString(i),
+                                                                         Integer.toString(min),
+                                                                         Integer.toString(max));
                 valid = false;
             }
         }

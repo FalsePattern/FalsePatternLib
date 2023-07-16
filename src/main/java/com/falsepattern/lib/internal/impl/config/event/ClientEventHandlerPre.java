@@ -61,19 +61,23 @@ public class ClientEventHandlerPre {
     public void onConfigSyncFinished(ConfigSyncEvent.End e) {
         val cfg = e.configClass.getAnnotation(Config.class);
         if (e.successful) {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
+            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
+                                         null,
                                          FormattedText.parse(EnumChatFormatting.GREEN + "Synced config")
                                                       .toChatText()
                                                       .get(0),
                                          FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false, 5000));
+                                         false,
+                                         5000));
         } else {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK, null,
+            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
+                                         null,
                                          FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config")
                                                       .toChatText()
                                                       .get(0),
                                          FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false, 5000));
+                                         false,
+                                         5000));
         }
     }
 }

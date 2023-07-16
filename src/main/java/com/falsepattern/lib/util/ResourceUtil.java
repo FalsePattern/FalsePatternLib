@@ -128,8 +128,10 @@ public final class ResourceUtil {
             }
         }
         //Fallback logic
-        System.out.println("Using fallback resource loading logic for " + resourcePath + " with reference to " +
-                           referenceClass.getName());
+        System.out.println("Using fallback resource loading logic for "
+                           + resourcePath
+                           + " with reference to "
+                           + referenceClass.getName());
         return referenceClass.getResourceAsStream(resourcePath);
     }
 

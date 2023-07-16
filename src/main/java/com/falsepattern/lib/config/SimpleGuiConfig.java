@@ -40,7 +40,12 @@ public class SimpleGuiConfig extends GuiConfig {
     @StableAPI.Expose(since = "0.10.0")
     public SimpleGuiConfig(GuiScreen parent, String modID, String modName, Class<?>... configClasses)
             throws ConfigException {
-        super(parent, ConfigurationManager.getConfigElementsMulti(configClasses), modID, false, false,
-              modName + " Configuration", I18n.format("falsepatternlib.gui.config.description"));
+        super(parent,
+              ConfigurationManager.getConfigElementsMulti(configClasses),
+              modID,
+              false,
+              false,
+              modName + " Configuration",
+              I18n.format("falsepatternlib.gui.config.description"));
     }
 }

@@ -49,10 +49,11 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDoubleList.class))
                                .map(Config.DefaultDoubleList::value)
                                .orElseGet(() -> {
-                                   Share.LOG
-                                                  .warn("The field " + field.getName() + " in class " +
-                                                        field.getDeclaringClass().getName() +
-                                                        " has no DefaultDoubleList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
+                                   Share.LOG.warn("The field "
+                                                  + field.getName()
+                                                  + " in class "
+                                                  + field.getDeclaringClass().getName()
+                                                  + " has no DefaultDoubleList annotation!\nThis will be a crash in FalsePatternLib 0.11, update your code!");
                                    try {
                                        return (double[]) field.get(null);
                                    } catch (IllegalAccessException e) {
@@ -107,8 +108,11 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
         for (int j = 0; j < doubles.length; j++) {
             double d = doubles[j];
             if (d < min || d > max) {
-                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field, j, Double.toString(d),
-                                                                         Double.toString(min), Double.toString(max));
+                ConfigValidationFailureEvent.postNumericRangeOutOfBounds(field,
+                                                                         j,
+                                                                         Double.toString(d),
+                                                                         Double.toString(min),
+                                                                         Double.toString(max));
                 valid = false;
             }
         }

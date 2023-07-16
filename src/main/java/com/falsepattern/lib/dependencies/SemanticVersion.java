@@ -111,9 +111,11 @@ public class SemanticVersion extends Version {
 
     @Override
     public String toString() {
+        // @formatter:off
         return majorVersion + (minorVersion < 0 ? "" : "." + minorVersion) +
                (patchVersion < 0 ? "" : "." + patchVersion) + (preRelease == null ? "" : "-" + preRelease) +
                (build == null ? "" : "+" + build);
+        // @formatter:on
     }
 
     @StableAPI(since = "0.10.0")
@@ -165,9 +167,17 @@ public class SemanticVersion extends Version {
 
         @Override
         public String toString() {
-            return "SemanticVersion.SemanticVersionBuilder(majorVersion=" + this.majorVersion + ", minorVersion=" +
-                   this.minorVersion + ", patchVersion=" + this.patchVersion + ", preRelease=" + this.preRelease +
-                   ", build=" + this.build + ")";
+            return "SemanticVersion.SemanticVersionBuilder(majorVersion="
+                   + this.majorVersion
+                   + ", minorVersion="
+                   + this.minorVersion
+                   + ", patchVersion="
+                   + this.patchVersion
+                   + ", preRelease="
+                   + this.preRelease
+                   + ", build="
+                   + this.build
+                   + ")";
         }
     }
 }

@@ -28,9 +28,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class RawVersion extends Version {
     public final String versionString;
+
     public RawVersion(String versionString) {
         this.versionString = versionString;
     }
+
     @Override
     public int compareTo(@NotNull Version o) {
         if (o instanceof RawVersion) {
