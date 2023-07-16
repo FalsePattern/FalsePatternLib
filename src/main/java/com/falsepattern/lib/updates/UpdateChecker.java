@@ -22,6 +22,7 @@ package com.falsepattern.lib.updates;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.updates.UpdateCheckerImpl;
 
 import net.minecraft.util.IChatComponent;
@@ -124,6 +125,7 @@ public final class UpdateChecker {
     @DeprecationDetails.RemovedInVersion("0.13")
     @StableAPI.Expose
     public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
+        Share.deprecatedWarning(new Throwable());
         return UpdateCheckerImpl.fetchUpdates(url);
     }
 
@@ -136,6 +138,7 @@ public final class UpdateChecker {
                         replacement = "fetchUpdatesAsyncV2")
     @DeprecationDetails.RemovedInVersion("0.13")
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
+        Share.deprecatedWarning(new Throwable());
         return UpdateCheckerImpl.fetchUpdatesAsync(url);
     }
     //endregion

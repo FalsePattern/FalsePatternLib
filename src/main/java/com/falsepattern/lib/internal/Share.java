@@ -45,4 +45,8 @@ public final class Share {
             throw new RuntimeException(e);
         }
     }
+
+    public static void deprecatedWarning(Throwable stacktrace) {
+        LOG.warn("DEPRECATED API CALLED!", stacktrace);
+    }
 }
