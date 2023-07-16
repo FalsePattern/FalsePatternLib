@@ -37,7 +37,6 @@ import java.util.concurrent.CompletableFuture;
 @DeprecationDetails(deprecatedSince = "0.11.0")
 @StableAPI(since = "0.6.0")
 public class DependencyLoader {
-
     @StableAPI.Expose
     public static void addMavenRepo(String url) {
         DependencyLoaderImpl.addMavenRepo(url);
@@ -51,112 +50,5 @@ public class DependencyLoader {
     @StableAPI.Expose(since = "0.10.0")
     public static void loadLibraries(Library... libraries) {
         DependencyLoaderImpl.loadLibraries(libraries);
-    }
-
-    /**
-     * Deprecated, but will be kept here due to mod compat for an undetermined duration.
-     */
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @StableAPI.Expose
-    public static void loadLibrary(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
-        DependencyLoaderImpl.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
-                                         regularSuffix, devSuffix);
-    }
-
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @StableAPI.Expose
-    @Deprecated
-    public static VoidBuilder builder() {
-        return new VoidBuilder();
-    }
-
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @StableAPI(since = "0.6.0")
-    public static class VoidBuilder {
-        private String loadingModId;
-        private String groupId;
-        private String artifactId;
-        private Version minVersion;
-        private Version maxVersion;
-        private Version preferredVersion;
-        private String regularSuffix;
-        private String devSuffix;
-
-        @Deprecated
-        VoidBuilder() {
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder loadingModId(@NonNull String loadingModId) {
-            this.loadingModId = loadingModId;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder groupId(@NonNull String groupId) {
-            this.groupId = groupId;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder artifactId(@NonNull String artifactId) {
-            this.artifactId = artifactId;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder minVersion(@NonNull Version minVersion) {
-            this.minVersion = minVersion;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder maxVersion(Version maxVersion) {
-            this.maxVersion = maxVersion;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder preferredVersion(@NonNull Version preferredVersion) {
-            this.preferredVersion = preferredVersion;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder regularSuffix(String regularSuffix) {
-            this.regularSuffix = regularSuffix;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public VoidBuilder devSuffix(String devSuffix) {
-            this.devSuffix = devSuffix;
-            return this;
-        }
-
-        @StableAPI.Expose
-        @Deprecated
-        public void build() {
-            DependencyLoader.loadLibrary(loadingModId, groupId, artifactId, minVersion, maxVersion, preferredVersion,
-                                         regularSuffix, devSuffix);
-        }
-
-        @Override
-        public String toString() {
-            return "DependencyLoader.VoidBuilder(loadingModId=" + this.loadingModId + ", groupId=" + this.groupId +
-                   ", artifactId=" + this.artifactId + ", minVersion=" + this.minVersion + ", maxVersion=" +
-                   this.maxVersion + ", preferredVersion=" + this.preferredVersion + ", regularSuffix=" +
-                   this.regularSuffix + ", devSuffix=" + this.devSuffix + ")";
-        }
     }
 }

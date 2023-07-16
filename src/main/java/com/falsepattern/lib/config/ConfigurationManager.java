@@ -103,21 +103,6 @@ public class ConfigurationManager {
     }
 
     /**
-     * Registers a configuration class to be loaded. This should be done early on.
-     *
-     * @param configClass The class to register.
-     */
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @StableAPI.Expose
-    public static void registerConfig(Class<?> configClass) throws ConfigException {
-        Share.LOG
-                       .warn("A mod is using the deprecated config registration method! The following exception contains the stacktrace.",
-                             new Exception());
-        ConfigurationManagerImpl.registerLoadSaveConfig(configClass);
-    }
-
-    /**
      * Process the configuration into a list of config elements usable in config GUI code.
      *
      * @param configClass The class to process.

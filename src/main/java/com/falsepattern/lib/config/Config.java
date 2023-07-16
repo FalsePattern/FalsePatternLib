@@ -122,37 +122,6 @@ public @interface Config {
     }
 
     /**
-     * The range of possible values a float config can have.
-     * Notice: float configs are deprecated! Use double configs instead!
-     */
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @StableAPI(since = "0.6.0")
-    @interface RangeFloat {
-        @StableAPI.Expose float min() default -Float.MAX_VALUE;
-
-        @StableAPI.Expose float max() default Float.MAX_VALUE;
-    }
-
-    /**
-     * The default value for a float field. Not having a default is deprecated since 0.10, and will be strongly
-     * enforced in 0.11+!
-     * Notice: float configs are deprecated! Use double configs instead!
-     */
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.10.0")
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @StableAPI(since = "0.6.0")
-    @interface DefaultFloat {
-        @StableAPI.Expose float value();
-    }
-
-    /**
      * The range of possible values a double config can have.
      */
     @StableAPI(since = "0.10.0")
