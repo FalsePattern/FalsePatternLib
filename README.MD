@@ -1,4 +1,4 @@
-A library for 1.7.10 with lots of useful stuff, licensed under the LGPL3.0+SNEED license.
+A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 license.
 
 | Package                                                         | Contents / Purpose                                                                                                                      |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
