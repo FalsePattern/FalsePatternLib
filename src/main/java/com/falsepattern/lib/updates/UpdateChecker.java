@@ -121,6 +121,7 @@ public final class UpdateChecker {
     @Deprecated
     @DeprecationDetails(deprecatedSince = "0.11.0",
                         replacement = "fetchUpdatesV2")
+    @DeprecationDetails.RemovedInVersion("0.13")
     @StableAPI.Expose
     public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
         return UpdateCheckerImpl.fetchUpdates(url);
@@ -133,6 +134,7 @@ public final class UpdateChecker {
     @Deprecated
     @DeprecationDetails(deprecatedSince = "0.11.0",
                         replacement = "fetchUpdatesAsyncV2")
+    @DeprecationDetails.RemovedInVersion("0.13")
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
         return UpdateCheckerImpl.fetchUpdatesAsync(url);
     }
