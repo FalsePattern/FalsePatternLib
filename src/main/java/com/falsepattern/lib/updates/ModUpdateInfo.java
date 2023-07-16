@@ -25,6 +25,9 @@ import lombok.Data;
 import lombok.NonNull;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Information about a new version of a mod.
+ */
 @Data
 @StableAPI(since = "0.8.0")
 public class ModUpdateInfo {

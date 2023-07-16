@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.updates;
 
+import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.updates.UpdateCheckerImpl;
 
@@ -30,15 +31,6 @@ import java.util.concurrent.CompletableFuture;
 
 @StableAPI(since = "0.8.0")
 public final class UpdateChecker {
-    /**
-     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
-     */
-    @StableAPI.Expose
-    @Deprecated
-    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        return UpdateCheckerImpl.fetchUpdatesAsync(url);
-    }
-
     /**
      * Checks for updates. The URL should be a JSON file that contains a list of mods, each with a mod ID, and one or more
      * versions. The JSON file must have the following format:
@@ -96,15 +88,6 @@ public final class UpdateChecker {
     }
 
     /**
-     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
-     */
-    @StableAPI.Expose
-    @Deprecated
-    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
-        return UpdateCheckerImpl.fetchUpdates(url);
-    }
-
-    /**
      * Same this as {@link #fetchUpdatesAsyncV2(String)}, but returns the result in a blocking fashion.
      *
      * @param url The URL to check
@@ -130,4 +113,28 @@ public final class UpdateChecker {
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
         return UpdateCheckerImpl.updateListToChatMessages(initiator, updates);
     }
+
+    //region deprecated
+    /**
+     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
+     */
+    @Deprecated
+    @DeprecationDetails(deprecatedSince = "0.11.0",
+                        replacement = "fetchUpdatesV2")
+    @StableAPI.Expose
+    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
+        return UpdateCheckerImpl.fetchUpdates(url);
+    }
+
+    /**
+     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
+     */
+    @StableAPI.Expose
+    @Deprecated
+    @DeprecationDetails(deprecatedSince = "0.11.0",
+                        replacement = "fetchUpdatesAsyncV2")
+    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
+        return UpdateCheckerImpl.fetchUpdatesAsync(url);
+    }
+    //endregion
 }

@@ -49,6 +49,64 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class UpdateCheckerImpl {
+    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsyncV2(String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return fetchUpdatesV2(url);
+            } catch (UpdateCheckException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static List<ModUpdateInfo> fetchUpdatesV2(String url) throws UpdateCheckException {
+        try {
+            val modList = fetchRootListShared(url);
+            val result = new ArrayList<ModUpdateInfo>();
+            val installedMods = Loader.instance().getIndexedModList();
+            for (val node : modList) {
+                if (!node.isJsonObject()) {
+                    continue;
+                }
+                val obj = node.getAsJsonObject();
+                if (!obj.has("modid")) {
+                    continue;
+                }
+                if (!obj.has("versions")) {
+                    continue;
+                }
+                val modid = obj.get("modid").getAsString();
+                if (!installedMods.containsKey(modid)) {
+                    continue;
+                }
+                val mod = installedMods.get(modid);
+                var versions = obj.get("versions");
+                if (!versions.isJsonArray()) {
+                    if (!versions.isJsonObject()) {
+                        continue;
+                    }
+                    val ver = versions.getAsJsonObject();
+                    versions = new JsonArray();
+                    versions.getAsJsonArray().add(ver);
+                }
+                val parsedVersions = parseVersionSpecs(versions.getAsJsonArray()).join();
+                val latestVersions = new ArrayList<String>();
+                for (val version : parsedVersions) {
+                    val versionObj = version.getAsJsonObject();
+                    latestVersions.add(versionObj.get("version").getAsString());
+                }
+                val currentVersion = mod.getVersion();
+                if (latestVersions.contains(currentVersion)) {
+                    continue;
+                }
+                val latest = parsedVersions.get(0).getAsJsonObject();
+                result.add(new ModUpdateInfo(modid, currentVersion, latest.get("version").getAsString(), latest.get("url").getAsString()));
+            }
+            return result;
+        } catch (Exception e) {
+            throw new UpdateCheckException("Failed to check for updates!", e);
+        }
+    }
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
         if (updates == null || updates.size() == 0) {
             return null;
@@ -110,118 +168,6 @@ public final class UpdateCheckerImpl {
             modList.add(parsed);
         }
         return modList;
-    }
-
-    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        return CompletableFuture.supplyAsync(() -> {
-            val modList = fetchRootListShared(url);
-            val result = new ArrayList<ModUpdateInfo>();
-            val installedMods = Loader.instance().getIndexedModList();
-            for (val node : modList) {
-                if (!node.isJsonObject()) {
-                    continue;
-                }
-                val obj = node.getAsJsonObject();
-                if (!obj.has("modid")) {
-                    continue;
-                }
-                if (!obj.has("latestVersion")) {
-                    continue;
-                }
-                val modid = obj.get("modid").getAsString();
-                if (!installedMods.containsKey(modid)) {
-                    continue;
-                }
-                val mod = installedMods.get(modid);
-                val latestVersionsNode = obj.get("latestVersion");
-                List<String> latestVersions;
-                if (latestVersionsNode.isJsonPrimitive() && (latestVersionsNode.getAsJsonPrimitive().isString())) {
-                    latestVersions = Collections.singletonList(latestVersionsNode.getAsString());
-                } else if (latestVersionsNode.isJsonArray()) {
-                    latestVersions = new ArrayList<>();
-                    for (val version : latestVersionsNode.getAsJsonArray()) {
-                        if (!version.isJsonPrimitive() || !version.getAsJsonPrimitive().isString()) {
-                            continue;
-                        }
-                        latestVersions.add(version.getAsString());
-                    }
-                } else {
-                    continue;
-                }
-                val currentVersion = mod.getVersion();
-                if (latestVersions.contains(currentVersion)) {
-                    continue;
-                }
-                val updateURL = obj.has("updateURL") &&
-                                obj.get("updateURL").isJsonPrimitive() &&
-                                obj.get("updateURL").getAsJsonPrimitive().isString()
-                                ? obj.get("updateURL").getAsString()
-                                : "";
-                result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
-            }
-            return result;
-        });
-    }
-
-    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
-        try {
-            return fetchUpdatesAsync(url).join();
-        } catch (CompletionException e) {
-            try {
-                throw e.getCause();
-            } catch (UpdateCheckException e1) {
-                throw e1;
-            } catch (Throwable e1) {
-                throw new UpdateCheckException("Failed to check for updates!", e1);
-            }
-        }
-    }
-
-    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsyncV2(String url) {
-        return CompletableFuture.supplyAsync(() -> {
-            val modList = fetchRootListShared(url);
-            val result = new ArrayList<ModUpdateInfo>();
-            val installedMods = Loader.instance().getIndexedModList();
-            for (val node : modList) {
-                if (!node.isJsonObject()) {
-                    continue;
-                }
-                val obj = node.getAsJsonObject();
-                if (!obj.has("modid")) {
-                    continue;
-                }
-                if (!obj.has("versions")) {
-                    continue;
-                }
-                val modid = obj.get("modid").getAsString();
-                if (!installedMods.containsKey(modid)) {
-                    continue;
-                }
-                val mod = installedMods.get(modid);
-                var versions = obj.get("versions");
-                if (!versions.isJsonArray()) {
-                    if (!versions.isJsonObject()) {
-                        continue;
-                    }
-                    val ver = versions.getAsJsonObject();
-                    versions = new JsonArray();
-                    versions.getAsJsonArray().add(ver);
-                }
-                val parsedVersions = parseVersionSpecs(versions.getAsJsonArray()).join();
-                val latestVersions = new ArrayList<String>();
-                for (val version : parsedVersions) {
-                    val versionObj = version.getAsJsonObject();
-                    latestVersions.add(versionObj.get("version").getAsString());
-                }
-                val currentVersion = mod.getVersion();
-                if (latestVersions.contains(currentVersion)) {
-                    continue;
-                }
-                val latest = parsedVersions.get(0).getAsJsonObject();
-                result.add(new ModUpdateInfo(modid, currentVersion, latest.get("version").getAsString(), latest.get("url").getAsString()));
-            }
-            return result;
-        });
     }
 
     private static String getString(JsonObject object, String entry) {
@@ -318,9 +264,63 @@ public final class UpdateCheckerImpl {
         return result;
     }
 
-    public static List<ModUpdateInfo> fetchUpdatesV2(String url) throws UpdateCheckException {
+    //region deprecated
+    @Deprecated
+    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            val modList = fetchRootListShared(url);
+            val result = new ArrayList<ModUpdateInfo>();
+            val installedMods = Loader.instance().getIndexedModList();
+            for (val node : modList) {
+                if (!node.isJsonObject()) {
+                    continue;
+                }
+                val obj = node.getAsJsonObject();
+                if (!obj.has("modid")) {
+                    continue;
+                }
+                if (!obj.has("latestVersion")) {
+                    continue;
+                }
+                val modid = obj.get("modid").getAsString();
+                if (!installedMods.containsKey(modid)) {
+                    continue;
+                }
+                val mod = installedMods.get(modid);
+                val latestVersionsNode = obj.get("latestVersion");
+                List<String> latestVersions;
+                if (latestVersionsNode.isJsonPrimitive() && (latestVersionsNode.getAsJsonPrimitive().isString())) {
+                    latestVersions = Collections.singletonList(latestVersionsNode.getAsString());
+                } else if (latestVersionsNode.isJsonArray()) {
+                    latestVersions = new ArrayList<>();
+                    for (val version : latestVersionsNode.getAsJsonArray()) {
+                        if (!version.isJsonPrimitive() || !version.getAsJsonPrimitive().isString()) {
+                            continue;
+                        }
+                        latestVersions.add(version.getAsString());
+                    }
+                } else {
+                    continue;
+                }
+                val currentVersion = mod.getVersion();
+                if (latestVersions.contains(currentVersion)) {
+                    continue;
+                }
+                val updateURL = obj.has("updateURL") &&
+                                obj.get("updateURL").isJsonPrimitive() &&
+                                obj.get("updateURL").getAsJsonPrimitive().isString()
+                                ? obj.get("updateURL").getAsString()
+                                : "";
+                result.add(new ModUpdateInfo(modid, currentVersion, latestVersions.get(0), updateURL));
+            }
+            return result;
+        });
+    }
+
+    @Deprecated
+    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
         try {
-            return fetchUpdatesAsyncV2(url).join();
+            return fetchUpdatesAsync(url).join();
         } catch (CompletionException e) {
             try {
                 throw e.getCause();
@@ -331,4 +331,5 @@ public final class UpdateCheckerImpl {
             }
         }
     }
+    //endregion
 }

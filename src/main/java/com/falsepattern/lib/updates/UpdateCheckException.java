@@ -22,6 +22,10 @@ package com.falsepattern.lib.updates;
 
 import com.falsepattern.lib.StableAPI;
 
+/**
+ * Exception only thrown by methods of {@link UpdateChecker}.
+ * Please don't throw this in your own code, only catch/handle it.
+ */
 @StableAPI(since = "0.8.3")
 public class UpdateCheckException extends Exception {
     @StableAPI.Internal
