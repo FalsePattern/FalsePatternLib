@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2022 FalsePattern
+ * Copyright (C) 2022-2023 FalsePattern
  * All Rights Reserved
  *
- * The above copyright notice, this permission notice and the word "SNEED"
+ * The above copyright notice and this permission notice
  * shall be included in all copies or substantial portions of the Software.
  *
  * This program is free software: you can redistribute it and/or modify
