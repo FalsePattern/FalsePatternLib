@@ -215,14 +215,10 @@ public class DependencyLoaderImpl {
         Internet.transferAndClose(is, new BufferedOutputStream(Files.newOutputStream(target.toPath())));
     }
 
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.11.0")
     public static void loadLibraries(Library... libraries) {
         loadLibrariesAsync(libraries).join();
     }
 
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.11.0")
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         val futures = new ArrayList<CompletableFuture<Void>>();
         for (val library : libraries) {

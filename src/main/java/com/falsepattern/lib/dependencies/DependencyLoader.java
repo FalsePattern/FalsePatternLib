@@ -29,12 +29,9 @@ import java.util.concurrent.CompletableFuture;
 
 
 /**
- * DEPRECATED. See the DEPENDENCIES.MD files in the root of the resources for more information.
- * <p>
- * This class will stay here for legacy compatibility
+ * For regular external dependencies, see the DEPENDENCIES.MD files in the root of the resources for more information.
+ * If you need more power than the one provided by the json format, you may use this class for granular loading instead.
  */
-@Deprecated
-@DeprecationDetails(deprecatedSince = "0.11.0")
 @StableAPI(since = "0.6.0")
 public class DependencyLoader {
     @StableAPI.Expose

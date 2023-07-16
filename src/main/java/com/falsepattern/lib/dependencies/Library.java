@@ -25,8 +25,6 @@ import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 
-@Deprecated
-@DeprecationDetails(deprecatedSince = "0.11.0")
 @StableAPI(since = "0.10.0")
 public class Library {
     @StableAPI.Expose
