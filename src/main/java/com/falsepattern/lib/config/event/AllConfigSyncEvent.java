@@ -21,9 +21,9 @@
 package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.EventUtil;
 import lombok.val;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -44,13 +44,12 @@ public class AllConfigSyncEvent extends Event {
     @StableAPI.Internal
     public static boolean postStart() {
         val event = new Start();
-        FMLCommonHandler.instance().bus().post(event);
-        return !event.isCanceled();
+        return EventUtil.postOnCommonBus(event);
     }
 
     @StableAPI.Internal
     public static void postEnd() {
-        FMLCommonHandler.instance().bus().post(new End());
+        EventUtil.postOnCommonBus(new End());
     }
 
     @SideOnly(Side.CLIENT)

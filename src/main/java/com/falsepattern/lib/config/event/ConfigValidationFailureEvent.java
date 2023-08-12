@@ -22,6 +22,7 @@ package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.internal.EventUtil;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
@@ -30,7 +31,6 @@ import com.falsepattern.lib.toasts.icon.ToastBG;
 import lombok.val;
 
 import net.minecraft.util.EnumChatFormatting;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -61,53 +61,45 @@ public class ConfigValidationFailureEvent extends Event {
 
     @StableAPI.Internal
     public static void postNumericRangeOutOfBounds(Field field, int listIndex, String value, String min, String max) {
-        FMLCommonHandler.instance()
-                        .bus()
-                        .post(new NumericRangeOutOfBounds(field.getDeclaringClass(),
-                                                          field.getName(),
-                                                          listIndex,
-                                                          value,
-                                                          min,
-                                                          max));
+        EventUtil.postOnCommonBus(new NumericRangeOutOfBounds(field.getDeclaringClass(),
+                                                              field.getName(),
+                                                              listIndex,
+                                                              value,
+                                                              min,
+                                                              max));
     }
 
     @StableAPI.Internal
     public static void postSize(Field field, int requestedSize, boolean fixedSize, int maxSize, int defaultSize) {
-        FMLCommonHandler.instance()
-                        .bus()
-                        .post(new ListSizeOutOfBounds(field.getDeclaringClass(),
-                                                      field.getName(),
-                                                      requestedSize,
-                                                      fixedSize,
-                                                      maxSize,
-                                                      defaultSize));
+        EventUtil.postOnCommonBus(new ListSizeOutOfBounds(field.getDeclaringClass(),
+                                                          field.getName(),
+                                                          requestedSize,
+                                                          fixedSize,
+                                                          maxSize,
+                                                          defaultSize));
     }
 
     @StableAPI.Internal
     public static void postStringSizeOutOfBounds(Field field, int listIndex, String text, int maxSize) {
-        FMLCommonHandler.instance()
-                        .bus()
-                        .post(new StringSizeOutOfBounds(field.getDeclaringClass(),
-                                                        field.getName(),
-                                                        listIndex,
-                                                        text,
-                                                        maxSize));
+        EventUtil.postOnCommonBus(new StringSizeOutOfBounds(field.getDeclaringClass(),
+                                                            field.getName(),
+                                                            listIndex,
+                                                            text,
+                                                            maxSize));
     }
 
     @StableAPI.Internal
     public static void fieldIsNull(Field field, int listIndex) {
-        FMLCommonHandler.instance().bus().post(new FieldIsNull(field.getDeclaringClass(), field.getName(), listIndex));
+        EventUtil.postOnCommonBus(new FieldIsNull(field.getDeclaringClass(), field.getName(), listIndex));
     }
 
     @StableAPI.Internal
     public static void postStringPatternMismatch(Field field, int listIndex, String text, String pattern) {
-        FMLCommonHandler.instance()
-                        .bus()
-                        .post(new StringPatternMismatch(field.getDeclaringClass(),
-                                                        field.getName(),
-                                                        listIndex,
-                                                        text,
-                                                        pattern));
+        EventUtil.postOnCommonBus(new StringPatternMismatch(field.getDeclaringClass(),
+                                                            field.getName(),
+                                                            listIndex,
+                                                            text,
+                                                            pattern));
     }
 
     @SideOnly(Side.CLIENT)

@@ -21,34 +21,16 @@
 
 package com.falsepattern.lib.internal;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.Event;
 
-import net.minecraft.launchwrapper.Launch;
-
-import java.io.IOException;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Share {
-    public static final Logger LOG = LogManager.getLogger(Tags.MODNAME);
-
-    public static final boolean DEV_ENV;
-
-    static {
-        try {
-            val bs = Launch.classLoader.getClassBytes("net.minecraft.world.World");
-            DEV_ENV = bs != null;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+public class EventUtil {
+    public static boolean postOnCommonBus(Event event) {
+        if (!Share.EARLY_INIT_DONE) {
+            return false;
         }
-    }
-
-    public static boolean EARLY_INIT_DONE = false;
-
-    public static void deprecatedWarning(Throwable stacktrace) {
-        LOG.warn("DEPRECATED API CALLED!", stacktrace);
+        return FMLCommonHandler.instance()
+                               .bus()
+                               .post(event);
     }
 }

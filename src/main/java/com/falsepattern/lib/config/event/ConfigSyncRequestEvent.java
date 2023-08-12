@@ -21,9 +21,9 @@
 package com.falsepattern.lib.config.event;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.EventUtil;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event;
 
 import java.util.ArrayList;
@@ -43,12 +43,12 @@ public class ConfigSyncRequestEvent extends Event {
 
     @StableAPI.Expose
     public static void postClient() {
-        FMLCommonHandler.instance().bus().post(new Client());
+        EventUtil.postOnCommonBus(new Client());
     }
 
     @StableAPI.Expose
     public static void postServer(List<EntityPlayerMP> players) {
-        FMLCommonHandler.instance().bus().post(new Server(new ArrayList<>(players)));
+        EventUtil.postOnCommonBus(new Server(new ArrayList<>(players)));
     }
 
     @StableAPI(since = "0.10.0")
