@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.proxy;
 
+import com.falsepattern.lib.internal.config.InGameModOptionsFix;
 import com.falsepattern.lib.internal.impl.config.event.ClientEventHandlerPost;
 import com.falsepattern.lib.internal.impl.config.event.ClientEventHandlerPre;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
@@ -27,6 +28,7 @@ import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -45,6 +47,12 @@ public class ClientProxy extends CommonProxy {
         super.preInit(e);
         ClientEventHandlerPre.registerBus();
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @Override
+    public void init(FMLInitializationEvent e) {
+        super.init(e);
+        InGameModOptionsFix.init();
     }
 
     @Override

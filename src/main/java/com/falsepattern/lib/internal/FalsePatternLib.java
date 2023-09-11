@@ -27,6 +27,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -66,11 +67,15 @@ public class FalsePatternLib {
     }
 
     @Mod.EventHandler
+    public void init(FMLInitializationEvent e) {
+        proxy.init(e);
+    }
+
+    @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
         if (Loader.isModLoaded("gasstation")) {
             CoreLoadingPlugin.validateGasStation();
         }
         proxy.postInit(e);
     }
-
 }

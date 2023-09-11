@@ -45,6 +45,13 @@ public class LibraryConfig {
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_LIBRARY_DOWNLOADS;
 
+    @Config.Comment({"Fixes the mod options menu in-game.",
+                     "By default, the mod options when in already in a game will show \"Test1, Test2, DISABLED\" in bright red.",
+                     "This replaces that interface with the one from the main menu."})
+    @Config.LangKey("config.falsepatternlib.ingamemodoptionsfix")
+    @Config.DefaultBoolean(true)
+    public static boolean IN_GAME_MOD_OPTIONS_FIX;
+
     @Config.Comment("How \"loud\" the config error logging should be.")
     @Config.LangKey("config.falsepatternlib.configlogging")
     @Config.DefaultEnum("Log")
