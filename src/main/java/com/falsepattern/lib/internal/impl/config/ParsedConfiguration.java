@@ -174,7 +174,7 @@ public class ParsedConfiguration {
             cat.setRequiresMcRestart(true);
         }
         for (val field : configClass.getDeclaredFields()) {
-            if (field.getAnnotation(Config.Ignore.class) != null && (field.getModifiers() & Modifier.FINAL) != 0) {
+            if (field.getAnnotation(Config.Ignore.class) != null || (field.getModifiers() & Modifier.FINAL) != 0) {
                 continue;
             }
             field.setAccessible(true);
