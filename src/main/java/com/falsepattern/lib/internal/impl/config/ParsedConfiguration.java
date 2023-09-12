@@ -180,7 +180,9 @@ public class ParsedConfiguration {
             field.setAccessible(true);
             maxFieldNameLength = Math.max(maxFieldNameLength, field.getName().length());
             val fieldClass = field.getType();
-            val name = field.getName();
+            val name = Optional.ofNullable(field.getAnnotation(Config.Name.class))
+                               .map(Config.Name::value)
+                               .orElse(field.getName());
             AConfigField<?> configField;
             if (constructors.containsKey(fieldClass)) {
                 fields.put(name, configField = constructors.get(fieldClass).construct(field, rawConfig, category));
