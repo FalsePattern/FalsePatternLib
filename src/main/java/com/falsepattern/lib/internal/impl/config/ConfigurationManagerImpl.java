@@ -161,8 +161,9 @@ public final class ConfigurationManagerImpl {
     }
 
     public static void receiveReply(DataInput input) throws IOException {
-        if (!AllConfigSyncEvent.postStart()) {
-            Share.LOG.warn("Config synchronization was cancelled by event.");
+        if (AllConfigSyncEvent.postStart()) {
+            Share.LOG.warn("All config synchronization was cancelled by event.");
+            return;
         }
         int count = input.readInt();
         for (int i = 0; i < count; i++) {
@@ -182,7 +183,7 @@ public final class ConfigurationManagerImpl {
                                + serializedName);
                 continue;
             }
-            if (!ConfigSyncEvent.postStart(clazz)) {
+            if (ConfigSyncEvent.postStart(clazz)) {
                 input.skipBytes(dataSize);
                 Share.LOG.warn("Config synchronization was cancelled by event for: " + serializedName);
                 continue;
