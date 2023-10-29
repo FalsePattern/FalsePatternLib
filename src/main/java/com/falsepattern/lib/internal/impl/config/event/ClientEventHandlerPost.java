@@ -27,10 +27,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SideOnly(Side.CLIENT)
@@ -38,6 +44,7 @@ public final class ClientEventHandlerPost {
     private static final ClientEventHandlerPost INSTANCE = new ClientEventHandlerPost();
 
     public static void registerBus() {
+        MinecraftForge.EVENT_BUS.register(INSTANCE);
         FMLCommonHandler.instance().bus().register(INSTANCE);
     }
 
@@ -46,5 +53,23 @@ public final class ClientEventHandlerPost {
     @SubscribeEvent
     public void onSyncRequestClient(ConfigSyncRequestEvent.Client e) {
         ConfigurationManagerImpl.sendSyncRequest();
+    }
+
+    private AtomicBoolean shouldDoConfigSync = new AtomicBoolean(false);
+
+    @SneakyThrows
+    @SubscribeEvent
+    public void onJoinWorld(FMLNetworkEvent.ClientConnectedToServerEvent e) {
+        if (e.isLocal)
+            return;
+        shouldDoConfigSync.set(true);
+    }
+
+    @SneakyThrows
+    @SubscribeEvent
+    public void onJoinWorld(EntityJoinWorldEvent e) {
+        if (e.world.isRemote && e.entity instanceof EntityClientPlayerMP && shouldDoConfigSync.compareAndSet(true, false)) {
+            ConfigurationManagerImpl.sendSyncRequest();
+        }
     }
 }

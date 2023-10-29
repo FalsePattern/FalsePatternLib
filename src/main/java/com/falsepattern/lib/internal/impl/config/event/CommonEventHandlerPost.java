@@ -23,17 +23,13 @@ package com.falsepattern.lib.internal.impl.config.event;
 
 import com.falsepattern.lib.config.event.ConfigSyncRequestEvent;
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.val;
 
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -42,16 +38,7 @@ public class CommonEventHandlerPost {
     private static final CommonEventHandlerPost INSTANCE = new CommonEventHandlerPost();
 
     public static void registerBus() {
-        MinecraftForge.EVENT_BUS.register(INSTANCE);
         FMLCommonHandler.instance().bus().register(INSTANCE);
-    }
-
-    @SneakyThrows
-    @SubscribeEvent
-    public void onJoinWorld(EntityJoinWorldEvent e) {
-        if (e.world.isRemote && e.entity instanceof EntityClientPlayerMP) {
-            ConfigurationManagerImpl.sendSyncRequest();
-        }
     }
 
     @SubscribeEvent
