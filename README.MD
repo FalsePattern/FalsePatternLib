@@ -10,7 +10,6 @@ A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 licens
 | [mixin](src/main/java/com/falsepattern/lib/mixin)               | Mixin loader plugin boilerplate code                                                                                                    |
 | [text](src/main/java/com/falsepattern/lib/text)                 | Better Chat and GUI text processing                                                                                                     |
 | [toasts](src/main/java/com/falsepattern/lib/toasts)             | The toast system from newer versions, with some extras                                                                                  |
-| [updates](src/main/java/com/falsepattern/lib/updates)           | Helper code for update checking                                                                                                         |
 | [util](src/main/java/com/falsepattern/lib/util)                 | Additional utilities that do not fit the above categories, see below for more information                                               |
 
 The contents of the [util](src/main/java/com/falsepattern/lib/util) package so far:

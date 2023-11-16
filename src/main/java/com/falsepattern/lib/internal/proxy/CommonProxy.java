@@ -52,29 +52,8 @@ public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent e) {
         CommonEventHandlerPre.registerBus();
-        if (LibraryConfig.ENABLE_UPDATE_CHECKER) {
-            Share.LOG.info("Launching asynchronous update check.");
-            UpdateChecker.fetchUpdatesAsyncV2(FalsePatternLib.UPDATE_URL).thenApplyAsync(updates -> {
-                if (updates == null) {
-                    updates = Collections.emptyList();
-                }
-                if (updates.isEmpty()) {
-                    Share.LOG.info("No updates found.");
-                } else {
-                    Share.LOG.info("Found {} updates.", updates.size());
-                    for (val update : updates) {
-                        update.log(Share.LOG);
-                    }
-                }
-                return updates;
-            }).exceptionally(ex -> {
-                Share.LOG.error("Failed to check for updates!", ex);
-                return Collections.emptyList();
-            });
-        }
     }
 
-    @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
     }
 

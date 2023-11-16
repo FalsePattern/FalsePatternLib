@@ -23,124 +23,46 @@ package com.falsepattern.lib.updates;
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.Share;
-import com.falsepattern.lib.internal.impl.updates.UpdateCheckerImpl;
 
 import net.minecraft.util.IChatComponent;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Obsolete, marked for removal.
+ */
 @StableAPI(since = "0.8.0")
+@DeprecationDetails(deprecatedSince = "1.0.0",
+                    replacement = "None, the update checker system is being removed.")
+@DeprecationDetails.RemovedInVersion("1.1.0")
+@Deprecated
 public final class UpdateChecker {
     /**
-     * Checks for updates. The URL should be a JSON file that contains a list of mods, each with a mod ID, and one or more
-     * versions. The JSON file must have the following format:
-     * <pre>{@code
-     *  [
-     *      {
-     *          "modid": "modid",
-     *          "versions": [
-     *              {
-     *                  ...version object...
-     *              },
-     *              {
-     *                  ...version object...
-     *              }
-     *          ]
-     *      },
-     *      {
-     *          "modid": "modid2",
-     *          "versions": {
-     *              ...version object...
-     *          },
-     *          "updateURL": "https://example.com/mods/mymod2"
-     *      },
-     *      ...etc, one json object per mod.
-     *  ]
-     * }</pre>
-     * The currently supported version object formats are:
-     * <p>
-     * Raw version entry:
-     * <pre>{@code
-     * {
-     *     "type": "raw",
-     *     "version": "1.0.0",
-     *     "updateURL": "https://example.com/mods/mymod"
-     * }
-     * }</pre>
-     * <p>
-     * GitHub version entry:
-     * <pre>{@code
-     * {
-     *    "type": "github",
-     *    "repo": "Example/ExampleMod"
-     * }
-     * }</pre>
-     * <p>
-     * The GitHub version entry will automatically fetch the latest release from the specified repository using the GitHub API.
-     *
-     * @param url The URL to check
-     *
-     * @return A list of mods that were both available on the URL and installed
+     * Obsolete, marked for removal.
      */
     @StableAPI.Expose(since = "0.11.0")
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsyncV2(String url) {
-        return UpdateCheckerImpl.fetchUpdatesAsyncV2(url);
+        Share.deprecatedWarning(new Throwable());
+        return CompletableFuture.completedFuture(Collections.emptyList());
     }
 
     /**
-     * Same this as {@link #fetchUpdatesAsyncV2(String)}, but returns the result in a blocking fashion.
-     *
-     * @param url The URL to check
-     *
-     * @return A future that will contain the update info about mods that were both available on the URL and installed
-     *
-     * @throws UpdateCheckException If the update checker is disabled in config, the URL is invalid, or
+     * Obsolete, marked for removal.
      */
     @StableAPI.Expose(since = "0.11.0")
     public static List<ModUpdateInfo> fetchUpdatesV2(String url) throws UpdateCheckException {
-        return UpdateCheckerImpl.fetchUpdatesV2(url);
+        Share.deprecatedWarning(new Throwable());
+        return Collections.emptyList();
     }
 
     /**
-     * Formats the raw list of updates into lines of chat messages you can send to players.
-     *
-     * @param initiator Who/what/which mod did this update check
-     * @param updates   The list of updates to convert
-     *
-     * @return A list of chat messages that can be sent to players
+     * Obsolete, marked for removal.
      */
     @StableAPI.Expose
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
-        return UpdateCheckerImpl.updateListToChatMessages(initiator, updates);
-    }
-
-    //region deprecated
-
-    /**
-     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
-     */
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.11.0",
-                        replacement = "fetchUpdatesV2")
-    @DeprecationDetails.RemovedInVersion("0.13")
-    @StableAPI.Expose
-    public static List<ModUpdateInfo> fetchUpdates(String url) throws UpdateCheckException {
         Share.deprecatedWarning(new Throwable());
-        return UpdateCheckerImpl.fetchUpdates(url);
+        return Collections.emptyList();
     }
-
-    /**
-     * DEPRECATED: Use the V2 API instead. This is kept for backwards compatibility.
-     */
-    @StableAPI.Expose
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "0.11.0",
-                        replacement = "fetchUpdatesAsyncV2")
-    @DeprecationDetails.RemovedInVersion("0.13")
-    public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsync(String url) {
-        Share.deprecatedWarning(new Throwable());
-        return UpdateCheckerImpl.fetchUpdatesAsync(url);
-    }
-    //endregion
 }

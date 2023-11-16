@@ -18,44 +18,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.updates;
-
-import com.falsepattern.lib.DeprecationDetails;
-import com.falsepattern.lib.StableAPI;
-import lombok.Data;
-import lombok.NonNull;
-import org.apache.logging.log4j.Logger;
 
 /**
- * Obsolete, marked for removal.
+ * This package used to contain a system for checking for updates to mods.
+ * This system is being removed, and this package is being kept for backwards compatibility.
+ * Reasons for removal:
+ * - In older versions of the mod, this used to show a message in chat when an update was available. This was annoying and
+ *  not very useful, so it was removed.
+ * - In 0.12, the updates were shown only in the console, which is not very visible, so people didn't notice them.
+ * - The update checker system was very complicated and hard to maintain, and required externally hosted JSON files.
+ * <p>
+ * For anyone who wants to implement their own update checker, don't. Nobody cares about mod updates anyway,
+ * they will keep playing on ancient versions of the mod no matter what you do or how many critical bugs you fix.
  */
-@Data
-@StableAPI(since = "0.8.0")
 @DeprecationDetails(deprecatedSince = "1.0.0",
                     replacement = "None, the update checker system is being removed.")
 @DeprecationDetails.RemovedInVersion("1.1.0")
 @Deprecated
-public class ModUpdateInfo {
-    @NonNull
-    @StableAPI.Expose
-    public final String modID;
-    @NonNull
-    @StableAPI.Expose
-    public final String currentVersion;
-    @NonNull
-    @StableAPI.Expose
-    public final String latestVersion;
-    @NonNull
-    @StableAPI.Expose
-    public final String updateURL;
+package com.falsepattern.lib.updates;
 
-    @StableAPI.Expose
-    public void log(Logger logger) {
-        logger.info("Updates are available for mod {}: Currently installed version is {}, "
-                    + "latest available version is {}. Update URL: {}",
-                    modID,
-                    currentVersion,
-                    latestVersion,
-                    updateURL.isEmpty() ? "unavailable" : updateURL);
-    }
-}
+import com.falsepattern.lib.DeprecationDetails;

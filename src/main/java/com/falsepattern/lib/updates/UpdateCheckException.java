@@ -20,13 +20,17 @@
  */
 package com.falsepattern.lib.updates;
 
+import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 
 /**
- * Exception only thrown by methods of {@link UpdateChecker}.
- * Please don't throw this in your own code, only catch/handle it.
+ * Obsolete, marked for removal.
  */
 @StableAPI(since = "0.8.3")
+@DeprecationDetails(deprecatedSince = "1.0.0",
+                    replacement = "None, the update checker system is being removed.")
+@DeprecationDetails.RemovedInVersion("1.1.0")
+@Deprecated
 public class UpdateCheckException extends Exception {
     @StableAPI.Internal
     public UpdateCheckException(String message) {
