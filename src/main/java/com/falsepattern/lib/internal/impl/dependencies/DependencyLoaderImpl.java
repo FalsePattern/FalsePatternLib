@@ -45,18 +45,17 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -94,54 +93,71 @@ public class DependencyLoaderImpl {
         thread.setName("Dependency Download Thread " + counter.incrementAndGet());
         return thread;
     });
-    private static final File libDir;
+    private static final Path libDir;
+    private static final Path tempDir;
+
+    private static void ensureExists(Path directory) {
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                LOG.fatal("Failed to create directory {}", directory);
+                throw new RuntimeException("Failed to create directory " + directory, e);
+            }
+        }
+    }
 
     static {
-
-        var homeDir = System.getProperty("minecraft.sharedDataDir");
-        if (homeDir == null) {
-            homeDir = System.getenv("MINECRAFT_SHARED_DATA_DIR");
-            if (homeDir == null) {
-                homeDir = FileUtil.getMinecraftHome().getAbsolutePath();
-            }
+        Path homeDir;
+        String homeDirStr = System.getProperty("minecraft.sharedDataDir");
+        if (homeDirStr == null) {
+            homeDirStr = System.getenv("MINECRAFT_SHARED_DATA_DIR");
         }
-        val modsDir = Paths.get(homeDir, "mods").toFile();
-        val oldLibDir = new File(modsDir, "falsepattern");
-        libDir = new File(homeDir, "falsepattern");
-        if (!libDir.exists()) {
-            if (!libDir.mkdirs()) {
-                LOG.fatal("Failed to create directory {}", libDir);
-                throw new RuntimeException("Failed to create directory " + libDir);
-            }
+        if (homeDirStr == null) {
+            homeDir = FileUtil.getMinecraftHome().toPath();
+        } else {
+            homeDir = Paths.get(homeDirStr);
         }
-        if (oldLibDir.exists()) {
+        libDir = homeDir.resolve("falsepattern");
+        tempDir = homeDir.resolve(Paths.get("logs", "falsepattern_tmp"));
+        ensureExists(libDir);
+        ensureExists(tempDir);
+        val oldLibDir = homeDir.resolve(Paths.get("mods", "falsepattern"));
+        if (Files.exists(oldLibDir)) {
             LOG.info("Migrating old library folder. From: "
-                     + oldLibDir.getAbsolutePath()
+                     + oldLibDir.toAbsolutePath()
                      + ", To: "
-                     + libDir.getAbsolutePath());
-            val oldFiles = oldLibDir.listFiles();
-            if (oldFiles != null) {
-                for (val file : oldFiles) {
+                     + libDir.toAbsolutePath());
+            try (val oldFiles = Files.list(oldLibDir)) {
+                oldFiles.forEach(file -> {
                     try {
-                        Files.move(file.toPath(),
-                                   libDir.toPath().resolve(oldLibDir.toPath().relativize(file.toPath())),
+                        Files.move(file,
+                                   libDir.resolve(oldLibDir.relativize(file)),
                                    StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
-                        LOG.warn("Failed to move file " + file.getName() + " to new dir! Deleting instead.");
+                        LOG.warn("Failed to move file " + file.getFileName() + " to new dir! Deleting instead.");
                         try {
-                            Files.deleteIfExists(file.toPath());
+                            Files.deleteIfExists(file);
                         } catch (IOException ex) {
-                            LOG.warn("Failed to delete file " + file.getPath() + "!");
-                            file.deleteOnExit();
+                            LOG.warn("Failed to delete file " + file + "!", ex);
                         }
                     }
-                }
+                });
+            } catch (IOException e) {
+                LOG.warn("Failed to iterate old library directory!", e);
             }
             try {
-                Files.deleteIfExists(oldLibDir.toPath());
+                Files.deleteIfExists(oldLibDir);
             } catch (IOException e) {
-                LOG.warn("Failed to delete old library directory!");
-                oldLibDir.deleteOnExit();
+                LOG.warn("Failed to delete old library directory!", e);
+            }
+        }
+        var oldCacheFile = libDir.resolve(".depscan_cache");
+        if (Files.exists(oldCacheFile)) {
+            try {
+                Files.delete(oldCacheFile);
+            } catch (IOException e) {
+                LOG.warn("Failed to delete old depscan cache file!", e);
             }
         }
     }
@@ -168,8 +184,8 @@ public class DependencyLoaderImpl {
     }
 
     @SneakyThrows
-    private static String hash(String algo, File file) {
-        byte[] data = Files.readAllBytes(file.toPath());
+    private static String hash(String algo, Path file) {
+        byte[] data = Files.readAllBytes(file);
         switch (algo) {
             case "md5":
                 algo = "MD5";
@@ -187,29 +203,31 @@ public class DependencyLoaderImpl {
         return digest(algo, data);
     }
 
-    private static void checkedDelete(File file) {
-        if (!file.delete()) {
+    private static void checkedDelete(Path file) {
+        try {
+            Files.delete(file);
+        } catch (IOException e) {
             LOG.fatal("Failed to delete file {}", file);
-            throw new RuntimeException("Failed to delete file " + file);
+            throw new RuntimeException("Failed to delete file " + file, e);
         }
     }
 
-    private static synchronized void addToClasspath(File file) {
+    private static synchronized void addToClasspath(Path file) {
         try {
             val cl = (LaunchClassLoader) DependencyLoaderImpl.class.getClassLoader();
-            cl.addURL(file.toURI().toURL());
-            LOG.debug("Injected file {} into classpath!", file.getPath());
+            cl.addURL(file.toUri().toURL());
+            LOG.debug("Injected file {} into classpath!", file);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to add library to classpath: " + file.getAbsolutePath(), e);
+            throw new RuntimeException("Failed to add library to classpath: " + file.toAbsolutePath(), e);
         }
     }
 
     @SneakyThrows
-    private static void download(InputStream is, File target) {
-        if (target.exists()) {
+    private static void download(InputStream is, Path target) {
+        if (Files.exists(target)) {
             return;
         }
-        Internet.transferAndClose(is, new BufferedOutputStream(Files.newOutputStream(target.toPath())));
+        Internet.transferAndClose(is, new BufferedOutputStream(Files.newOutputStream(target)));
     }
 
     public static void loadLibraries(Library... libraries) {
@@ -258,53 +276,55 @@ public class DependencyLoaderImpl {
                 LOG.error("Failed to open jar file {}", source.getPath());
             }
         } else {
-            val dir = new File(fileName);
-            if (!dir.exists() || !dir.isDirectory()) {
+            val dir = Paths.get(fileName);
+            if (!Files.exists(dir) || !Files.isDirectory(dir)) {
                 LOG.warn("Skipping non-directory, nor jar source: {}", source);
                 return false;
             }
             //Scan directory for json in META-INF, add them to the list
-            val metaInf = new File(dir, "META-INF");
-            if (!metaInf.exists() || !metaInf.isDirectory()) {
+            val metaInf = dir.resolve("META-INF");
+            if (!Files.exists(metaInf) || !Files.isDirectory(metaInf)) {
                 return false;
             }
-            val files = metaInf.listFiles();
-            if (files == null) {
-                return false;
-            }
-            for (val file : files) {
-                if (!file.getName().endsWith(".json")) {
-                    continue;
-                }
-                try {
-                    output.add(file.toURI().toURL());
-                    found = true;
-                } catch (MalformedURLException e) {
-                    LOG.error("Failed to add json source {} to dependency source list: {}", file.getName(), e);
-                }
+            try (val files = Files.list(metaInf)) {
+                found = files.reduce(false, (prev,file) -> {
+                    if (!file.endsWith(".json")) {
+                        return prev;
+                    }
+                    try {
+                        output.add(file.toUri().toURL());
+                        return true;
+                    } catch (MalformedURLException e) {
+                        LOG.error("Failed to add json source {} to dependency source list: {}", file.getFileName(), e);
+                    }
+                    return prev;
+                }, (a,b) -> a || b);
+            } catch (IOException e) {
+                LOG.error("Failed to open directory {}", metaInf);
             }
         }
         return found;
     }
 
-    private static Stream<URL> grabSourceCandidatesFromFolder(File folder) {
-        if (!folder.exists() || !folder.isDirectory()) {
-            LOG.warn("File does not exist or is not a directory: {}", folder);
-        } else {
-            val files = folder.listFiles();
-            if (files == null) {
-                LOG.warn("Folder is not readable: {}", folder);
-            } else {
-                return Arrays.stream(files).map(file -> {
-                    try {
-                        return file.toURI().toURL();
-                    } catch (MalformedURLException e) {
-                        return null;
-                    }
-                }).filter(Objects::nonNull);
-            }
+    private static Stream<URL> grabSourceCandidatesFromFolder(Path folder) {
+        if (!Files.exists(folder) || !Files.isDirectory(folder)) {
+            return Stream.empty();
         }
-        return Stream.empty();
+        Stream<Path> paths;
+        try (val files = Files.list(folder)) {
+            //Lazy loading is bad here
+            paths = files.collect(Collectors.toSet()).stream();
+        } catch (IOException ignored) {
+            return Stream.empty();
+        }
+
+        return paths.map(file -> {
+            try {
+                return file.toUri().toURL();
+            } catch (MalformedURLException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull);
     }
 
     private static <A, B, C> Stream<Pair<A, B>> flatMap(Pair<A, C> pair, Function<C, Stream<B>> mapper) {
@@ -320,14 +340,14 @@ public class DependencyLoaderImpl {
 
     public static void scanDeps() {
         LOG.debug("Discovering dependency source candidates...");
-        val modsDir = new File(FileUtil.getMinecraftHome(), "mods");
-        val mods1710Dir = new File(modsDir, "1.7.10");
+        val modsDir = FileUtil.getMinecraftHomePath().resolve("mods");
+        val mods1710Dir = modsDir.resolve("1.7.10");
         long start = System.currentTimeMillis();
         val urlsWithoutDeps = new HashSet<String>();
-        val depCache = new File(libDir, ".depscan_cache");
-        if (depCache.exists()) {
+        val depCache = tempDir.resolve(".depscan_cache");
+        if (Files.exists(depCache)) {
             try {
-                urlsWithoutDeps.addAll(Files.readAllLines(depCache.toPath()));
+                urlsWithoutDeps.addAll(Files.readAllLines(depCache));
             } catch (IOException e) {
                 LOG.error("Could not read dependency scanner cache", e);
             }
@@ -344,7 +364,7 @@ public class DependencyLoaderImpl {
                 urlsWithoutDeps.add(candidate.toString());
             }
         }
-        try (val out = Files.newBufferedWriter(depCache.toPath())) {
+        try (val out = Files.newBufferedWriter(depCache)) {
             for (val noDep : urlsWithoutDeps) {
                 out.append(noDep).append(System.lineSeparator());
             }
@@ -500,7 +520,7 @@ public class DependencyLoaderImpl {
         private String artifact;
         private String mavenJarName;
         private String jarName;
-        private File file;
+        private Path file;
 
         private void load() {
             try {
@@ -586,11 +606,11 @@ public class DependencyLoaderImpl {
             mavenJarName =
                     String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
             jarName = groupId + "-" + mavenJarName;
-            file = new File(libDir, jarName);
+            file = libDir.resolve(jarName);
         }
 
         private boolean tryLoadingExistingFile() {
-            if (!file.exists()) {
+            if (!Files.exists(file)) {
                 return false;
             }
             try {
@@ -694,7 +714,7 @@ public class DependencyLoaderImpl {
         private ChecksumStatus validateChecksum(String url) throws IOException {
             for (val checksumType : CHECKSUM_TYPES) {
                 val checksumURL = url + "." + checksumType;
-                val checksumFile = new File(libDir, jarName + "." + checksumType);
+                val checksumFile = libDir.resolve(jarName + "." + checksumType);
                 LOG.debug("Attempting to get {} checksum...", checksumType);
                 val success = new AtomicBoolean(false);
                 Internet.connect(new URL(checksumURL),
@@ -715,20 +735,20 @@ public class DependencyLoaderImpl {
             return ChecksumStatus.MISSING;
         }
 
-        private ChecksumStatus validateChecksum(File file) throws IOException {
+        private ChecksumStatus validateChecksum(Path file) throws IOException {
             for (val checksumType : CHECKSUM_TYPES) {
-                val checksumFile = new File(libDir, jarName + "." + checksumType);
+                val checksumFile = libDir.resolve(jarName + "." + checksumType);
                 LOG.debug("Attempting to read {} checksum from file...", checksumType);
-                if (checksumFile.exists()) {
+                if (Files.exists(checksumFile)) {
                     return getChecksumStatus(file, checksumType, checksumFile);
                 }
             }
             return ChecksumStatus.MISSING;
         }
 
-        private ChecksumStatus getChecksumStatus(File file, String checksumType, File checksumFile) throws IOException {
+        private ChecksumStatus getChecksumStatus(Path file, String checksumType, Path checksumFile) throws IOException {
             val fileHash = hash(checksumType, file);
-            val referenceHash = new String(Files.readAllBytes(checksumFile.toPath()));
+            val referenceHash = new String(Files.readAllBytes(checksumFile));
             if (!fileHash.equals(referenceHash)) {
                 LOG.error("Failed {} checksum validation for {}.", checksumType, artifactLogName);
                 checkedDelete(file);

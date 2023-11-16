@@ -26,12 +26,19 @@ import lombok.experimental.UtilityClass;
 import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @UtilityClass
 @StableAPI(since = "0.8.2")
 public final class FileUtil {
     @StableAPI.Expose
     public static File getMinecraftHome() {
-        return Launch.minecraftHome == null ? new File(".") : Launch.minecraftHome;
+        return getMinecraftHomePath().toFile();
+    }
+
+    @StableAPI.Expose(since = "1.0.0")
+    public static Path getMinecraftHomePath() {
+        return Launch.minecraftHome == null ? Paths.get("").toAbsolutePath() : Launch.minecraftHome.toPath();
     }
 }
