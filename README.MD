@@ -2,6 +2,7 @@ A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 licens
 
 | Package                                                         | Contents / Purpose                                                                                                                      |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| [.](src/main/java/com/falsepattern/lib)                         | StableAPI and DeprecationDetails annotations                                                                                            |
 | [asm](src/main/java/com/falsepattern/lib/asm)                   | ASM helper code                                                                                                                         |
 | [compat](src/main/java/com/falsepattern/lib/compat)             | Code backported from vanilla 1.12.2                                                                                                     |
 | [config](src/main/java/com/falsepattern/lib/config)             | 1.12.2-style annotation-based config library                                                                                            |
