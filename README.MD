@@ -9,6 +9,7 @@ A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 licens
 | [dependencies](src/main/java/com/falsepattern/lib/dependencies) | Runtime dependency loader which uses Maven (DEPRECATED, see [The new data-driven dependency format](src/main/resources/DEPENDENCIES.md) |
 | [mapping](src/main/java/com/falsepattern/lib/mapping)           | Notch-SRG-MCP name mapping helper code                                                                                                  |
 | [mixin](src/main/java/com/falsepattern/lib/mixin)               | Mixin loader plugin boilerplate code                                                                                                    |
+| [optifine](src/main/java/com/falsepattern/lib/optifine)         | Tools for messing with OptiFine                                                                                                         |
 | [text](src/main/java/com/falsepattern/lib/text)                 | Better Chat and GUI text processing                                                                                                     |
 | [toasts](src/main/java/com/falsepattern/lib/toasts)             | The toast system from newer versions, with some extras                                                                                  |
 | [util](src/main/java/com/falsepattern/lib/util)                 | Additional utilities that do not fit the above categories, see below for more information                                               |

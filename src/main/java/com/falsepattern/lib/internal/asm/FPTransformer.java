@@ -29,6 +29,7 @@ import com.falsepattern.lib.internal.asm.transformers.ConfigOrderTransformer;
 import com.falsepattern.lib.internal.asm.transformers.GasStationValidatorTransformer;
 import com.falsepattern.lib.internal.asm.transformers.IMixinPluginTransformer;
 import com.falsepattern.lib.internal.asm.transformers.ITypeDiscovererTransformer;
+import com.falsepattern.lib.internal.impl.optifine.OptiFineTransformerHooksImpl;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +48,10 @@ public class FPTransformer implements SmartTransformer {
 
     @Getter
     private final Logger logger = LOG;
+
+    static {
+        OptiFineTransformerHooksImpl.init();
+    }
 
     public FPTransformer() {
         transformers = Arrays.asList(new IMixinPluginTransformer(),
