@@ -45,10 +45,12 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -276,7 +278,13 @@ public class DependencyLoaderImpl {
                 LOG.error("Failed to open jar file {}", source.getPath());
             }
         } else {
-            val dir = Paths.get(fileName);
+            Path dir;
+            try {
+                dir = Paths.get(source.toURI());
+            } catch (URISyntaxException e) {
+                LOG.error("Could not scan URL " + source + " for dependencies", e);
+                return false;
+            }
             if (!Files.exists(dir) || !Files.isDirectory(dir)) {
                 LOG.warn("Skipping non-directory, nor jar source: {}", source);
                 return false;
