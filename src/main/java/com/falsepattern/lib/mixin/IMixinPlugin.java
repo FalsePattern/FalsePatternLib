@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.walk;
@@ -119,7 +120,14 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
         val targetedMods = getTargetedModEnumValues();
         val loadedMods = Arrays.stream(targetedMods)
-                               .filter(mod -> (mod.isLoadInDevelopment() && isDevelopmentEnvironment) || loadJarOf(mod))
+                               //Java 21 compat
+                               .filter(new Predicate<ITargetedMod>() {
+                                   @Override
+                                   public boolean test(ITargetedMod mod) {
+                                       return (mod.isLoadInDevelopment() && isDevelopmentEnvironment)
+                                              || IMixinPlugin.this.loadJarOf(mod);
+                                   }
+                               })
                                .collect(Collectors.toList());
 
         for (val mod : targetedMods) {
