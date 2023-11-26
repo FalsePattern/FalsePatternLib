@@ -143,7 +143,7 @@ public class ASMUtil {
 
     @StableAPI.Expose
     public static MappingType discoverClassMappingType(ClassNode cn) {
-        if (CoreLoadingPlugin.isObfuscated()) {
+        if (!CoreLoadingPlugin.isObfuscated()) {
             if (MappingManager.containsClass(NameType.Internal, MappingType.MCP, cn.name)) {
                 return MappingType.MCP;
             }
@@ -157,7 +157,7 @@ public class ASMUtil {
 
     @StableAPI.Expose
     public static UniversalClass toUniversalClass(ClassNode cn) {
-        if (CoreLoadingPlugin.isObfuscated()) {
+        if (!CoreLoadingPlugin.isObfuscated()) {
             try {
                 return MappingManager.classForName(NameType.Internal, MappingType.MCP, cn.name);
             } catch (ClassNotFoundException e) {
