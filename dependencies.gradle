@@ -8,7 +8,6 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
 
     //Mod deps
-    compileOnly("org.spongepowered:mixin:0.8.5-gasstation_7")
-    compileOnly("com.llamalad7:MixinExtras:0.1.1-gasstation")
-    compileOnly("com.falsepattern:00gasstation-mc1.7.10:0.5.1:dev")
+    def unimixinsVersion = "0.1.14"
+    compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")
 }
