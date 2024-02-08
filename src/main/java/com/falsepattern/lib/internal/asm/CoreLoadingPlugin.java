@@ -62,7 +62,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         long end = System.nanoTime();
         Share.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest
-        Share.LOG.info("Initializing mapping manager...");
         MappingManager.initialize();
     }
 
