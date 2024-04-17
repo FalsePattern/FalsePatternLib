@@ -44,13 +44,9 @@ import org.jetbrains.annotations.NotNull;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

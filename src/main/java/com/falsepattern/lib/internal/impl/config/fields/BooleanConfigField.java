@@ -22,7 +22,6 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.Share;
 import lombok.SneakyThrows;
 
 import net.minecraftforge.common.config.Configuration;

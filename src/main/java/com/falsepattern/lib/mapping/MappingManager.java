@@ -22,8 +22,6 @@ package com.falsepattern.lib.mapping;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
 import com.falsepattern.lib.mapping.types.MappingType;
@@ -39,7 +37,6 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @StableAPI(since = "0.10.0")

@@ -21,8 +21,6 @@
 package com.falsepattern.lib.internal.proxy;
 
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.Share;
-import com.falsepattern.lib.internal.config.LibraryConfig;
 import com.falsepattern.lib.internal.impl.config.event.CommonEventHandlerPost;
 import com.falsepattern.lib.internal.impl.config.event.CommonEventHandlerPre;
 import com.falsepattern.lib.internal.impl.config.net.SyncPrompt;
@@ -31,16 +29,12 @@ import com.falsepattern.lib.internal.impl.config.net.SyncReply;
 import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequestHandler;
-import lombok.val;
 
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
-
-import java.util.Collections;
 
 public class CommonProxy {
     public void construct(FMLConstructionEvent e) {

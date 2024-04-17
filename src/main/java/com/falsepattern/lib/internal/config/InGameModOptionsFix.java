@@ -1,8 +1,6 @@
 package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 

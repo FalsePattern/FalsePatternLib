@@ -22,7 +22,6 @@
 package com.falsepattern.lib.internal.impl.optifine;
 
 import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
 import lombok.val;
 
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -30,10 +29,8 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class OptiFineTransformerHooksImpl {

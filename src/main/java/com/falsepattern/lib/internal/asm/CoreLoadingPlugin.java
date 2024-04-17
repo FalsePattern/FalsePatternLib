@@ -21,7 +21,6 @@
 package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 import com.falsepattern.lib.mapping.MappingManager;

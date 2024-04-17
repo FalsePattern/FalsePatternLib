@@ -21,7 +21,6 @@
 package com.falsepattern.lib.internal.impl.config.net;
 
 import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;

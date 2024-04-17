@@ -22,7 +22,6 @@ package com.falsepattern.lib.internal.impl.config.net;
 
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.Share;
 import lombok.val;
 
 import net.minecraft.client.Minecraft;

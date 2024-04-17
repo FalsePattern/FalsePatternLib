@@ -25,7 +25,6 @@ import com.falsepattern.lib.config.event.AllConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigSyncEvent;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.FalsePatternLib;
-import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.util.FileUtil;
 import com.google.common.collect.BiMap;
