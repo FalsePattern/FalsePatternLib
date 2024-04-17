@@ -1,6 +1,6 @@
 FalsePatternLib
 
-Copyright (C) 2022-2023 FalsePattern
+Copyright (C) 2022-2024 FalsePattern
 All Rights Reserved
 
 The above copyright notice and this permission notice
