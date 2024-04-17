@@ -31,13 +31,6 @@ public class LibraryConfig {
         ConfigurationManager.selfInit();
     }
 
-    @Config.Comment({"Used to control whether FalsePatternLib should check for outdated mods.",
-                     "If you're building a public modpack, you should turn this off so that your users don't "
-                     + "get nagged about outdated mods."})
-    @Config.LangKey("config.falsepatternlib.updatecheck")
-    @Config.DefaultBoolean(true)
-    public static boolean ENABLE_UPDATE_CHECKER;
-
     @Config.Comment({"Fixes the mod options menu in-game.",
                      "By default, the mod options when in already in a game will show \"Test1, Test2, DISABLED\" in bright red.",
                      "This replaces that interface with the one from the main menu."})

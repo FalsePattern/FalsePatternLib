@@ -31,7 +31,6 @@ import com.falsepattern.lib.internal.impl.config.net.SyncReply;
 import com.falsepattern.lib.internal.impl.config.net.SyncReplyHandler;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequestHandler;
-import com.falsepattern.lib.updates.UpdateChecker;
 import lombok.val;
 
 import cpw.mods.fml.common.Mod;

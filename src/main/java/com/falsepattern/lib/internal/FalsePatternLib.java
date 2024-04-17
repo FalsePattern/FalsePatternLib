@@ -44,7 +44,6 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
      guiFactory = Tags.GROUPNAME + ".internal.config.LibraryGuiFactory",
      acceptableRemoteVersions = "*")
 public class FalsePatternLib {
-    public static final String UPDATE_URL = "https://falsepattern.com/mc/api/v2/versions.json";
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 
     @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy",
