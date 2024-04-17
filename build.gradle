@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern72
+//version: 1656003793falsepattern75
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -322,13 +322,20 @@ repositories {
             name = "sponge2"
             url = "https://mvn.falsepattern.com/sponge"
         }
+        maven {
+            name = "jitpack"
+            url = "https://mvn.falsepattern.com/jitpack/"
+        }
     }
 }
 
-def unimixinsVersion = "0.1.14"
+def unimixinsVersion = "0.1.15"
 
 dependencies {
     if(usesMixins.toBoolean()) {
+        annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
+        annotationProcessor("com.google.guava:guava:24.1.1-jre")
+        annotationProcessor("com.google.code.gson:gson:2.8.6")
         annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")
         implementation("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")
         runtimeOnly('org.jetbrains:intellij-fernflower:1.2.1.16')
@@ -1025,6 +1032,10 @@ static unzip(String zipFileName, String outputDir) {
 configure(deobfParams) {
     group = 'forgegradle'
     description = 'Rename all obfuscated parameter names inherited from Minecraft classes'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 // Dependency Deobfuscation
