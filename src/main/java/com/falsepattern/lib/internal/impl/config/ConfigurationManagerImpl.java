@@ -23,6 +23,7 @@ package com.falsepattern.lib.internal.impl.config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.AllConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigSyncEvent;
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.impl.config.net.SyncRequest;
@@ -162,7 +163,7 @@ public final class ConfigurationManagerImpl {
 
     public static void receiveReply(DataInput input) throws IOException {
         if (AllConfigSyncEvent.postStart()) {
-            Share.LOG.warn("All config synchronization was cancelled by event.");
+            FPLog.LOG.warn("All config synchronization was cancelled by event.");
             return;
         }
         int count = input.readInt();
@@ -172,20 +173,20 @@ public final class ConfigurationManagerImpl {
             val opt = serializedNames.keySet().stream().filter((key) -> key.equals(serializedName)).findFirst();
             if (!opt.isPresent()) {
                 input.skipBytes(dataSize);
-                Share.LOG.warn("Server tried to sync config not registered on our side: " + serializedName);
+                FPLog.LOG.warn("Server tried to sync config not registered on our side: " + serializedName);
                 continue;
             }
             val clazz = serializedNames.get(opt.get());
             val config = parsedConfigMap.get(clazz);
             if (!config.sync) {
                 input.skipBytes(dataSize);
-                Share.LOG.warn("Server tried to sync config without @Synchronize annotation on our side: "
+                FPLog.LOG.warn("Server tried to sync config without @Synchronize annotation on our side: "
                                + serializedName);
                 continue;
             }
             if (ConfigSyncEvent.postStart(clazz)) {
                 input.skipBytes(dataSize);
-                Share.LOG.warn("Config synchronization was cancelled by event for: " + serializedName);
+                FPLog.LOG.warn("Config synchronization was cancelled by event for: " + serializedName);
                 continue;
             }
             val bytes = new byte[dataSize];

@@ -15,4 +15,11 @@ repositories {
         name = "repsy_ventooth"
         url = "https://repo.repsy.io/mvn/ventooth/public/"
     }
+    maven {
+        name = "horizon"
+        url = "https://mvn.falsepattern.com/horizon/"
+        content {
+            includeGroup("com.gtnewhorizons.retrofuturabootstrap")
+        }
+    }
 }

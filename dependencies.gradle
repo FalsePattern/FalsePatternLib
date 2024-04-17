@@ -7,6 +7,8 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:24.0.1")
 
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.2")
+
     //Mod deps
     def unimixinsVersion = "0.1.17"
     compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:$unimixinsVersion:dev")

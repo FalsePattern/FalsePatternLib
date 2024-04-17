@@ -1,5 +1,6 @@
 package com.falsepattern.lib.internal.config;
 
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -37,7 +38,7 @@ public final class InGameModOptionsFix {
             MODS_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
             MODS_FIELD = null;
-            Share.LOG.error("Failed to get field: cpw.mods.fml.client.GuiModList.mods,"
+            FPLog.LOG.error("Failed to get field: cpw.mods.fml.client.GuiModList.mods,"
                             + " In-Game Mod Options Fix will not work", e);
             return;
         }

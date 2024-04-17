@@ -21,6 +21,7 @@
 package com.falsepattern.lib.mapping;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
@@ -69,7 +70,7 @@ public class MappingManager {
                     if (time - lastInit < 10_000) {
                         continue;
                     }
-                    Share.LOG.info("Terminating MappingManager");
+                    FPLog.LOG.info("Terminating MappingManager");
                     internalLookup = null;
                     regularLookup = null;
                     initialized = false;
@@ -88,7 +89,7 @@ public class MappingManager {
             }
             initialized = true;
             val cleanupThread = new CleanupThread();
-            Share.LOG.info("Initializing MappingManager");
+            FPLog.LOG.info("Initializing MappingManager");
             internalLookup = new Lookup<>();
             regularLookup = new Lookup<>();
             val stringPool = new HashMap<String, String>();

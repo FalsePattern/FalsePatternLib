@@ -22,6 +22,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -102,7 +103,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
 
     private T getEnumByName(String name) {
         if (!enumNameMap.containsKey(name)) {
-            Share.LOG.warn("Invalid value "
+            FPLog.LOG.warn("Invalid value "
                            + name
                            + " for enum configuration field "
                            + field.getName()

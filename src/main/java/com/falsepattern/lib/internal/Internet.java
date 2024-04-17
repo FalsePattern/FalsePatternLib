@@ -45,22 +45,11 @@ import java.util.function.Consumer;
 public class Internet {
     private static final Map<String, String> NO_HEADERS = Collections.emptyMap();
 
-    public static void connect(URL URL, Consumer<Exception> onError, Consumer<InputStream> onSuccess) {
-        connect(URL, NO_HEADERS, onError, onSuccess);
+    public static void connect(URL URL, Consumer<Exception> onError, Consumer<InputStream> onSuccess, Consumer<Long> contentLengthCallback) {
+        connect(URL, NO_HEADERS, onError, onSuccess, contentLengthCallback);
     }
 
-    public static Map<String, String> constructHeaders(String... entries) {
-        if (entries.length % 2 != 0) {
-            throw new IllegalArgumentException("Entries must be in pairs");
-        }
-        val map = new java.util.HashMap<String, String>();
-        for (int i = 0; i < entries.length; i += 2) {
-            map.put(entries[i], entries[i + 1]);
-        }
-        return map;
-    }
-
-    public static void connect(URL URL, Map<String, String> headers, Consumer<Exception> onError, Consumer<InputStream> onSuccess) {
+    public static void connect(URL URL, Map<String, String> headers, Consumer<Exception> onError, Consumer<InputStream> onSuccess, Consumer<Long> contentLengthCallback) {
         try {
             val connection = (HttpURLConnection) URL.openConnection();
             connection.setConnectTimeout(3500);
@@ -85,6 +74,7 @@ public class Internet {
             if (connection.getResponseCode() != 200) {
                 onError.accept(new Exception("HTTP response code " + connection.getResponseCode()));
             } else {
+                contentLengthCallback.accept(connection.getContentLengthLong());
                 onSuccess.accept(connection.getInputStream());
             }
             connection.disconnect();
@@ -103,57 +93,14 @@ public class Internet {
         }
     }
 
-    public static CompletableFuture<byte[]> download(URL... urls) {
-        return CompletableFuture.supplyAsync(() -> {
-            val result = new ByteArrayOutputStream();
-            val caught = new AtomicReference<Exception>();
-            val success = new AtomicBoolean(false);
-            for (val url : urls) {
-                connect(url, caught::set, (input) -> {
-                    try {
-                        transferAndClose(input, result);
-                        success.set(true);
-                    } catch (IOException e) {
-                        throw new CompletionException(e);
-                    }
-                });
-                if (success.get()) {
-                    return result.toByteArray();
-                }
-            }
-            throw new CompletionException(caught.get());
-        });
-    }
-
-    public static CompletableFuture<Void> downloadFile(File file, URL... urls) {
-        return CompletableFuture.runAsync(() -> {
-            val caught = new AtomicReference<Exception>();
-            val success = new AtomicBoolean(false);
-            for (val url : urls) {
-                connect(url, caught::set, (input) -> {
-                    try {
-                        @Cleanup val outputStream = Files.newOutputStream(file.toPath());
-                        transferAndClose(input, outputStream);
-                        success.set(true);
-                    } catch (IOException e) {
-                        throw new CompletionException(e);
-                    }
-                });
-                if (success.get()) {
-                    return;
-                }
-            }
-            throw new CompletionException(caught.get());
-        });
-    }
-
-
-    public static void transferAndClose(InputStream is, OutputStream target) throws IOException {
+    public static void transferAndClose(InputStream is, OutputStream target, Consumer<Integer> downloadSizeCallback)
+            throws IOException {
         var bytesRead = 0;
 
-        byte[] smallBuffer = new byte[4096];
+        byte[] smallBuffer = new byte[256 * 1024];
         while ((bytesRead = is.read(smallBuffer)) >= 0) {
             target.write(smallBuffer, 0, bytesRead);
+            downloadSizeCallback.accept(bytesRead);
         }
         target.close();
         is.close();

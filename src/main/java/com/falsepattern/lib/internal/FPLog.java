@@ -18,31 +18,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal.impl.config.net;
 
-import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
+package com.falsepattern.lib.internal;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class FPLog {
+    public static final Logger LOG = LogManager.getLogger(Tags.MODNAME);
 
-public class SyncReplyHandler implements IMessageHandler<SyncReply, IMessage> {
-
-    @Override
-    public IMessage onMessage(SyncReply message, MessageContext ctx) {
-        if (ctx.side == Side.SERVER) {
-            //Do not sync client to server
-            return null;
-        }
-        try {
-            message.receive();
-        } catch (IOException e) {
-            FPLog.LOG.error("Failed to sync config", e);
-        }
-        return null;
+    public static void deprecatedWarning(Throwable stacktrace) {
+        LOG.warn("DEPRECATED API CALLED!", stacktrace);
     }
 }

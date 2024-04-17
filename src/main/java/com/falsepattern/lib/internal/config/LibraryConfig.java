@@ -38,13 +38,6 @@ public class LibraryConfig {
     @Config.DefaultBoolean(true)
     public static boolean ENABLE_UPDATE_CHECKER;
 
-    @Config.Comment({"Used to control whether FalsePatternLib should be allowed to use the internet.",
-                     "If this is disabled, library downloads will be blocked.",
-                     "Note that if a mod tries to download a library that is not downloaded yet, the game will crash."})
-    @Config.LangKey("config.falsepatternlib.disableinternet")
-    @Config.DefaultBoolean(true)
-    public static boolean ENABLE_LIBRARY_DOWNLOADS;
-
     @Config.Comment({"Fixes the mod options menu in-game.",
                      "By default, the mod options when in already in a game will show \"Test1, Test2, DISABLED\" in bright red.",
                      "This replaces that interface with the one from the main menu."})

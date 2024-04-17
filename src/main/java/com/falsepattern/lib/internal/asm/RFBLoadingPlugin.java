@@ -18,31 +18,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal.impl.config.net;
 
-import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Share;
+package com.falsepattern.lib.internal.asm;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
+import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
+import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 
-import java.io.IOException;
-
-public class SyncReplyHandler implements IMessageHandler<SyncReply, IMessage> {
-
-    @Override
-    public IMessage onMessage(SyncReply message, MessageContext ctx) {
-        if (ctx.side == Side.SERVER) {
-            //Do not sync client to server
-            return null;
-        }
-        try {
-            message.receive();
-        } catch (IOException e) {
-            FPLog.LOG.error("Failed to sync config", e);
-        }
-        return null;
+public class RFBLoadingPlugin implements RfbPlugin {
+    static {
+        LowLevelCallMultiplexer.rfbDetected();
+        DependencyLoaderImpl.executeDependencyLoading(false);
     }
 }

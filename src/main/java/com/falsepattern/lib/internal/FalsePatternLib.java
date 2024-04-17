@@ -52,7 +52,7 @@ public class FalsePatternLib {
     private static CommonProxy proxy;
 
     public FalsePatternLib() {
-        Share.LOG.info("Version " + Tags.VERSION + " initialized!");
+        FPLog.LOG.info("Version " + Tags.VERSION + " initialized!");
     }
 
     @Mod.EventHandler

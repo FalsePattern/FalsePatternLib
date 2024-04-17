@@ -23,6 +23,7 @@ package com.falsepattern.lib.config.event;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.internal.EventUtil;
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
@@ -131,7 +132,7 @@ public class ConfigValidationFailureEvent extends Event {
         }
         customText(errorString);
         for (val line : errorString.toString().split("\n")) {
-            Share.LOG.error(line);
+            FPLog.LOG.error(line);
         }
     }
 

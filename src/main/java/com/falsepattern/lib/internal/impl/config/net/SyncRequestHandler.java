@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.impl.config.net;
 
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Share;
 import lombok.val;
@@ -56,7 +57,7 @@ public class SyncRequestHandler implements IMessageHandler<SyncRequest, IMessage
             FalsePatternLib.NETWORK.sendTo(reply, ctx.getServerHandler().playerEntity);
             return null;
         } catch (IOException e) {
-            Share.LOG.error("Failed to sync config", e);
+            FPLog.LOG.error("Failed to sync config", e);
             return null;
         }
     }

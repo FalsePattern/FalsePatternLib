@@ -21,6 +21,7 @@
 
 package com.falsepattern.lib.internal.impl.optifine;
 
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 import lombok.val;
 
@@ -42,7 +43,7 @@ public class OptiFineTransformerHooksImpl {
         try {
             tField = LaunchClassLoader.class.getDeclaredField("transformers");
         } catch (NoSuchFieldException e) {
-            Share.LOG.error("Could not retrieve transformers field", e);
+            FPLog.LOG.error("Could not retrieve transformers field", e);
             return;
         }
         tField.setAccessible(true);
@@ -50,14 +51,14 @@ public class OptiFineTransformerHooksImpl {
         try {
             transformers = (List<IClassTransformer>)tField.get(Launch.classLoader);
         } catch (IllegalAccessException e) {
-            Share.LOG.error("Could not retrieve transformers list", e);
+            FPLog.LOG.error("Could not retrieve transformers list", e);
             return;
         }
         for (int i = 0; i < transformers.size(); i++) {
             val transformer = transformers.get(i);
             System.out.println(transformer.getClass().getName());
             if (transformer.getClass().getName().equals("optifine.OptiFineClassTransformer")) {
-                Share.LOG.info("Attaching OptiFine ASM transformer hooks");
+                FPLog.LOG.info("Attaching OptiFine ASM transformer hooks");
                 transformers.set(i, new WrappedOptiFineClassTransformer(transformer));
             }
         }

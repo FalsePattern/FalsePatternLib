@@ -20,6 +20,7 @@
  */
 package com.falsepattern.lib.internal.asm;
 
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
@@ -48,19 +49,19 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     private static boolean obfuscated;
 
     static {
-        Share.LOG.info("Removing skill issues...");
+        FPLog.LOG.info("Removing skill issues...");
         try {
             Class.forName("thermos.Thermos");
-            Share.LOG.fatal("Sorry, i prefer iced coffee.");
+            FPLog.LOG.fatal("Sorry, i prefer iced coffee.");
             throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
         } catch (ClassNotFoundException ignored) {
         }
         //Scan for dependencies now
-        Share.LOG.info("Scanning for deps...");
+        FPLog.LOG.info("Scanning for deps...");
         long start = System.nanoTime();
-        DependencyLoaderImpl.scanDeps();
+        DependencyLoaderImpl.executeDependencyLoading(true);
         long end = System.nanoTime();
-        Share.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
+        FPLog.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest
         MappingManager.initialize();
     }
@@ -116,7 +117,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     }
 
     public static void validateGasStation() {
-        Share.LOG.info("Got any gas?");
+        FPLog.LOG.info("Got any gas?");
         //Make sure everything is loaded correctly, crash if gasstation is bugged
         // @formatter:off
         if (!isClassPresentSafe("com.falsepattern.gasstation.core.GasStationCore") //Validate core class
@@ -126,7 +127,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
             || !isClassPresentSafe("org.spongepowered.asm.lib.Opcodes") //Validate correct mixins class
             || isClassPresentSafe("org.spongepowered.libraries.org.objectweb.asm.Opcodes")
         ) {
-            Share.LOG.fatal("Somebody put diesel in my gas tank!");
+            FPLog.LOG.fatal("Somebody put diesel in my gas tank!");
             throw new Error("Failed to validate your GasStation mixin plugin installation. "
                             + "Please make sure you have the latest GasStation installed from the official source: "
                             + "https://github.com/FalsePattern/GasStation");

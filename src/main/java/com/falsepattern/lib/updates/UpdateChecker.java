@@ -22,6 +22,7 @@ package com.falsepattern.lib.updates;
 
 import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Share;
 
 import net.minecraft.util.IChatComponent;
@@ -44,7 +45,7 @@ public final class UpdateChecker {
      */
     @StableAPI.Expose(since = "0.11.0")
     public static CompletableFuture<List<ModUpdateInfo>> fetchUpdatesAsyncV2(String url) {
-        Share.deprecatedWarning(new Throwable());
+        FPLog.deprecatedWarning(new Throwable());
         return CompletableFuture.completedFuture(Collections.emptyList());
     }
 
@@ -53,7 +54,7 @@ public final class UpdateChecker {
      */
     @StableAPI.Expose(since = "0.11.0")
     public static List<ModUpdateInfo> fetchUpdatesV2(String url) throws UpdateCheckException {
-        Share.deprecatedWarning(new Throwable());
+        FPLog.deprecatedWarning(new Throwable());
         return Collections.emptyList();
     }
 
@@ -62,7 +63,7 @@ public final class UpdateChecker {
      */
     @StableAPI.Expose
     public static List<IChatComponent> updateListToChatMessages(String initiator, List<ModUpdateInfo> updates) {
-        Share.deprecatedWarning(new Throwable());
+        FPLog.deprecatedWarning(new Throwable());
         return Collections.emptyList();
     }
 }
