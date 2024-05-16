@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
     private final int maxLength;
@@ -50,9 +51,13 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
     public EnumConfigField(Field field, Configuration configuration, String category) {
         super(field, configuration, category, Property.Type.STRING);
         enumClass = (Class<T>) field.getType();
+
+        val sj = new StringJoiner(", ", "[", "]");
         for (val e : enumClass.getEnumConstants()) {
+            sj.add(e.name());
             enumNameMap.put(e.name(), e);
         }
+
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultEnum.class))
                                .map(Config.DefaultEnum::value)
                                .map((defName) -> enumNameMap.values()
@@ -74,8 +79,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
         property.comment += "\n[default: "
                             + defaultValue
                             + ", possible values: "
-                            + Arrays.toString(enumNameMap.keySet()
-                                                         .toArray(new String[0]))
+                            + sj
                             + "]";
     }
 
