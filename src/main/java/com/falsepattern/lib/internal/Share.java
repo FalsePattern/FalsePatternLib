@@ -35,8 +35,6 @@ import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Share {
-    public static final Logger LOG = LogManager.getLogger(Tags.MODNAME);
-
     public static final boolean DEV_ENV;
 
     static {
@@ -49,8 +47,4 @@ public final class Share {
     }
 
     public static boolean EARLY_INIT_DONE = false;
-
-    public static void deprecatedWarning(Throwable stacktrace) {
-        LOG.warn("DEPRECATED API CALLED!", stacktrace);
-    }
 }

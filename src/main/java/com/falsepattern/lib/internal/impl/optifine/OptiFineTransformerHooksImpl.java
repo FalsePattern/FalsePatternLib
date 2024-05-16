@@ -55,7 +55,6 @@ public class OptiFineTransformerHooksImpl {
         }
         for (int i = 0; i < transformers.size(); i++) {
             val transformer = transformers.get(i);
-            System.out.println(transformer.getClass().getName());
             if (transformer.getClass().getName().equals("optifine.OptiFineClassTransformer")) {
                 FPLog.LOG.info("Attaching OptiFine ASM transformer hooks");
                 transformers.set(i, new WrappedOptiFineClassTransformer(transformer));

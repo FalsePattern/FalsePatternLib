@@ -23,6 +23,7 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.FPLog;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
@@ -125,15 +126,14 @@ public final class ResourceUtil {
                 URL resource = new URL("jar:" + file.substring(0, id) + "!" + resourcePath);
                 return resource.openStream();
             } catch (IOException e) {
-                System.err.println("Failed to load resource " + resourcePath + " from jar " + file.substring(0, id));
-                e.printStackTrace();
+                FPLog.LOG.error("Failed to load resource " + resourcePath + " from jar " + file.substring(0, id), e);
             }
         }
         //Fallback logic
-        System.out.println("Using fallback resource loading logic for "
-                           + resourcePath
-                           + " with reference to "
-                           + referenceClass.getName());
+        FPLog.LOG.warn("Using fallback resource loading logic for "
+                       + resourcePath
+                       + " with reference to "
+                       + referenceClass.getName());
         return referenceClass.getResourceAsStream(resourcePath);
     }
 
