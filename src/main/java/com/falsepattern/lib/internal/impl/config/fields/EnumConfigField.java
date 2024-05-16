@@ -52,7 +52,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
         super(field, configuration, category, Property.Type.STRING);
         enumClass = (Class<T>) field.getType();
 
-        val sj = new StringJoiner(", ");
+        val sj = new StringJoiner(", ", "[", "]");
         for (val e : enumClass.getEnumConstants()) {
             sj.add(e.name());
             enumNameMap.put(e.name(), e);
