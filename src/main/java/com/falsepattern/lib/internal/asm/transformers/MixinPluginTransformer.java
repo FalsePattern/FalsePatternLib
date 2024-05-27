@@ -23,17 +23,19 @@
 
 package com.falsepattern.lib.internal.asm.transformers;
 
-import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.FPTransformer;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class IMixinPluginTransformer implements IClassNodeTransformer {
+public class MixinPluginTransformer implements TurboClassTransformer {
     private static final String IMIXINPLUGIN = Tags.GROUPNAME + ".mixin.IMixinPlugin";
     private static final String IMIXINPLUGIN_INTERNAL = IMIXINPLUGIN.replace('.', '/');
     private static final String IMIXINCONFIGPLUGIN = "org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin";
@@ -57,25 +59,42 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
     }
 
     @Override
-    public String getName() {
-        return "IMixinPluginTransformer";
+    public String owner() {
+        return Tags.MODNAME;
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return IMIXINPLUGIN.equals(transformedName)
-               || IMIXINCONFIGPLUGIN.equals(transformedName)
-               || cn.interfaces.stream()
-                               .anyMatch((i) -> IMIXINPLUGIN_INTERNAL.equals(i)
-                                                || IMIXINCONFIGPLUGIN_INTERNAL.equals(i));
+    public String name() {
+        return "MixinPluginTransformer";
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
-        if (IMIXINCONFIGPLUGIN.equals(transformedName)) {
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        if (IMIXINPLUGIN.equals(className) ||
+            IMIXINCONFIGPLUGIN.equals(className))
+            return true;
+        if (classNode.isOriginal()) {
+            val meta = classNode.getOriginalMetadata();
+            if (meta != null && meta.interfacesCount == 0)
+                return false;
+        }
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
+        return cn.interfaces.stream()
+                            .anyMatch((i) -> IMIXINPLUGIN_INTERNAL.equals(i) ||
+                                             IMIXINCONFIGPLUGIN_INTERNAL.equals(i));
+    }
+
+    @Override
+    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return;
+        if (IMIXINCONFIGPLUGIN.equals(className)) {
             extractMixinConfigPluginData(cn);
         } else {
-            transformPlugin(cn, transformedName);
+            transformPlugin(cn);
         }
     }
 
@@ -101,8 +120,7 @@ public class IMixinPluginTransformer implements IClassNodeTransformer {
         }
     }
 
-    private static void transformPlugin(ClassNode cn, String transformedName) {
-        FPTransformer.LOG.info("Transforming " + transformedName + " to fit current mixin environment.");
+    private static void transformPlugin(ClassNode cn) {
         if (PREAPPLY_DESC == null) {
             PREAPPLY_DESC = extractMethodWithReflection("preApply");
         }

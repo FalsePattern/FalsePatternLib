@@ -24,41 +24,25 @@
 package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.asm.IClassNodeTransformer;
-import com.falsepattern.lib.asm.SmartTransformer;
-import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.asm.transformers.ConfigOrderTransformer;
-import com.falsepattern.lib.internal.asm.transformers.GasStationValidatorTransformer;
-import com.falsepattern.lib.internal.asm.transformers.IMixinPluginTransformer;
-import com.falsepattern.lib.internal.asm.transformers.ITypeDiscovererTransformer;
+import com.falsepattern.lib.internal.asm.transformers.MixinPluginTransformer;
+import com.falsepattern.lib.internal.asm.transformers.TypeDiscovererModuleInfoSilencer;
 import com.falsepattern.lib.internal.impl.optifine.OptiFineTransformerHooksImpl;
-import lombok.Getter;
+import com.falsepattern.lib.turboasm.MergeableTurboTransformer;
 import lombok.experimental.Accessors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Accessors(fluent = true)
 @StableAPI(since = "__INTERNAL__")
-public class FPTransformer implements SmartTransformer {
-    public static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " ASM");
-
-    @Getter
-    private final List<IClassNodeTransformer> transformers;
-
-    @Getter
-    private final Logger logger = LOG;
-
+public class FPTransformer extends MergeableTurboTransformer {
     static {
         OptiFineTransformerHooksImpl.init();
     }
 
     public FPTransformer() {
-        transformers = Arrays.asList(new IMixinPluginTransformer(),
-                                     new ITypeDiscovererTransformer(),
-                                     new GasStationValidatorTransformer(),
-                                     new ConfigOrderTransformer());
+        super(Arrays.asList(new MixinPluginTransformer(),
+                            new TypeDiscovererModuleInfoSilencer(),
+                            new ConfigOrderTransformer()));
     }
 }

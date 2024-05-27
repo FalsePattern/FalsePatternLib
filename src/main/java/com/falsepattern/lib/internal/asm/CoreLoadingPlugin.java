@@ -26,14 +26,24 @@ import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 import com.falsepattern.lib.mapping.MappingManager;
+import com.falsepattern.lib.turboasm.MergeableTurboTransformer;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.val;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import java.util.List;
 import java.util.Map;
 
 import static com.falsepattern.lib.mixin.MixinInfo.isClassPresentSafe;
@@ -44,7 +54,7 @@ import static com.falsepattern.lib.mixin.MixinInfo.isClassPresentSafe;
 @MCVersion("1.7.10")
 @Name(Tags.MODID)
 @SortingIndex(500)
-@IFMLLoadingPlugin.TransformerExclusions({Tags.GROUPNAME + ".internal.asm", Tags.GROUPNAME + ".asm"})
+@IFMLLoadingPlugin.TransformerExclusions({Tags.GROUPNAME + ".internal.asm", Tags.GROUPNAME + ".asm", Tags.GROUPNAME + ".turboasm"})
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
     private static boolean obfuscated;
@@ -117,25 +127,6 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         return skillIssue;
     }
 
-    public static void validateGasStation() {
-        FPLog.LOG.info("Got any gas?");
-        //Make sure everything is loaded correctly, crash if gasstation is bugged
-        // @formatter:off
-        if (!isClassPresentSafe("com.falsepattern.gasstation.core.GasStationCore") //Validate core class
-            || !isClassPresentSafe("makamys.mixingasm.api.TransformerInclusions") //Validate the mixingasm compat
-            || !isClassPresentSafe("ru.timeconqueror.spongemixins.core.SpongeMixinsCore") //Validate the spongemixins compat
-            || !isClassPresentSafe("io.github.tox1cozz.mixinbooterlegacy.MixinBooterLegacyPlugin") //Validate the MBL compat
-            || !isClassPresentSafe("org.spongepowered.asm.lib.Opcodes") //Validate correct mixins class
-            || isClassPresentSafe("org.spongepowered.libraries.org.objectweb.asm.Opcodes")
-        ) {
-            FPLog.LOG.fatal("Somebody put diesel in my gas tank!");
-            throw new Error("Failed to validate your GasStation mixin plugin installation. "
-                            + "Please make sure you have the latest GasStation installed from the official source: "
-                            + "https://github.com/FalsePattern/GasStation");
-        }
-        // @formatter:on
-    }
-
     @Override
     public String[] getASMTransformerClass() {
         return new String[]{Tags.GROUPNAME + ".internal.asm.FPTransformer"};
@@ -154,10 +145,32 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public void injectData(Map<String, Object> data) {
         obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
+        mergeTurboTransformers();
     }
 
     @Override
     public String getAccessTransformerClass() {
         return null;
+    }
+
+    @SneakyThrows
+    public static synchronized void mergeTurboTransformers() {
+        val f = LaunchClassLoader.class.getDeclaredField("transformers");
+        f.setAccessible(true);
+
+        val transformers = (List<IClassTransformer>) f.get(Launch.classLoader);
+        for (int i = 0; i < transformers.size() - 1; i++) {
+            val a = transformers.get(i);
+            if (!(a instanceof MergeableTurboTransformer))
+                continue;
+
+            val b = transformers.get(i + 1);
+            if (!(b instanceof MergeableTurboTransformer))
+                continue;
+
+            transformers.remove(i + 1);
+            transformers.set(i, MergeableTurboTransformer.merge((MergeableTurboTransformer) a, (MergeableTurboTransformer) b));
+            i--;
+        }
     }
 }

@@ -51,6 +51,9 @@ public class FalsePatternLib {
     @SidedProxy(clientSide = Tags.GROUPNAME + ".internal.proxy.ClientProxy",
                 serverSide = Tags.GROUPNAME + ".internal.proxy.CommonProxy")
     private static CommonProxy proxy;
+    static {
+        CoreLoadingPlugin.mergeTurboTransformers();
+    }
 
     public FalsePatternLib() {
         FPLog.LOG.info("Version " + Tags.VERSION + " initialized!");
@@ -74,9 +77,6 @@ public class FalsePatternLib {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent e) {
-        if (Loader.isModLoaded("gasstation")) {
-            CoreLoadingPlugin.validateGasStation();
-        }
         proxy.postInit(e);
     }
 }

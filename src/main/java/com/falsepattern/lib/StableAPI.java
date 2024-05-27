@@ -48,6 +48,11 @@ import java.lang.annotation.Target;
  * You may set the {@link #since()} attribute to "__INTERNAL__", this will signal that even though the specific class/member
  * has been marked as stable, it is still for internal use only. This may be done for reference purposes in multi-developer
  * projects, where you need to communicate intent even in internal code.
+ * <p>
+ * Similarly, you may also set the {@link #since()} attribute to "__EXPERIMENTAL__", this will signal that the given API
+ * is highly experimental and may be removed or change at any time, however, using it in third party projects is not an
+ * error, unlike __INTERNAL__, but if any issues arise from the usage of the API or the API changing, the API developer
+ * shall not be blamed for it.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

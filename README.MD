@@ -12,6 +12,7 @@ A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 licens
 | [optifine](src/main/java/com/falsepattern/lib/optifine)         | Tools for messing with OptiFine                                                                                                         |
 | [text](src/main/java/com/falsepattern/lib/text)                 | Better Chat and GUI text processing                                                                                                     |
 | [toasts](src/main/java/com/falsepattern/lib/toasts)             | The toast system from newer versions, with some extras                                                                                  |
+| [turboasm](src/main/java/com/falsepattern/lib/turboasm)         | A forge-style class transformer port of RFB's transformer API.                                                                          |
 | [util](src/main/java/com/falsepattern/lib/util)                 | Additional utilities that do not fit the above categories, see below for more information                                               |
 
 The contents of the [util](src/main/java/com/falsepattern/lib/util) package so far:

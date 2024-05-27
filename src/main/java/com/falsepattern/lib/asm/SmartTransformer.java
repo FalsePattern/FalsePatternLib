@@ -22,6 +22,7 @@
  */
 package com.falsepattern.lib.asm;
 
+import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import lombok.val;
@@ -36,9 +37,12 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * An ASM transformation dispatcher utility, inspired by mixins.
+ * See: {@link com.falsepattern.lib.turboasm.MergeableTurboTransformer}.
+ * This class will not be removed, for backwards compatibility reasons.
  */
 @StableAPI(since = "0.10.0")
+@Deprecated
+@DeprecationDetails(deprecatedSince = "1.2.0")
 public interface SmartTransformer extends IClassTransformer {
     @StableAPI.Expose
     Logger logger();

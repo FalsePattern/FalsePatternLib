@@ -23,24 +23,35 @@
 
 package com.falsepattern.lib.internal.asm.transformers;
 
-import com.falsepattern.lib.asm.IClassNodeTransformer;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 
-public class ITypeDiscovererTransformer implements IClassNodeTransformer {
+public class TypeDiscovererModuleInfoSilencer implements TurboClassTransformer {
+
     @Override
-    public String getName() {
-        return "ITypeDiscovererTransformer";
+    public String owner() {
+        return "FalsePatternLib";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
-        return "cpw.mods.fml.common.discovery.ITypeDiscoverer".equals(transformedName);
+    public String name() {
+        return "TypeDiscovererModuleInfoSilencer";
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        return "cpw.mods.fml.common.discovery.ITypeDiscoverer".equals(className);
+    }
+
+    @Override
+    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return;
         for (val method : cn.methods) {
             if (!method.name.equals("<clinit>")) {
                 continue;

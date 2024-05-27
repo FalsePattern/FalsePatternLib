@@ -23,26 +23,36 @@
 
 package com.falsepattern.lib.internal.asm.transformers;
 
-import com.falsepattern.lib.asm.IClassNodeTransformer;
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.config.DeclOrderInternal;
+import com.falsepattern.lib.turboasm.ClassNodeHandle;
+import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
 
-public class ConfigOrderTransformer implements IClassNodeTransformer {
+public class ConfigOrderTransformer implements TurboClassTransformer {
     private static final String DESC_CONFIG = Type.getDescriptor(Config.class);
     private static final String DESC_CONFIG_IGNORE = Type.getDescriptor(Config.Ignore.class);
     private static final String DESC_ORDER = Type.getDescriptor(DeclOrderInternal.class);
 
     @Override
-    public String getName() {
+    public String name() {
         return "ConfigOrderTransformer";
     }
 
     @Override
-    public boolean shouldTransform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public String owner() {
+        return Tags.MODNAME;
+    }
+
+    @Override
+    public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return false;
         if (cn.visibleAnnotations != null) {
             for (val ann : cn.visibleAnnotations) {
                 if (DESC_CONFIG.equals(ann.desc)) {
@@ -54,7 +64,10 @@ public class ConfigOrderTransformer implements IClassNodeTransformer {
     }
 
     @Override
-    public void transform(ClassNode cn, String transformedName, boolean obfuscated) {
+    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+        val cn = classNode.getNode();
+        if (cn == null)
+            return;
         int order = 0;
         outer:
         for (val field : cn.fields) {
