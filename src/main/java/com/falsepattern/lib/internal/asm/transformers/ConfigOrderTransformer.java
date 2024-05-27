@@ -64,11 +64,12 @@ public class ConfigOrderTransformer implements TurboClassTransformer {
     }
 
     @Override
-    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
         if (cn == null)
-            return;
+            return false;
         int order = 0;
+        boolean changed = false;
         outer:
         for (val field : cn.fields) {
             if ((field.access & Opcodes.ACC_PUBLIC) == 0
@@ -85,6 +86,8 @@ public class ConfigOrderTransformer implements TurboClassTransformer {
             val annVisitor = field.visitAnnotation(DESC_ORDER, true);
             annVisitor.visit("value", order++);
             annVisitor.visitEnd();
+            changed = true;
         }
+        return changed;
     }
 }

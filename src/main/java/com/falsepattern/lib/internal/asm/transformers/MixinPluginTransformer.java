@@ -73,32 +73,43 @@ public class MixinPluginTransformer implements TurboClassTransformer {
         if (IMIXINPLUGIN.equals(className) ||
             IMIXINCONFIGPLUGIN.equals(className))
             return true;
+
+        if (!classNode.isPresent())
+            return false;
+
         if (classNode.isOriginal()) {
             val meta = classNode.getOriginalMetadata();
             if (meta != null && meta.interfacesCount == 0)
                 return false;
         }
+
         val cn = classNode.getNode();
         if (cn == null)
             return false;
-        return cn.interfaces.stream()
-                            .anyMatch((i) -> IMIXINPLUGIN_INTERNAL.equals(i) ||
-                                             IMIXINCONFIGPLUGIN_INTERNAL.equals(i));
+
+        for (String i : cn.interfaces) {
+            if (IMIXINPLUGIN_INTERNAL.equals(i) || IMIXINCONFIGPLUGIN_INTERNAL.equals(i)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
-    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
         if (cn == null)
-            return;
+            return false;
         if (IMIXINCONFIGPLUGIN.equals(className)) {
-            extractMixinConfigPluginData(cn);
+            return extractMixinConfigPluginData(cn);
         } else {
-            transformPlugin(cn);
+            return transformPlugin(cn);
         }
     }
 
-    private static void extractMixinConfigPluginData(ClassNode cn) {
+    private static boolean extractMixinConfigPluginData(ClassNode cn) {
+        boolean changed = false;
         for (val method : cn.methods) {
             switch (method.name) {
                 case "preApply":
@@ -114,29 +125,39 @@ public class MixinPluginTransformer implements TurboClassTransformer {
                 for (val local : method.localVariables) {
                     if (local.desc.contains("ClassNode;")) {
                         local.desc = local.desc.replaceAll("L[a-zA-Z/$]+[a-zA-Z$]+/ClassNode;", CLASSNODE_REAL);
+                        changed = true;
                     }
                 }
             }
         }
+        return changed;
     }
 
-    private static void transformPlugin(ClassNode cn) {
+    private static boolean transformPlugin(ClassNode cn) {
         if (PREAPPLY_DESC == null) {
             PREAPPLY_DESC = extractMethodWithReflection("preApply");
         }
         if (POSTAPPLY_DESC == null) {
             POSTAPPLY_DESC = extractMethodWithReflection("postApply");
         }
+        boolean changed = false;
         for (val method : cn.methods) {
             switch (method.name) {
                 case "preApply":
-                    method.desc = PREAPPLY_DESC;
+                    if (!PREAPPLY_DESC.equals(method.desc)) {
+                        method.desc = PREAPPLY_DESC;
+                        changed = true;
+                    }
                     break;
                 case "postApply":
-                    method.desc = POSTAPPLY_DESC;
+                    if (!POSTAPPLY_DESC.equals(method.desc)) {
+                        method.desc = POSTAPPLY_DESC;
+                        changed = true;
+                    }
                     break;
             }
         }
+        return changed;
     }
 
     private static String extractMethodWithReflection(String m) {

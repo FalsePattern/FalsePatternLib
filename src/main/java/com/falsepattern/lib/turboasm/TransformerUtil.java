@@ -32,22 +32,26 @@ import java.util.List;
 public class TransformerUtil {
     private static final Logger LOG = LogManager.getLogger("ASM");
     public static boolean executeTransformers(String transformedName, ClassNodeHandle handle, List<TurboClassTransformer> transformers) {
-        boolean didTransformation = false;
+        boolean modified = false;
         for (val transformer: transformers) {
             try {
                 if (transformer.shouldTransformClass(transformedName, handle)) {
-                    if (!didTransformation) {
-                        LOG.debug("Transforming {}!", transformedName);
+                    LOG.trace("Transforming {} with {}, owner: {}", transformedName, transformer.name(), transformer.owner());
+                    if (transformer.transformClass(transformedName, handle)) {
+                        LOG.trace("Transformed.");
+                        modified = true;
+                    } else {
+                        LOG.trace("No change.");
                     }
-                    didTransformation = true;
-                    transformer.transformClass(transformedName, handle);
-                    LOG.debug("Successfully transformed class {} with {}, owner: {}", transformedName, transformer.name(), transformer.owner());
                 }
             } catch (Exception e) {
                 LOG.error("Failed to transform class {} with {}, owner: {}", transformedName, transformer.name(), transformer.owner());
                 LOG.error("Exception stacktrace:", e);
             }
         }
-        return didTransformation;
+        if (modified) {
+            LOG.trace("Transformed class {}", transformedName);
+        }
+        return modified;
     }
 }

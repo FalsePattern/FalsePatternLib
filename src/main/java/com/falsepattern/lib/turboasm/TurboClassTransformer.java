@@ -58,7 +58,9 @@ public interface TurboClassTransformer {
      * (Optionally) transform a given class. No ClassReader flags are used for maximum efficiency, so stack frames are not expanded.
      * @param className The name of the transformed class (in the dot-separated format).
      * @param classNode The handle to the lazily ASM-parsed class to modify, and metadata used for class writing.
+     * @return True if the class has been modified in any way by this transformer. If all transformers return false,
+     * then the ClassNode instance will not be re-serialized.
      */
     @Expose
-    void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode);
+    boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode);
 }

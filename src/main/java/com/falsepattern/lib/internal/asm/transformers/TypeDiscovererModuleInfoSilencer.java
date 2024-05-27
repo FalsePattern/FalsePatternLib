@@ -48,10 +48,10 @@ public class TypeDiscovererModuleInfoSilencer implements TurboClassTransformer {
     }
 
     @Override
-    public void transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
+    public boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
         val cn = classNode.getNode();
         if (cn == null)
-            return;
+            return false;
         for (val method : cn.methods) {
             if (!method.name.equals("<clinit>")) {
                 continue;
@@ -63,10 +63,11 @@ public class TypeDiscovererModuleInfoSilencer implements TurboClassTransformer {
                     val ldc = (LdcInsnNode) insn;
                     if (ldc.cst.equals("[^\\s\\$]+(\\$[^\\s]+)?\\.class$")) {
                         ldc.cst = "(?!module-info)[^\\s\\$]+(\\$[^\\s]+)?\\.class$";
-                        return;
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }
