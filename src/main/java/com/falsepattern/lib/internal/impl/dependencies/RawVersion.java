@@ -47,4 +47,9 @@ public class RawVersion extends Version {
             throw new IllegalArgumentException("Unknown version type: " + o.getClass().getName());
         }
     }
+
+    @Override
+    public String toString() {
+        return versionString;
+    }
 }

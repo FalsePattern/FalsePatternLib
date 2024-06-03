@@ -502,11 +502,6 @@ public class DependencyLoaderImpl {
                                                val build = matcher.group(5);
                                                version = new SemanticVersion(major, minor, patch, preRelease, build);
                                            } catch (IllegalArgumentException e) {
-                                               LOG.warn("Unparseable dependency version {}:{}:{} from {}",
-                                                        groupId,
-                                                        artifactId,
-                                                        parts[2],
-                                                        source);
                                                version = new RawVersion(parts[2]);
                                            }
                                            final String classifier = parts.length > 3 ? parts[3] : null;
