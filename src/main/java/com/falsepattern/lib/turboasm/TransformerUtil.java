@@ -23,6 +23,7 @@
 
 package com.falsepattern.lib.turboasm;
 
+import com.falsepattern.lib.internal.Tags;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,18 +31,22 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 public class TransformerUtil {
+    private static final boolean DEBUG_VERBOSE_TRANSFORMERS = Boolean.parseBoolean(System.getProperty(Tags.MODID + ".debug.verboseTransformers", "false"));
     private static final Logger LOG = LogManager.getLogger("ASM");
     public static boolean executeTransformers(String transformedName, ClassNodeHandle handle, List<TurboClassTransformer> transformers) {
         boolean modified = false;
         for (val transformer: transformers) {
             try {
                 if (transformer.shouldTransformClass(transformedName, handle)) {
-                    LOG.trace("Transforming {} with {}, owner: {}", transformedName, transformer.name(), transformer.owner());
+                    if (DEBUG_VERBOSE_TRANSFORMERS)
+                        LOG.trace("Transforming {} with {}, owner: {}", transformedName, transformer.name(), transformer.owner());
                     if (transformer.transformClass(transformedName, handle)) {
-                        LOG.trace("Transformed.");
+                        if (DEBUG_VERBOSE_TRANSFORMERS)
+                            LOG.trace("Transformed.");
                         modified = true;
                     } else {
-                        LOG.trace("No change.");
+                        if (DEBUG_VERBOSE_TRANSFORMERS)
+                            LOG.trace("No change.");
                     }
                 }
             } catch (Exception e) {
@@ -49,7 +54,7 @@ public class TransformerUtil {
                 LOG.error("Exception stacktrace:", e);
             }
         }
-        if (modified) {
+        if (DEBUG_VERBOSE_TRANSFORMERS && modified) {
             LOG.trace("Transformed class {}", transformedName);
         }
         return modified;
