@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern75
+//version: 1656003793falsepattern76
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -311,7 +311,11 @@ configurations {
 repositories {
     maven {
         name = "Overmind forge repo mirror"
-        url = "https://gregtech.overminddl1.com/"
+        url = "https://mvn.falsepattern.com/overmind"
+        content {
+            includeGroup("net.minecraftforge")
+            includeGroup("org.scala-lang")
+        }
     }
     if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
         maven {
