@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.1.10")
+    id("fpgradle-minecraft") version("0.1.11")
 }
 
 group = "com.falsepattern"
@@ -28,7 +28,7 @@ minecraft_fp {
     }
 
     publish {
-        changelog = "https://github.com/FalsePattern/FalsePatternLib/releases/tag/{version}"
+        changelog = "https://github.com/FalsePattern/FalsePatternLib/releases/tag/$version"
         maven {
             repoUrl = "https://mvn.falsepattern.com/releases/"
             repoName = "mavenpattern"
