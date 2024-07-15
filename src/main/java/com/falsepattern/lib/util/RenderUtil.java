@@ -47,7 +47,7 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 @StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
-    private static final ResourceLocation EMPTY_TEXTURE = new ResourceLocation(Tags.MODID, "textures/gui/empty_texture.png");
+    private static final ResourceLocation EMPTY_TEXTURE = new ResourceLocation(Tags.MODID, "textures/empty_texture.png");
 
     /**
      * Sets the OpenGL translation, relative to the player's position.
