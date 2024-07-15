@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.1.11")
+    id("fpgradle-minecraft") version("0.5.0")
 }
 
 group = "com.falsepattern"
@@ -43,20 +43,8 @@ minecraft_fp {
 }
 
 repositories {
-    maven {
-        name = "horizon"
-        url = uri("https://mvn.falsepattern.com/horizon/")
-        content {
-            includeGroup("com.gtnewhorizons.retrofuturabootstrap")
-        }
-    }
-    maven {
-        name = "jitpack"
-        url = uri("https://mvn.falsepattern.com/jitpack/")
-        content {
-            includeGroup("com.github.LegacyModdingMC.UniMixins")
-        }
-    }
+    exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon/"), "com.gtnewhorizons.retrofuturabootstrap")
+    exclusive(jitpack(), "com.github.LegacyModdingMC.UniMixins")
 }
 
 dependencies {
