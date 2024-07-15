@@ -48,6 +48,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.2")
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.5")
     compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.1.17:dev")
 }
