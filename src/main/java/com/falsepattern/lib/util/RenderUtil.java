@@ -23,11 +23,13 @@
 package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.render.ClampedIcon;
 import com.falsepattern.lib.internal.render.FullTextureIcon;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -45,6 +47,7 @@ import static net.minecraft.client.Minecraft.getMinecraft;
 @StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
+    private static final ResourceLocation EMPTY_TEXTURE = new ResourceLocation(Tags.MODID, "textures/gui/empty_texture.png");
 
     /**
      * Sets the OpenGL translation, relative to the player's position.
@@ -93,6 +96,19 @@ public final class RenderUtil {
     @StableAPI.Expose(since = "0.12.0")
     public static IIcon wrapAsClampedIcon(IIcon icon) {
         return new ClampedIcon(icon);
+    }
+
+    /**
+     * Binds an empty texture.
+     * <p>
+     * When rendering without shaders, using {@link GL11#glDisable(int)} with {@link GL11#GL_TEXTURE_2D}
+     * is sufficient to achieve the same effect.
+     * <p>
+     * However, when shaders are enabled, disabling textures using this method will have no effect. Therefore this method can be used as a workaround.
+     */
+    // TODO: Define stable API Version
+    public static void bindEmptyTexture() {
+        getMinecraft().renderEngine.bindTexture(EMPTY_TEXTURE);
     }
 
     /**
