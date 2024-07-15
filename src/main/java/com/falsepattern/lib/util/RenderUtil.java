@@ -106,7 +106,7 @@ public final class RenderUtil {
      * <p>
      * However, when shaders are enabled, disabling textures using this method will have no effect. Therefore this method can be used as a workaround.
      */
-    // TODO: Define stable API Version
+    @StableAPI.Expose(since = "1.3.0")
     public static void bindEmptyTexture() {
         getMinecraft().renderEngine.bindTexture(EMPTY_TEXTURE);
     }
