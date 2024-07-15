@@ -27,7 +27,6 @@ import com.falsepattern.lib.toasts.IToast;
 import com.falsepattern.lib.util.MathUtil;
 import com.google.common.collect.Queues;
 import lombok.val;
-import lombok.var;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;

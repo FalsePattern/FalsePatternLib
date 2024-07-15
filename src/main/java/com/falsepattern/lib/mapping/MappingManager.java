@@ -34,7 +34,6 @@ import com.falsepattern.lib.mapping.types.UniversalMethod;
 import com.falsepattern.lib.util.ResourceUtil;
 import lombok.SneakyThrows;
 import lombok.val;
-import lombok.var;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 

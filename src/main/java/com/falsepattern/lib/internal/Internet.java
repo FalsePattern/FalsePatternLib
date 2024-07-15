@@ -23,7 +23,6 @@
 package com.falsepattern.lib.internal;
 
 import lombok.val;
-import lombok.var;
 
 import net.minecraft.launchwrapper.Launch;
 

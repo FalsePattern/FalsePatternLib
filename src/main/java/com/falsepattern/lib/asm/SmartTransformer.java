@@ -51,6 +51,7 @@ public interface SmartTransformer extends IClassTransformer {
     List<IClassNodeTransformer> transformers();
 
     @Override
+    @Deprecated
     default byte[] transform(String name, String transformedName, byte[] bytes) {
         if (bytes == null) {
             return null;

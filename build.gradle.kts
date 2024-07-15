@@ -5,6 +5,10 @@ plugins {
 group = "com.falsepattern"
 
 minecraft_fp {
+    java {
+        compatibility = jabel
+        version = JavaVersion.VERSION_17
+    }
     mod {
         modid = "falsepatternlib"
         name = "FalsePatternLib"

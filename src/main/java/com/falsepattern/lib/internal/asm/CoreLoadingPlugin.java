@@ -158,6 +158,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         val f = LaunchClassLoader.class.getDeclaredField("transformers");
         f.setAccessible(true);
 
+        @SuppressWarnings("unchecked")
         val transformers = (List<IClassTransformer>) f.get(Launch.classLoader);
         for (int i = 0; i < transformers.size() - 1; i++) {
             val a = transformers.get(i);
