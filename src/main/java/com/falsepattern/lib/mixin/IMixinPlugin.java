@@ -92,11 +92,11 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
     static Set<File> findJarsOf(IMixinPlugin self, final ITargetedMod mod) {
         if (!self.useNewFindJar()) {
             val jar = findJarOf(mod);
-            return jar == null ? Collections.emptySet() : Set.of(jar);
+            return jar == null ? Collections.emptySet() : Collections.singleton(jar);
         }
         val results = new HashSet<File>();
         try (val stream = walk(MODS_DIRECTORY_PATH)) {
-            results.addAll(stream.filter(mod::isMatchingJar).map(Path::toFile).toList());
+            results.addAll(stream.filter(mod::isMatchingJar).map(Path::toFile).collect(Collectors.toSet()));
         } catch (Exception e) {
             e.printStackTrace();
         }
