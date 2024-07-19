@@ -22,6 +22,7 @@
  */
 package com.falsepattern.lib.mixin;
 
+import com.falsepattern.lib.DeprecationDetails;
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
@@ -40,6 +41,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -57,6 +60,8 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return LogManager.getLogger(modName + " Mixin Loader");
     }
 
+    @Deprecated
+    @DeprecationDetails(deprecatedSince = "1.4.0")
     @StableAPI.Expose
     static File findJarOf(final ITargetedMod mod) {
         File result = null;
@@ -83,6 +88,32 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return result;
     }
 
+    @StableAPI.Expose(since = "1.4.0")
+    static Set<File> findJarsOf(IMixinPlugin self, final ITargetedMod mod) {
+        if (!self.useNewFindJar()) {
+            val jar = findJarOf(mod);
+            return jar == null ? Collections.emptySet() : Set.of(jar);
+        }
+        val results = new HashSet<File>();
+        try (val stream = walk(MODS_DIRECTORY_PATH)) {
+            results.addAll(stream.filter(mod::isMatchingJar).map(Path::toFile).toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (URL url : Launch.classLoader.getURLs()) {
+            try {
+                String file = url.getFile();
+                Path path = Paths.get(file);
+                if (mod.isMatchingJar(path)) {
+                    results.add(path.toFile());
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return results;
+    }
+
     @StableAPI.Expose
     Logger getLogger();
 
@@ -91,6 +122,11 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
 
     @StableAPI.Expose
     ITargetedMod[] getTargetedModEnumValues();
+
+    @StableAPI.Expose(since = "1.4.0")
+    default boolean useNewFindJar() {
+        return false;
+    }
 
     @Override
     @StableAPI.Expose(since = "__INTERNAL__")
@@ -126,8 +162,9 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
                                .filter(new Predicate<ITargetedMod>() {
                                    @Override
                                    public boolean test(ITargetedMod mod) {
+                                       boolean loadJar = IMixinPlugin.this.loadJarOf(mod);
                                        return (mod.isLoadInDevelopment() && isDevelopmentEnvironment)
-                                              || IMixinPlugin.this.loadJarOf(mod);
+                                              || loadJar;
                                    }
                                })
                                .collect(Collectors.toList());
@@ -153,24 +190,24 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
 
     @StableAPI.Expose(since = "__INTERNAL__")
     default boolean loadJarOf(final ITargetedMod mod) {
-        boolean success = false;
         try {
-            File jar = findJarOf(mod);
-            if (jar == null) {
-                getLogger().info("Jar not found for " + mod);
+            val jars = findJarsOf(this, mod);
+            if (jars.isEmpty()) {
+                getLogger().info("Jar not found for {}", mod);
                 return false;
             }
-            getLogger().info("Attempting to add " + jar + " to the URL Class Path");
-            success = true;
-            if (!jar.exists()) {
-                success = false;
-                throw new FileNotFoundException(jar.toString());
+            for (val jar: jars) {
+                getLogger().info("Attempting to add {} to the URL Class Path", jar);
+                try {
+                    MinecraftURLClassPath.addJar(jar);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
-            MinecraftURLClassPath.addJar(jar);
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        return success;
+        return true;
     }
 
     @StableAPI.Expose(since = "__INTERNAL__")
