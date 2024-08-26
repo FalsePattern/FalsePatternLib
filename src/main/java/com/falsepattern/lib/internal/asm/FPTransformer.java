@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.asm.transformers.ConfigOrderTransformer;
+import com.falsepattern.lib.internal.asm.transformers.CrashReportImprover;
 import com.falsepattern.lib.internal.asm.transformers.MixinPluginTransformer;
 import com.falsepattern.lib.internal.asm.transformers.TypeDiscovererModuleInfoSilencer;
 import com.falsepattern.lib.internal.impl.optifine.OptiFineTransformerHooksImpl;
@@ -42,6 +43,7 @@ public class FPTransformer extends MergeableTurboTransformer {
 
     public FPTransformer() {
         super(Arrays.asList(new MixinPluginTransformer(),
+                            new CrashReportImprover(),
                             new TypeDiscovererModuleInfoSilencer(),
                             new ConfigOrderTransformer()));
     }

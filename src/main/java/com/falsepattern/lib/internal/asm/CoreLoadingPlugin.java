@@ -25,6 +25,8 @@ package com.falsepattern.lib.internal.asm;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import com.falsepattern.lib.internal.logging.CrashImprover;
+import com.falsepattern.lib.internal.logging.NotEnoughVerbosity;
 import com.falsepattern.lib.mapping.MappingManager;
 import com.falsepattern.lib.turboasm.MergeableTurboTransformer;
 import lombok.Getter;
@@ -75,6 +77,8 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         FPLog.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest
         MappingManager.initialize();
+        NotEnoughVerbosity.apply();
+        CrashImprover.probe();
     }
 
     @SuppressWarnings("SameParameterValue")
