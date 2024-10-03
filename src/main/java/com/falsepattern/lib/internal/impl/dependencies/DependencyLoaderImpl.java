@@ -805,7 +805,7 @@ public class DependencyLoaderImpl {
         }
 
         private void validateDownloadsAllowed() {
-            if (!EarlyConfig.load().enableLibraryDownloads()) {
+            if (!EarlyConfig.getInstance().enableLibraryDownloads()) {
                 val errorMessage = "Failed to load library "
                                    + groupId
                                    + ":"

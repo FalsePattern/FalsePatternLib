@@ -24,14 +24,21 @@
 package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.StableAPI;
+import com.falsepattern.lib.internal.FalsePatternLib;
+import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -43,22 +50,45 @@ public class EarlyConfig {
     @StableAPI.Expose(since = "__INTERNAL__")
     private boolean enableLibraryDownloads;
 
-    private static EarlyConfig instance = null;
+    private static volatile EarlyConfig instance = null;
 
-    @SneakyThrows
-    public static EarlyConfig load() {
-        if (instance != null)
-            return instance;
-        val configFile = LowLevelCallMultiplexer.gameDir().resolve("config").resolve("falsepatternlib-early.json");
-        val gson = new Gson();
-        EarlyConfig config;
-        if (!Files.exists(configFile)) {
+    private static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " Early Config");
+
+    public static @NotNull EarlyConfig getInstance() {
+        val config = instance;
+        if (config != null)
+            return config;
+        return loadFromDisk();
+    }
+
+    private static synchronized @NotNull EarlyConfig loadFromDisk() {
+        var config = instance;
+        if (config != null) {
+            return config;
+        }
+        val configDir = LowLevelCallMultiplexer.gameDir().resolve("config");
+        val configFile = configDir.resolve("falsepatternlib-early.json");
+        val gson = new GsonBuilder().setPrettyPrinting().create();
+        try {
+            if (!Files.exists(configDir)) {
+                Files.createDirectories(configDir);
+            }
+            if (Files.exists(configFile)) {
+                config = gson.fromJson(new String(Files.readAllBytes(configFile), StandardCharsets.UTF_8),
+                                       EarlyConfig.class);
+            }
+        } catch (IOException e) {
+            LOG.error("Failed to load from disk", e);
+        }
+        if (config == null) {
             config = new EarlyConfig();
             config.enableLibraryDownloads(true);
-        } else {
-            config = gson.fromJson(new String(Files.readAllBytes(configFile), StandardCharsets.UTF_8), EarlyConfig.class);
+            try {
+                Files.write(configFile, gson.toJson(config).getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                LOG.error("Failed to write to disk", e);
+            }
         }
-        Files.write(configFile, gson.toJson(config).getBytes(StandardCharsets.UTF_8));
         instance = config;
         return config;
     }

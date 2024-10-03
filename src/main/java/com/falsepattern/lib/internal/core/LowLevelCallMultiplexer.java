@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.core;
 
 import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -56,7 +57,7 @@ public class LowLevelCallMultiplexer {
         }
     }
 
-    public static Path gameDir() {
+    public static @NotNull Path gameDir() {
         if (rfbDetected) {
             return RFBLowLevel.gameDir();
         } else {
@@ -76,7 +77,7 @@ public class LowLevelCallMultiplexer {
             return RfbApiImpl.INSTANCE.compatClassLoader().getSources();
         }
 
-        static Path gameDir() {
+        static @NotNull Path gameDir() {
             return RfbApiImpl.INSTANCE.gameDirectory();
         }
     }
@@ -90,7 +91,7 @@ public class LowLevelCallMultiplexer {
             return Launch.classLoader.getSources();
         }
 
-        static Path gameDir() {
+        static @NotNull Path gameDir() {
             return Launch.minecraftHome == null ? Paths.get(".") : Launch.minecraftHome.toPath();
         }
     }
