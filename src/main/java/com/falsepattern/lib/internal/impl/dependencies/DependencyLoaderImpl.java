@@ -271,7 +271,7 @@ public class DependencyLoaderImpl {
         if (fileName.endsWith(".jar")) {
             //Scan jar file for json in META-INF, add them to the list
             try (val inputStream = new BufferedInputStream(source.openStream(), 65536);
-                 val jarFile = new JarInputStream(inputStream)) {
+                 val jarFile = new JarInputStream(inputStream, false)) {
                 ZipEntry entry;
                 while ((entry = jarFile.getNextEntry()) != null) {
                     if (!entry.getName().startsWith("META-INF") || !entry.getName().endsWith(".json")) {
@@ -823,68 +823,71 @@ public class DependencyLoaderImpl {
             }
         }
 
+        private static final Object mutex = new Object();
         private boolean tryDownloadFromMaven(String repo) {
-            try {
-                if (!repo.endsWith("/")) {
-                    repo = repo + "/";
-                }
-                val url = String.format("%s%s/%s/%s/%s",
-                                        repo,
-                                        groupId.replace('.', '/'),
-                                        artifactId,
-                                        preferredVersion,
-                                        mavenJarName);
-                String finalRepo = repo;
-                int retryCount = 0;
-                while (true) {
-                    retryCount++;
-                    if (retryCount > 3) {
-                        break;
+            synchronized (mutex) {
+                try {
+                    if (!repo.endsWith("/")) {
+                        repo = repo + "/";
                     }
-                    val success = new AtomicBoolean(false);
-                    val tmpFile = file.getParent().resolve(file.getFileName().toString() + ".tmp");
-                    if (Files.exists(tmpFile)) {
-                        Files.delete(tmpFile);
-                    }
-                    Internet.connect(new URL(url),
-                                     ex -> LOG.debug("Artifact {} could not be downloaded from repo {}: {}",
-                                                       artifactLogName,
-                                                       finalRepo,
-                                                       ex.getMessage()),
-                                     input -> {
-                                         LOG.debug("Downloading {} from {}", artifactLogName, finalRepo);
-                                         download(input, tmpFile, d -> downloaded += d);
-                                         LOG.debug("Downloaded {} from {}", artifactLogName, finalRepo);
-                                         success.set(true);
-                                     },
-                                     contentLength -> this.contentLength = contentLength);
-                    if (success.get()) {
-                        try {
-                            Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
-                        } catch (AtomicMoveNotSupportedException ignored) {
-                            Files.move(tmpFile, file);
+                    val url = String.format("%s%s/%s/%s/%s",
+                                            repo,
+                                            groupId.replace('.', '/'),
+                                            artifactId,
+                                            preferredVersion,
+                                            mavenJarName);
+                    String finalRepo = repo;
+                    int retryCount = 0;
+                    while (true) {
+                        retryCount++;
+                        if (retryCount > 3) {
+                            break;
                         }
-                        LOG.debug("Validating checksum for {}", artifactLogName);
-                        val hadChecksum = validateChecksum(url);
-                        switch (hadChecksum) {
-                            case FAILED:
-                                continue;
-                            case OK:
-                                break;
-                            case MISSING:
-                                LOG.warn("The library {} had no checksum available on the repository.\n"
-                                         + "There's a chance it might have gotten corrupted during download,\n"
-                                         + "but we're loading it anyways.", artifactLogName);
+                        val success = new AtomicBoolean(false);
+                        val tmpFile = file.getParent().resolve(file.getFileName().toString() + ".tmp");
+                        if (Files.exists(tmpFile)) {
+                            Files.delete(tmpFile);
                         }
-                        loadedLibraries.put(artifact, preferredVersion);
-                        loadedLibraryMods.put(artifact, loadingModId);
-                        addToClasspath(file);
-                        return true;
+                        Internet.connect(new URL(url),
+                                         ex -> LOG.debug("Artifact {} could not be downloaded from repo {}: {}",
+                                                         artifactLogName,
+                                                         finalRepo,
+                                                         ex.getMessage()),
+                                         input -> {
+                                             LOG.debug("Downloading {} from {}", artifactLogName, finalRepo);
+                                             download(input, tmpFile, d -> downloaded += d);
+                                             LOG.debug("Downloaded {} from {}", artifactLogName, finalRepo);
+                                             success.set(true);
+                                         },
+                                         contentLength -> this.contentLength = contentLength);
+                        if (success.get()) {
+                            try {
+                                Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
+                            } catch (AtomicMoveNotSupportedException ignored) {
+                                Files.move(tmpFile, file);
+                            }
+                            LOG.debug("Validating checksum for {}", artifactLogName);
+                            val hadChecksum = validateChecksum(url);
+                            switch (hadChecksum) {
+                                case FAILED:
+                                    continue;
+                                case OK:
+                                    break;
+                                case MISSING:
+                                    LOG.warn("The library {} had no checksum available on the repository.\n"
+                                             + "There's a chance it might have gotten corrupted during download,\n"
+                                             + "but we're loading it anyways.", artifactLogName);
+                            }
+                            loadedLibraries.put(artifact, preferredVersion);
+                            loadedLibraryMods.put(artifact, loadingModId);
+                            addToClasspath(file);
+                            return true;
+                        }
                     }
+                } catch (IOException ignored) {
                 }
-            } catch (IOException ignored) {
+                return false;
             }
-            return false;
         }
 
         private ChecksumStatus validateChecksum(String url) throws IOException {
