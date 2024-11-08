@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.7.5")
+    id("fpgradle-minecraft") version("0.8.1")
 }
 
 group = "com.falsepattern"
@@ -52,6 +52,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.5")
-    compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.1.17:dev")
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
+    compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.1.19:dev")
 }
