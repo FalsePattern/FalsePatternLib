@@ -53,7 +53,11 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
         property.setDefaultValues(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
-        if (!property.isDoubleList()) {
+        try {
+            if (!property.isDoubleList()) {
+                setToDefault();
+            }
+        } catch (NullPointerException ignored) {
             setToDefault();
         }
         property.comment += "\n[range: " + min + " ~ " + max + ", default: " + Arrays.toString(defaultValue) + "]";
