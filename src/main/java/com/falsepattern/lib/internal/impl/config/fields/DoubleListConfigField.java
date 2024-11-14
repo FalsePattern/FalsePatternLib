@@ -43,7 +43,7 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
     private final double[] defaultValue;
 
     public DoubleListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
-        super(field, configuration, category, Property.Type.INTEGER);
+        super(field, configuration, category, Property.Type.DOUBLE);
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
         min = range.map(Config.RangeDouble::min).orElse(-Double.MAX_VALUE);
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);
