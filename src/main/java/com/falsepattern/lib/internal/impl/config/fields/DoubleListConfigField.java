@@ -83,7 +83,7 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
     @Override
     protected void receiveElements(DataInput input, double[] arr) throws IOException {
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = input.readInt();
+            arr[i] = input.readDouble();
         }
     }
 
