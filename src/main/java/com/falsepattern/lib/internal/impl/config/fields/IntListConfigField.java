@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -42,8 +43,8 @@ public class IntListConfigField extends AListConfigField<int[]> {
     private final int max;
     private final int[] defaultValue;
 
-    public IntListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
-        super(field, configuration, category, Property.Type.INTEGER);
+    public IntListConfigField(ConfigFieldParameters params) throws ConfigException {
+        super(params, Property.Type.INTEGER);
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
         min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
         max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);

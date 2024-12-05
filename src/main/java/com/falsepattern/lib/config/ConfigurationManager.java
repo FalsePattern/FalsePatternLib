@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 
+import cpw.mods.fml.client.config.DummyConfigElement;
 import cpw.mods.fml.client.config.IConfigElement;
 
 import java.lang.reflect.Field;
@@ -137,5 +138,21 @@ public class ConfigurationManager {
                 }
                 return result;
         }
+    }
+    /**
+     * @return The configuration elements, structured with DummyCategoryElement groups per config class
+     * @see #getConfigElementsMulti(Class[]) 
+     */
+    @SuppressWarnings("rawtypes")
+    @StableAPI.Expose(since = "1.5.0")
+    public static List<IConfigElement> getConfigElementsMultiStructured(Class<?>... configClasses) throws ConfigException {
+        if (configClasses.length == 0) {
+            return Collections.emptyList();
+        }
+        val result = new ArrayList<IConfigElement>();
+        for (val configClass: configClasses) {
+            result.add(ConfigurationManagerImpl.getConfigCategoryElement(configClass));
+        }
+        return result;
     }
 }

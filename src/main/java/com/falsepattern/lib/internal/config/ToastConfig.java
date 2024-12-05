@@ -27,10 +27,8 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.Tags;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-@SideOnly(Side.CLIENT)
+@Config.Comment("Toast notification settings")
+@Config.LangKey
 @Config(modid = Tags.MODID,
         category = "toasts")
 public class ToastConfig {
@@ -38,23 +36,29 @@ public class ToastConfig {
         ConfigurationManager.selfInit();
     }
 
-    @Config.Comment("The maximum amount of toasts to show on the screen")
-    @Config.LangKey("config.falsepatternlib.maxtoasts")
+    @Config.Comment("The maximum amount of toasts to show on the screen.")
+    @Config.LangKey
     @Config.DefaultInt(5)
     @Config.RangeInt(min = 1,
                      max = 10)
+    @Config.Name(value = "maxVisible",
+                 migrations = "")
     public static int MAX_VISIBLE;
 
-    @Config.Comment("The amount of empty space from the top of the screen in pixels")
-    @Config.LangKey("config.falsepatternlib.toastoffset")
+    @Config.Comment("The amount of empty space from the top of the screen in pixels.")
+    @Config.LangKey
     @Config.DefaultInt(0)
     @Config.RangeInt(min = 0,
                      max = 10000)
+    @Config.Name(value = "yOffset",
+                 migrations = "")
     public static int Y_OFFSET;
 
-    @Config.Comment("Which side of the screen should toasts show up on")
-    @Config.LangKey("config.falsepatternlib.toastalign")
+    @Config.Comment("Which side of the screen should toasts show up on.")
+    @Config.LangKey
     @Config.DefaultEnum("Right")
+    @Config.Name(value = "align",
+                 migrations = "")
     public static Side ALIGN;
 
     public static boolean leftAlign() {

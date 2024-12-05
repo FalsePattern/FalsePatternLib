@@ -35,10 +35,12 @@ import java.util.regex.Pattern;
 
 public class ConfigElementProxy<T> implements IConfigElement<T> {
     private final ConfigElement<T> element;
+    private final String comment;
     private final Runnable syncCallback;
 
-    public ConfigElementProxy(Property prop, Runnable syncCallback) {
+    public ConfigElementProxy(Property prop, String comment, Runnable syncCallback) {
         this.element = new ConfigElement<>(prop);
+        this.comment = comment;
         this.syncCallback = syncCallback;
     }
 
@@ -74,7 +76,7 @@ public class ConfigElementProxy<T> implements IConfigElement<T> {
 
     @Override
     public String getComment() {
-        return element.getComment();
+        return comment;
     }
 
     @Override
@@ -82,6 +84,7 @@ public class ConfigElementProxy<T> implements IConfigElement<T> {
         return element.getChildElements();
     }
 
+    // Caller sensitive
     @Override
     public ConfigGuiType getType() {
         return element.getType();

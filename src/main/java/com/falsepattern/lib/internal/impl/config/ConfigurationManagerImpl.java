@@ -34,8 +34,11 @@ import com.google.common.collect.HashBiMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraftforge.common.config.Configuration;
+import cpw.mods.fml.client.config.DummyConfigElement;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 
@@ -47,6 +50,7 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,7 +68,7 @@ import java.util.function.BiConsumer;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigurationManagerImpl {
-    private static final Map<String, Configuration> configs = new HashMap<>();
+    private static final Map<Path, Configuration> configs = new HashMap<>();
     private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
     private static final Map<Class<?>, ParsedConfiguration> parsedConfigMap = new HashMap<>();
     private static final BiMap<String, Class<?>> serializedNames = HashBiMap.create();
@@ -81,9 +85,33 @@ public final class ConfigurationManagerImpl {
         }
     }
 
-    static Configuration getForgeConfig(String modid) {
-        return configs.computeIfAbsent(modid, (ignored) -> {
-            val c = new Configuration(configDir.resolve(modid + ".cfg").toFile());
+    private static @Nullable Path resolveConfigFile(String pathSuffix, boolean create) throws ConfigException {
+        var thePath = configDir.resolve(pathSuffix);
+        val parent = thePath.getParent();
+        if (!Files.exists(parent)) {
+            if (!create) {
+                return null;
+            }
+            try {
+                Files.createDirectories(parent);
+            } catch (IOException e) {
+                throw new ConfigException(String.format("Failed to create config parent directory at %s", parent), e);
+            }
+        }
+        val fileName = thePath.getFileName().toString();
+        if (!fileName.contains(".")) {
+            thePath = parent.resolve(fileName + ".cfg");
+        }
+        return thePath;
+    }
+
+    static @NotNull Configuration getForgeConfig(String pathSuffix, boolean create) throws ConfigException {
+        val thePath = resolveConfigFile(pathSuffix, create);
+        if (thePath == null || !(create || Files.exists(thePath))) {
+            throw new ConfigException(String.format("Could not find config file at %s", pathSuffix));
+        }
+        return configs.computeIfAbsent(thePath, (ignored) -> {
+            val c = new Configuration(thePath.toFile());
             c.load();
             return c;
         });
@@ -93,14 +121,14 @@ public final class ConfigurationManagerImpl {
         if (!parsedConfigMap.containsKey(configClass)) {
             throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
         }
-        parsedConfigMap.get(configClass).load();
+        parsedConfigMap.get(configClass).loadFile();
     }
 
     public static void save(Class<?> configClass) throws ConfigException {
         if (!parsedConfigMap.containsKey(configClass)) {
             throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
         }
-        parsedConfigMap.get(configClass).save();
+        parsedConfigMap.get(configClass).saveFile();
     }
 
     public static boolean validateFields(BiConsumer<Class<?>, Field> invalidFieldHandler, Class<?> configClass, boolean resetInvalid)
@@ -233,6 +261,21 @@ public final class ConfigurationManagerImpl {
         }
         configDir = FileUtil.getMinecraftHome().toPath().resolve("config");
         initialized = true;
+    }
+
+    public static DummyConfigElement.DummyCategoryElement<?> getConfigCategoryElement(Class<?> configClass) throws ConfigException {
+        if (!parsedConfigMap.containsKey(configClass)) {
+            throw new ConfigException("Class " + configClass.getName() + " is not a registered configuration!");
+        }
+        val config = parsedConfigMap.get(configClass);
+        val entry = new DummyConfigElement.DummyCategoryElement<>(
+                config.category,
+                config.langKey,
+                config.getConfigElements()
+        );
+        entry.setRequiresWorldRestart(config.requiresWorldRestart());
+        entry.setRequiresMcRestart(config.requiresMcRestart());
+        return entry;
     }
 
     public static void sendSyncRequest() throws IOException {

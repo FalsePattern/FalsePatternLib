@@ -46,8 +46,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,6 +79,8 @@ public class ParsedConfiguration {
     public final Class<?> configClass;
     public final String modid;
     public final String category;
+    public final String comment;
+    public final String langKey;
     public final Configuration rawConfig;
     public final boolean sync;
     private final Map<String, AConfigField<?>> fields = new HashMap<>();
@@ -88,14 +93,76 @@ public class ParsedConfiguration {
                                                                  + configClass.getName()
                                                                  + " does not have a @Config annotation!"));
         val category = Optional.of(cfg.category().trim())
-                               .map((cat) -> cat.length() == 0 ? null : cat)
+                               .map((cat) -> cat.isEmpty() ? null : cat)
                                .orElseThrow(() -> new ConfigException("Config class "
                                                                       + configClass.getName()
                                                                       + " has an empty category!"));
-        val rawConfig = ConfigurationManagerImpl.getForgeConfig(cfg.modid());
+        val comment = Optional.ofNullable(configClass.getAnnotation(Config.Comment.class))
+                          .map(Config.Comment::value)
+                          .map((lines) -> String.join("\n", lines))
+                          .orElse("");
+        val langKey = Optional.ofNullable(configClass.getAnnotation(Config.LangKey.class))
+                              .map(Config.LangKey::value)
+                              .map(x -> x.isEmpty() ? "config." + cfg.modid() + "." + category : x)
+                              .orElse(category);
+        val path = Optional.of(cfg.customPath().trim())
+                           .map(p -> p.isEmpty() ? null : p)
+                           .orElse(cfg.modid());
+        val rawConfig = ConfigurationManagerImpl.getForgeConfig(path, true);
+        if (!rawConfig.hasCategory(category)) {
+            // Process migrations
+            migrate:
+            {
+                val categoryCandidates = new ArrayList<>(Arrays.asList(cfg.categoryMigrations()));
+                categoryCandidates.add(0, category);
+                for (var migration : cfg.pathMigrations()) {
+                    migration = migration.trim();
+                    try {
+                        val oldConfig = ConfigurationManagerImpl.getForgeConfig(migration, false);
+                        for (val fromCategory : categoryCandidates) {
+                            if (oldConfig.hasCategory(fromCategory)) {
+                                val oldCat = oldConfig.getCategory(fromCategory);
+                                val newCat = rawConfig.getCategory(category);
+                                val entries = oldCat.keySet();
+                                for (val entry : entries) {
+                                    newCat.put(entry, oldCat.get(entry));
+                                }
+                                rawConfig.save();
+                                oldConfig.removeCategory(oldConfig.getCategory(category));
+                                if (oldConfig.getCategoryNames().isEmpty()) {
+                                    oldConfig.getConfigFile().delete();
+                                } else {
+                                    oldConfig.save();
+                                }
+                                break migrate;
+                            }
+                        }
+                    } catch (ConfigException ignored) {
+                    }
+                }
+                // Try to migrate category in local file
+                categoryCandidates.remove(0);
+                for (val fromCategory : categoryCandidates) {
+                    if (rawConfig.hasCategory(fromCategory)) {
+                        val oldCategory = rawConfig.getCategory(fromCategory);
+                        val newCategory = rawConfig.getCategory(category);
+                        val entries = oldCategory.keySet();
+                        for (val entry: entries) {
+                            newCategory.put(entry, oldCategory.get(entry));
+                        }
+                        rawConfig.removeCategory(oldCategory);
+                        break migrate;
+                    }
+                }
+            }
+        }
+        rawConfig.setCategoryComment(category, comment);
+        rawConfig.setCategoryLanguageKey(category, langKey);
         val parsedConfig = new ParsedConfiguration(configClass,
                                                    cfg.modid(),
                                                    category,
+                                                   comment,
+                                                   langKey,
                                                    rawConfig,
                                                    configClass.isAnnotationPresent(Config.Synchronize.class));
         try {
@@ -106,11 +173,15 @@ public class ParsedConfiguration {
         return parsedConfig;
     }
 
-    public void save() {
+    public void saveFile() {
+        saveFields();
+        rawConfig.save();
+    }
+
+    public void saveFields() {
         for (val field : fields.values()) {
             field.save();
         }
-        rawConfig.save();
     }
 
     //Happens when changed through the gui
@@ -121,8 +192,12 @@ public class ParsedConfiguration {
         rawConfig.save();
     }
 
-    public void load() throws ConfigException {
+    public void loadFile() throws ConfigException {
         ConfigurationManagerImpl.loadRawConfig(rawConfig);
+        loadFields();
+    }
+
+    public void loadFields() {
         for (val field : fields.values()) {
             field.load();
         }
@@ -136,7 +211,7 @@ public class ParsedConfiguration {
                     syncFields.remove(key);
                 }
             }
-            while (syncFields.size() > 0) {
+            while (!syncFields.isEmpty()) {
                 val fieldName =
                         StringConfigField.receiveString(input, maxFieldNameLength, "field name", configClass.getName());
                 if (!syncFields.containsKey(fieldName)) {
@@ -175,6 +250,7 @@ public class ParsedConfiguration {
         if (configClass.isAssignableFrom(Config.RequiresMcRestart.class)) {
             cat.setRequiresMcRestart(true);
         }
+        val nonFoundKeys = new HashSet<>(rawConfig.getCategory(category).keySet());
         for (val field : configClass.getDeclaredFields()) {
             if (field.getAnnotation(Config.Ignore.class) != null || (field.getModifiers() & Modifier.FINAL) != 0) {
                 continue;
@@ -182,14 +258,32 @@ public class ParsedConfiguration {
             field.setAccessible(true);
             maxFieldNameLength = Math.max(maxFieldNameLength, field.getName().length());
             val fieldClass = field.getType();
-            val name = Optional.ofNullable(field.getAnnotation(Config.Name.class))
-                               .map(Config.Name::value)
-                               .orElse(field.getName());
+            val nameAnnotation = Optional.ofNullable(field.getAnnotation(Config.Name.class));
+            val name = nameAnnotation.map(Config.Name::value)
+                                     .orElse(field.getName());
+            if (!cat.containsKey(name) && nameAnnotation.isPresent()) {
+                val migrations = nameAnnotation.get().migrations();
+                for (var migration: migrations) {
+                    if (migration.isEmpty()) {
+                        migration = field.getName();
+                    }
+                    if (cat.containsKey(migration)) {
+                        val prop = cat.remove(migration);
+                        prop.setName(name);
+                        cat.put(name, prop);
+                        nonFoundKeys.remove(migration);
+                        break;
+                    }
+                }
+            } else {
+                nonFoundKeys.remove(name);
+            }
             AConfigField<?> configField;
+            val params = new ConfigFieldParameters(field, rawConfig, modid, category);
             if (constructors.containsKey(fieldClass)) {
-                fields.put(name, configField = constructors.get(fieldClass).construct(field, rawConfig, category));
+                fields.put(name, configField = constructors.get(fieldClass).construct(params));
             } else if (fieldClass.isEnum()) {
-                fields.put(name, configField = new EnumConfigField<>(field, rawConfig, category));
+                fields.put(name, configField = new EnumConfigField<>(params));
             } else {
                 throw new ConfigException("Illegal config field: "
                                           + field.getName()
@@ -206,11 +300,16 @@ public class ParsedConfiguration {
                 cat.setRequiresWorldRestart(true);
             }
             configField.init();
-            elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), () -> {
+            elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), configField.getComment(), () -> {
                 configField.load();
-                save();
+                configField.save();
             }));
         }
+        val rawCategory = rawConfig.getCategory(category);
+        for (val key : nonFoundKeys) {
+            rawCategory.remove(key);
+        }
+        saveFile();
         rawConfig.setCategoryPropertyOrder(category,
                                            fieldsSorted().map((prop) -> prop.name).collect(Collectors.toList()));
     }
@@ -222,6 +321,14 @@ public class ParsedConfiguration {
     @SuppressWarnings("rawtypes")
     public List<IConfigElement> getConfigElements() {
         return fieldsSorted().map((field) -> elements.get(field.name)).collect(Collectors.toList());
+    }
+
+    public boolean requiresWorldRestart() {
+        return rawConfig.getCategory(category).requiresWorldRestart();
+    }
+
+    public boolean requiresMcRestart() {
+        return rawConfig.getCategory(category).requiresMcRestart();
     }
 
     public boolean validate(BiConsumer<Class<?>, Field> invalidFieldHandler, boolean resetInvalid) {
@@ -239,6 +346,6 @@ public class ParsedConfiguration {
     }
 
     private interface FieldRefConstructor {
-        AConfigField<?> construct(Field field, Configuration configuration, String category) throws ConfigException;
+        AConfigField<?> construct(ConfigFieldParameters params) throws ConfigException;
     }
 }

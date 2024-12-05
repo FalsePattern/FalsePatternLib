@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -42,8 +43,8 @@ public class DoubleListConfigField extends AListConfigField<double[]> {
     private final double max;
     private final double[] defaultValue;
 
-    public DoubleListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
-        super(field, configuration, category, Property.Type.DOUBLE);
+    public DoubleListConfigField(ConfigFieldParameters params) throws ConfigException {
+        super(params, Property.Type.DOUBLE);
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
         min = range.map(Config.RangeDouble::min).orElse(-Double.MAX_VALUE);
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);

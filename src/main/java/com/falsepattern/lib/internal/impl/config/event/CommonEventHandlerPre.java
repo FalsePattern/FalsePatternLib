@@ -48,7 +48,7 @@ public class CommonEventHandlerPre {
 
     @SubscribeEvent
     public void onValidationErrorLog(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOUDNESS != LibraryConfig.ValidationLogging.None) {
+        if (LibraryConfig.CONFIG_ERROR_LOGGING != LibraryConfig.ValidationLogging.None) {
             e.logWarn();
         }
     }

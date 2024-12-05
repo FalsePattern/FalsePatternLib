@@ -40,14 +40,20 @@ public class SimpleGuiConfig extends GuiConfig {
     }
 
     @StableAPI.Expose(since = "0.10.0")
-    public SimpleGuiConfig(GuiScreen parent, String modID, String modName, Class<?>... configClasses)
+    public SimpleGuiConfig(GuiScreen parent, String modID, String title, Class<?>... configClasses)
+            throws ConfigException {
+        this(parent, modID, title, null, configClasses);
+    }
+
+    @StableAPI.Expose(since = "1.5.0")
+    public SimpleGuiConfig(GuiScreen parent, String modID, String title, String titleLine2, Class<?>... configClasses)
             throws ConfigException {
         super(parent,
-              ConfigurationManager.getConfigElementsMulti(configClasses),
+              ConfigurationManager.getConfigElementsMultiStructured(configClasses),
               modID,
               false,
               false,
-              modName + " Configuration",
-              I18n.format("falsepatternlib.gui.config.description"));
+              title,
+              titleLine2);
     }
 }

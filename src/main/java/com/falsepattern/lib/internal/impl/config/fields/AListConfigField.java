@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -41,9 +42,9 @@ public abstract class AListConfigField<T> extends AConfigField<T> {
     protected final boolean fixedLength;
     protected final int maxLength;
 
-    protected AListConfigField(Field field, Configuration configuration, String category, Property.Type type)
+    protected AListConfigField(ConfigFieldParameters params, Property.Type type)
             throws ConfigException {
-        super(field, configuration, category, type, true);
+        super(params, type, true);
         fixedLength = field.isAnnotationPresent(Config.ListFixedLength.class);
         maxLength = Optional.ofNullable(field.getAnnotation(Config.ListMaxLength.class))
                             .map(Config.ListMaxLength::value)

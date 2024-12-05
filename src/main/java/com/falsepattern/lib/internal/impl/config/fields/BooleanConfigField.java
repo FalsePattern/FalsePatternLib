@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 
 import net.minecraftforge.common.config.Configuration;
@@ -39,8 +40,8 @@ public class BooleanConfigField extends AConfigField<Boolean> {
     private final boolean primitive;
     private final boolean defaultValue;
 
-    public BooleanConfigField(Field field, Configuration configuration, String category) {
-        super(field, configuration, category, Property.Type.BOOLEAN);
+    public BooleanConfigField(ConfigFieldParameters params) {
+        super(params, Property.Type.BOOLEAN);
         primitive = field.getType().isPrimitive();
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class))
                                .map(Config.DefaultBoolean::value)

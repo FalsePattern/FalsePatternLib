@@ -53,7 +53,7 @@ public class ClientEventHandlerPre {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onValidationErrorToast(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOUDNESS == LibraryConfig.ValidationLogging.LogAndToast) {
+        if (LibraryConfig.CONFIG_ERROR_LOGGING == LibraryConfig.ValidationLogging.LogAndToast) {
             e.toast();
         }
     }

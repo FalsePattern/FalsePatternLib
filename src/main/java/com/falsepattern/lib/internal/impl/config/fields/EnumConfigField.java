@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.FPLog;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.SneakyThrows;
@@ -48,8 +49,8 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
     private final BiMap<String, T> enumNameMap = HashBiMap.create();
 
     @SuppressWarnings("unchecked")
-    public EnumConfigField(Field field, Configuration configuration, String category) {
-        super(field, configuration, category, Property.Type.STRING);
+    public EnumConfigField(ConfigFieldParameters params) {
+        super(params, Property.Type.STRING);
         enumClass = (Class<T>) field.getType();
 
         val sj = new StringJoiner(", ", "[", "]");

@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -42,8 +43,8 @@ public class StringListConfigField extends AListConfigField<String[]> {
     private final Pattern pattern;
     private final int maxStringLength;
 
-    public StringListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
-        super(field, configuration, category, Property.Type.STRING);
+    public StringListConfigField(ConfigFieldParameters params) throws ConfigException {
+        super(params, Property.Type.STRING);
         pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class))
                           .map((ptr) -> Pattern.compile(ptr.value()))
                           .orElse(null);

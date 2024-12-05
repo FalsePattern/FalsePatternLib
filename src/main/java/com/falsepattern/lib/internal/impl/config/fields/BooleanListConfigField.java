@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigException;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -39,8 +40,8 @@ import java.util.Optional;
 public class BooleanListConfigField extends AListConfigField<boolean[]> {
     private final boolean[] defaultValue;
 
-    public BooleanListConfigField(Field field, Configuration configuration, String category) throws ConfigException {
-        super(field, configuration, category, Property.Type.BOOLEAN);
+    public BooleanListConfigField(ConfigFieldParameters params) throws ConfigException {
+        super(params, Property.Type.BOOLEAN);
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBooleanList.class))
                                .map(Config.DefaultBooleanList::value)
                                .orElseThrow(() -> noDefault(field, "DefaultBooleanList"));

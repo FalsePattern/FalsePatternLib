@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -42,8 +43,8 @@ public class StringConfigField extends AConfigField<String> {
     private final Pattern pattern;
     private final String defaultValue;
 
-    public StringConfigField(Field field, Configuration configuration, String category) {
-        super(field, configuration, category, Property.Type.STRING);
+    public StringConfigField(ConfigFieldParameters params) {
+        super(params, Property.Type.STRING);
         pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class))
                           .map((ptr) -> Pattern.compile(ptr.value()))
                           .orElse(null);

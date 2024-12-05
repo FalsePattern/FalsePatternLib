@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -42,8 +43,8 @@ public class DoubleConfigField extends AConfigField<Double> {
     private final double min;
     private final double max;
 
-    public DoubleConfigField(Field field, Configuration configuration, String category) {
-        super(field, configuration, category, Property.Type.DOUBLE);
+    public DoubleConfigField(ConfigFieldParameters params) {
+        super(params, Property.Type.DOUBLE);
         primitive = field.getType().isPrimitive();
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
         min = range.map(Config.RangeDouble::min).orElse(-Double.MAX_VALUE);

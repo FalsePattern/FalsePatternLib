@@ -23,7 +23,9 @@
 package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import com.falsepattern.lib.internal.impl.config.DeclOrderInternal;
+import lombok.Getter;
 import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
@@ -44,7 +46,9 @@ public abstract class AConfigField<T> {
     protected final String category;
     protected final String langKey;
     protected final Property.Type type;
+    @Getter
     protected final Property property;
+    @Getter
     protected final String comment;
     private boolean uninitialized;
 
@@ -58,23 +62,26 @@ public abstract class AConfigField<T> {
                                     + " annotation!");
     }
 
-    protected AConfigField(Field field, Configuration configuration, String category, Property.Type type) {
-        this(field, configuration, category, type, false);
+    protected AConfigField(ConfigFieldParameters params, Property.Type type) {
+        this(params, type, false);
     }
 
-    protected AConfigField(Field field, Configuration configuration, String category, Property.Type type, boolean isList) {
-        this.field = field;
-        this.configuration = configuration;
-        this.category = category;
+    protected AConfigField(ConfigFieldParameters params, Property.Type type, boolean isList) {
+        this.field = params.field();
+        this.configuration = params.configuration();
+        this.category = params.category();
         comment = Optional.ofNullable(field.getAnnotation(Config.Comment.class))
                           .map(Config.Comment::value)
                           .map((lines) -> String.join("\n", lines))
                           .orElse("");
-        name = Optional.ofNullable(field.getAnnotation(Config.Name.class))
-                       .map(Config.Name::value)
-                       .orElse(field.getName());
+        val nameAnnotation = Optional.ofNullable(field.getAnnotation(Config.Name.class));
+        name = nameAnnotation.map(Config.Name::value)
+                             .orElse(field.getName());
         langKey =
-                Optional.ofNullable(field.getAnnotation(Config.LangKey.class)).map(Config.LangKey::value).orElse(name);
+                Optional.ofNullable(field.getAnnotation(Config.LangKey.class))
+                        .map(Config.LangKey::value)
+                        .map(x -> x.isEmpty() ? "config." + params.modid() + "." + params.category() + "." + name : x)
+                        .orElse(name);
         this.type = type;
         val cat = configuration.getCategory(category);
         uninitialized = !cat.containsKey(name);
@@ -125,11 +132,9 @@ public abstract class AConfigField<T> {
             uninitialized = false;
             putField(getDefault());
             putConfig(getDefault());
+        } else {
+            load();
         }
-    }
-
-    public Property getProperty() {
-        return property;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

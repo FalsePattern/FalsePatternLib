@@ -20,28 +20,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.StableAPI;
+package com.falsepattern.lib.internal.impl.config;
 
-/**
- * A really basic wrapper for config to simplify handling them in external code.
- */
-@StableAPI(since = "0.6.0")
-public class ConfigException extends Exception {
+import com.github.bsideup.jabel.Desugar;
 
-    @StableAPI.Internal
-    public ConfigException(String message) {
-        super(message);
-    }
+import net.minecraftforge.common.config.Configuration;
 
-    @StableAPI.Internal
-    public ConfigException(String message, Throwable cause) {
-        super(message, cause);
-    }
+import java.lang.reflect.Field;
 
-    @StableAPI.Internal
-    public ConfigException(Throwable cause) {
-        super(cause);
-    }
-}
+@Desugar
+public record ConfigFieldParameters(
+        Field field,
+        Configuration configuration,
+        String modid,
+        String category
+) {}

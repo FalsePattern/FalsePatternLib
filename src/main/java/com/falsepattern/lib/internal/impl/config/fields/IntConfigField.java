@@ -24,6 +24,7 @@ package com.falsepattern.lib.internal.impl.config.fields;
 
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
+import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -42,8 +43,8 @@ public class IntConfigField extends AConfigField<Integer> {
     private final int min;
     private final int max;
 
-    public IntConfigField(Field field, Configuration configuration, String category) {
-        super(field, configuration, category, Property.Type.INTEGER);
+    public IntConfigField(ConfigFieldParameters params) {
+        super(params, Property.Type.INTEGER);
         primitive = field.getType().isPrimitive();
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
         min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
