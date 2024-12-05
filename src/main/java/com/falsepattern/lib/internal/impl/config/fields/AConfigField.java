@@ -91,6 +91,8 @@ public abstract class AConfigField<T> {
             property = configuration.get(category, name, "", comment, type);
         }
         property.setLanguageKey(langKey);
+        property.setRequiresWorldRestart(field.isAnnotationPresent(Config.RequiresWorldRestart.class));
+        property.setRequiresMcRestart(field.isAnnotationPresent(Config.RequiresMcRestart.class));
         noSync = field.isAnnotationPresent(Config.NoSync.class);
         order = Optional.ofNullable(field.getAnnotation(DeclOrderInternal.class))
                         .map(DeclOrderInternal::value)

@@ -293,12 +293,6 @@ public class ParsedConfiguration {
                                           + fieldClass.getName()
                                           + "! Did you forget an @Ignore annotation?");
             }
-            if (field.isAnnotationPresent(Config.RequiresMcRestart.class)) {
-                cat.setRequiresMcRestart(true);
-            }
-            if (field.isAnnotationPresent(Config.RequiresWorldRestart.class)) {
-                cat.setRequiresWorldRestart(true);
-            }
             configField.init();
             elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), configField.getComment(), () -> {
                 configField.load();
