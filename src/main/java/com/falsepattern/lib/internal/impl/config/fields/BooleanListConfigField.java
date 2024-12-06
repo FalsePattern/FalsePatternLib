@@ -37,15 +37,15 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class BooleanListConfigField extends AListConfigField<boolean[]> {
-    private final boolean[] defaultValue;
+public class BooleanListConfigField extends AListConfigField<boolean[], Config.DefaultBooleanList> {
 
     public BooleanListConfigField(ConfigFieldParameters params) throws ConfigException {
-        super(params, Property.Type.BOOLEAN);
-        defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBooleanList.class))
-                               .map(Config.DefaultBooleanList::value)
-                               .orElseThrow(() -> noDefault(field, "DefaultBooleanList"));
-        property.setDefaultValues(defaultValue);
+        super(params,
+              Property.Type.BOOLEAN,
+              Config.DefaultBooleanList.class,
+              Config.DefaultBooleanList::value,
+              Property::setDefaultValues
+              );
         if (!property.isBooleanList()) {
             setToDefault();
         }

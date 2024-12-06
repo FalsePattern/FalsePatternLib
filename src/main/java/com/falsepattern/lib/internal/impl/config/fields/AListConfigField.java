@@ -29,36 +29,50 @@ import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
 import lombok.val;
 
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-public abstract class AListConfigField<T> extends AConfigField<T> {
+public abstract class AListConfigField<T, E extends Annotation> extends AConfigField<T> {
     protected final boolean fixedLength;
     protected final int maxLength;
+    protected final T defaultValue;
 
-    protected AListConfigField(ConfigFieldParameters params, Property.Type type)
+
+    protected AListConfigField(ConfigFieldParameters params,
+                               Property.Type type,
+                               Class<E> defaultAnnotation,
+                               Function<E, T> defaultValueGetter,
+                               BiConsumer<Property, T> defaultValueSetter
+                               )
             throws ConfigException {
         super(params, type, true);
         fixedLength = field.isAnnotationPresent(Config.ListFixedLength.class);
-        maxLength = Optional.ofNullable(field.getAnnotation(Config.ListMaxLength.class))
-                            .map(Config.ListMaxLength::value)
-                            .orElse(256);
-        if (maxLength < 0) {
-            throw new ConfigException("Negative length list configurations are not supported!\n"
-                                      + "Field name: "
-                                      + field.getName()
-                                      + ", class: "
-                                      + field.getDeclaringClass().getName());
-        }
         property.setIsListLengthFixed(fixedLength);
+        defaultValue = Optional.ofNullable(field.getAnnotation(defaultAnnotation))
+                               .map(defaultValueGetter)
+                               .orElseThrow(() -> noDefault(field, defaultAnnotation.getSimpleName()));
+        defaultValueSetter.accept(property, defaultValue);
+        if (fixedLength) {
+            maxLength = Array.getLength(defaultValue);
+        } else {
+            maxLength = Optional.ofNullable(field.getAnnotation(Config.ListMaxLength.class))
+                                .map(Config.ListMaxLength::value)
+                                .orElse(-1);
+        }
         property.setMaxListLength(maxLength);
-        property.comment += "\n[fixed length: " + (fixedLength ? "yes" : "no") + ", max length: " + maxLength + "]";
+        if (fixedLength) {
+            property.comment += "\n[fixed length: " + maxLength + "]";
+        } else if (maxLength >= 0) {
+            property.comment += "\n[max length: " + maxLength + "]";
+        }
     }
 
     protected abstract int length(T arr);

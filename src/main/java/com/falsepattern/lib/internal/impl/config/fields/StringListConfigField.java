@@ -38,33 +38,27 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class StringListConfigField extends AListConfigField<String[]> {
-    private final String[] defaultValue;
+public class StringListConfigField extends AListConfigField<String[], Config.DefaultStringList> {
     private final Pattern pattern;
     private final int maxStringLength;
 
     public StringListConfigField(ConfigFieldParameters params) throws ConfigException {
-        super(params, Property.Type.STRING);
+        super(params,
+              Property.Type.STRING,
+              Config.DefaultStringList.class,
+              Config.DefaultStringList::value,
+              Property::setDefaultValues
+              );
         pattern = Optional.ofNullable(field.getAnnotation(Config.Pattern.class))
                           .map((ptr) -> Pattern.compile(ptr.value()))
                           .orElse(null);
-        defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultStringList.class))
-                               .map(Config.DefaultStringList::value)
-                               .orElseThrow(() -> noDefault(field, "DefaultStringList"));
         maxStringLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                                   .map(Config.StringMaxLength::value)
-                                  .orElse(256);
-        property.setDefaultValues(defaultValue);
+                                  .orElse(-1);
         if (!property.isList()) {
             setToDefault();
         }
-        property.comment +=
-                "\n[max string length: "
-                + maxLength
-                + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "")
-                + ", default: \""
-                + stringify(defaultValue)
-                + "\"]";
+        property.comment += StringConfigField.generateStringComment(maxStringLength, pattern, stringify(defaultValue));
     }
 
     private static String stringify(String[] arr) {

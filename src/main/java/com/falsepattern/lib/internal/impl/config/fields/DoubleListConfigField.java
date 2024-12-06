@@ -38,20 +38,20 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class DoubleListConfigField extends AListConfigField<double[]> {
+public class DoubleListConfigField extends AListConfigField<double[], Config.DefaultDoubleList> {
     private final double min;
     private final double max;
-    private final double[] defaultValue;
 
     public DoubleListConfigField(ConfigFieldParameters params) throws ConfigException {
-        super(params, Property.Type.DOUBLE);
+        super(params,
+              Property.Type.DOUBLE,
+              Config.DefaultDoubleList.class,
+              Config.DefaultDoubleList::value,
+              Property::setDefaultValues
+             );
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
         min = range.map(Config.RangeDouble::min).orElse(-Double.MAX_VALUE);
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);
-        defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDoubleList.class))
-                               .map(Config.DefaultDoubleList::value)
-                               .orElseThrow(() -> noDefault(field, "DefaultDoubleList"));
-        property.setDefaultValues(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
         try {

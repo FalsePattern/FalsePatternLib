@@ -53,14 +53,35 @@ public class StringConfigField extends AConfigField<String> {
                                .orElseThrow(() -> noDefault(field, "DefaultString"));
         maxLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                             .map(Config.StringMaxLength::value)
-                            .orElse(256);
+                            .orElse(-1);
         property.setDefaultValue(defaultValue);
-        property.comment += "\n[max length: "
-                            + maxLength
-                            + (pattern != null ? ", pattern: \"" + pattern.pattern() + "\"" : "")
-                            + ", default: \""
-                            + defaultValue
-                            + "\"]";
+        property.comment += generateStringComment(maxLength, pattern, defaultValue);
+    }
+
+    public static String generateStringComment(int maxStringLength, Pattern pattern, String defaultValue) {
+        val cmt = new StringBuilder();
+        boolean comma = false;
+        if (maxStringLength >= 0) {
+            cmt.append("\n[max string length: ").append(maxStringLength);
+            comma = true;
+        }
+        if (pattern != null) {
+            if (comma) {
+                cmt.append(", ");
+            } else {
+                cmt.append("\n[");
+            }
+            cmt.append("pattern: \"").append(pattern.pattern()).append("\"");
+            comma = true;
+        }
+        if (comma) {
+            cmt.append(", ");
+        } else {
+            cmt.append("\n[");
+        }
+        cmt.append("default: ").append(defaultValue);
+        cmt.append("]");
+        return cmt.toString();
     }
 
     public static boolean validateString(String value, int maxLength, Pattern pattern, Field field, int listIndex) {
@@ -68,7 +89,7 @@ public class StringConfigField extends AConfigField<String> {
             ConfigValidationFailureEvent.fieldIsNull(field, listIndex);
             return false;
         }
-        if (value.length() > maxLength) {
+        if (maxLength >= 0 && value.length() > maxLength) {
             ConfigValidationFailureEvent.postStringSizeOutOfBounds(field, listIndex, value, maxLength);
             return false;
         }
@@ -87,7 +108,7 @@ public class StringConfigField extends AConfigField<String> {
     public static String receiveString(DataInput input, int maxLength, String valueName, String className)
             throws IOException {
         val length = input.readInt();
-        if (length > maxLength || length < 0) {
+        if ((maxLength >= 0 && length > maxLength) || length < 0) {
             throw new IOException("Error while retrieving value for "
                                   + valueName
                                   + " in class "

@@ -38,20 +38,20 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class IntListConfigField extends AListConfigField<int[]> {
+public class IntListConfigField extends AListConfigField<int[], Config.DefaultIntList> {
     private final int min;
     private final int max;
-    private final int[] defaultValue;
 
     public IntListConfigField(ConfigFieldParameters params) throws ConfigException {
-        super(params, Property.Type.INTEGER);
+        super(params,
+              Property.Type.INTEGER,
+              Config.DefaultIntList.class,
+              Config.DefaultIntList::value,
+              Property::setDefaultValues
+              );
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
         min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
         max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
-        defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultIntList.class))
-                               .map(Config.DefaultIntList::value)
-                               .orElseThrow(() -> noDefault(field, "DefaultIntList"));
-        property.setDefaultValues(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
         if (!property.isIntList()) {
