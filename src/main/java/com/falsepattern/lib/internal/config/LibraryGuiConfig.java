@@ -33,6 +33,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class LibraryGuiConfig extends SimpleGuiConfig {
     public LibraryGuiConfig(GuiScreen parent) throws ConfigException {
-        super(parent, Tags.MODID, Tags.MODNAME, LibraryConfig.class, ToastConfig.class);
+        super(parent, Tags.MODID, Tags.MODNAME, MiscConfig.class, ToastConfig.class, ConfigEngineConfig.class);
     }
 }

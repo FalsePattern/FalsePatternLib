@@ -22,7 +22,6 @@
  */
 package com.falsepattern.lib.internal.config;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.Tags;
@@ -32,11 +31,7 @@ import com.falsepattern.lib.internal.Tags;
 @Config(modid = Tags.MODID,
         category = "misc",
         categoryMigrations = "general")
-public class LibraryConfig {
-    static {
-        ConfigurationManager.selfInit();
-    }
-
+public class MiscConfig {
     @Config.Comment({"Fixes the mod options menu in-game.",
                      "By default, the mod options when in already in a game will show \"Test1, Test2, DISABLED\" in bright red.",
                      "This replaces that interface with the one from the main menu."})
@@ -46,17 +41,7 @@ public class LibraryConfig {
                  migrations = "")
     public static boolean IN_GAME_MOD_OPTIONS_FIX;
 
-    @Config.Comment({"How the config error logging should be set up.",
-                    "[None] disables all built-in config validation error logging"})
-    @Config.LangKey
-    @Config.DefaultEnum("Log")
-    @Config.Name(value = "configErrorLogging",
-                 migrations = "CONFIG_ERROR_LOUDNESS")
-    public static ValidationLogging CONFIG_ERROR_LOGGING;
-
-    public enum ValidationLogging {
-        @StableAPI.Expose(since = "__INTERNAL__") None,
-        @StableAPI.Expose(since = "__INTERNAL__") Log,
-        @StableAPI.Expose(since = "__INTERNAL__") LogAndToast
+    static {
+        ConfigurationManager.selfInit();
     }
 }

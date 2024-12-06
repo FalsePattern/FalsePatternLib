@@ -71,7 +71,7 @@ public final class InGameModOptionsFix {
     public void onGuiOpen(final GuiOpenEvent event) {
         if (!isInitialized)
             return;
-        if (!LibraryConfig.IN_GAME_MOD_OPTIONS_FIX)
+        if (!MiscConfig.IN_GAME_MOD_OPTIONS_FIX)
             return;
 
         if (event.gui instanceof GuiIngameModOptions)

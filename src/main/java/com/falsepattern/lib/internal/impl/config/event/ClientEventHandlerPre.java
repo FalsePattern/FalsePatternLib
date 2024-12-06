@@ -26,7 +26,9 @@ package com.falsepattern.lib.internal.impl.config.event;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.config.LibraryConfig;
+import com.falsepattern.lib.internal.FPLog;
+import com.falsepattern.lib.internal.config.ConfigEngineConfig;
+import com.falsepattern.lib.internal.config.MiscConfig;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
 import com.falsepattern.lib.toasts.SimpleToast;
@@ -53,7 +55,7 @@ public class ClientEventHandlerPre {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onValidationErrorToast(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOGGING == LibraryConfig.ValidationLogging.LogAndToast) {
+        if (ConfigEngineConfig.CONFIG_ERROR_LOGGING == ConfigEngineConfig.LoggingLevel.LogAndToast) {
             e.toast();
         }
     }
@@ -63,23 +65,28 @@ public class ClientEventHandlerPre {
     public void onConfigSyncFinished(ConfigSyncEvent.End e) {
         val cfg = e.configClass.getAnnotation(Config.class);
         if (e.successful) {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
-                                         null,
-                                         FormattedText.parse(EnumChatFormatting.GREEN + "Synced config")
-                                                      .toChatText()
-                                                      .get(0),
-                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false,
-                                         5000));
+            if (ConfigEngineConfig.CONFIG_SYNC_SUCCESS_LOGGING == ConfigEngineConfig.LoggingLevel.LogAndToast) {
+                GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
+                                             null,
+                                             FormattedText.parse(EnumChatFormatting.GREEN + "Synced config")
+                                                          .toChatText()
+                                                          .get(0),
+                                             FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
+                                             false,
+                                             5000));
+            }
         } else {
-            GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
-                                         null,
-                                         FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config")
-                                                      .toChatText()
-                                                      .get(0),
-                                         FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
-                                         false,
-                                         5000));
+            if (ConfigEngineConfig.CONFIG_SYNC_FAILURE_LOGGING == ConfigEngineConfig.LoggingLevel.LogAndToast) {
+                GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
+                                             null,
+                                             FormattedText.parse(EnumChatFormatting.RED + "Failed to sync config")
+                                                          .toChatText()
+                                                          .get(0),
+                                             FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
+                                             false,
+                                             5000));
+            }
+
         }
     }
 }

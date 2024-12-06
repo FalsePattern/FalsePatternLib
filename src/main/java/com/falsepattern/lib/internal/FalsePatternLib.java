@@ -23,6 +23,7 @@
 package com.falsepattern.lib.internal;
 
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
+import com.falsepattern.lib.internal.config.ConfigEngineConfig;
 import com.falsepattern.lib.internal.proxy.CommonProxy;
 
 import cpw.mods.fml.common.Loader;
@@ -61,6 +62,7 @@ public class FalsePatternLib {
 
     @Mod.EventHandler
     public void construct(FMLConstructionEvent e) {
+        ConfigEngineConfig.poke();
         proxy.construct(e);
         Share.EARLY_INIT_DONE = true;
     }

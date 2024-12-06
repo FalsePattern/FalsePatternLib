@@ -23,11 +23,16 @@
 
 package com.falsepattern.lib.internal.impl.config.event;
 
+import com.falsepattern.lib.config.Config;
+import com.falsepattern.lib.config.event.ConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.config.LibraryConfig;
+import com.falsepattern.lib.internal.FPLog;
+import com.falsepattern.lib.internal.config.ConfigEngineConfig;
+import com.falsepattern.lib.internal.config.MiscConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.val;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -48,8 +53,27 @@ public class CommonEventHandlerPre {
 
     @SubscribeEvent
     public void onValidationErrorLog(ConfigValidationFailureEvent e) {
-        if (LibraryConfig.CONFIG_ERROR_LOGGING != LibraryConfig.ValidationLogging.None) {
+        if (ConfigEngineConfig.CONFIG_ERROR_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
             e.logWarn();
+        }
+    }
+
+    @SubscribeEvent
+    public void onConfigSyncFinished(ConfigSyncEvent.End e) {
+            if (e.successful) {
+                if (ConfigEngineConfig.CONFIG_SYNC_SUCCESS_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
+                    val cfg = e.configClass.getAnnotation(Config.class);
+                    FPLog.LOG.info("Synced config: {}:{}", cfg.modid(), cfg.category());
+                }
+            } else {
+                if (ConfigEngineConfig.CONFIG_SYNC_FAILURE_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
+                    val cfg = e.configClass.getAnnotation(Config.class);
+                    FPLog.LOG.error("Failed to sync config: {}:{}", cfg.modid(), cfg.category());
+                    val t = e.error;
+                    if (t != null) {
+                        FPLog.LOG.error(t.getMessage(), t);
+                    }
+            }
         }
     }
 }
