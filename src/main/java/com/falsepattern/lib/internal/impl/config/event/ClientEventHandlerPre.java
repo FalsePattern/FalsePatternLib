@@ -28,7 +28,6 @@ import com.falsepattern.lib.config.event.ConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.config.ConfigEngineConfig;
-import com.falsepattern.lib.internal.config.MiscConfig;
 import com.falsepattern.lib.text.FormattedText;
 import com.falsepattern.lib.toasts.GuiToast;
 import com.falsepattern.lib.toasts.SimpleToast;
@@ -75,6 +74,9 @@ public class ClientEventHandlerPre {
                                              false,
                                              5000));
             }
+            if (ConfigEngineConfig.CONFIG_SYNC_SUCCESS_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
+                FPLog.LOG.info("Synced config: {}:{}", cfg.modid(), cfg.category());
+            }
         } else {
             if (ConfigEngineConfig.CONFIG_SYNC_FAILURE_LOGGING == ConfigEngineConfig.LoggingLevel.LogAndToast) {
                 GuiToast.add(new SimpleToast(ToastBG.TOAST_DARK,
@@ -85,6 +87,13 @@ public class ClientEventHandlerPre {
                                              FormattedText.parse(cfg.modid() + ":" + cfg.category()).toChatText().get(0),
                                              false,
                                              5000));
+            }
+            if (ConfigEngineConfig.CONFIG_SYNC_FAILURE_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
+                FPLog.LOG.error("Failed to sync config: {}:{}", cfg.modid(), cfg.category());
+                val t = e.error;
+                if (t != null) {
+                    FPLog.LOG.error(t.getMessage(), t);
+                }
             }
 
         }

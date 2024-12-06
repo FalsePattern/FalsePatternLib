@@ -57,23 +57,4 @@ public class CommonEventHandlerPre {
             e.logWarn();
         }
     }
-
-    @SubscribeEvent
-    public void onConfigSyncFinished(ConfigSyncEvent.End e) {
-            if (e.successful) {
-                if (ConfigEngineConfig.CONFIG_SYNC_SUCCESS_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
-                    val cfg = e.configClass.getAnnotation(Config.class);
-                    FPLog.LOG.info("Synced config: {}:{}", cfg.modid(), cfg.category());
-                }
-            } else {
-                if (ConfigEngineConfig.CONFIG_SYNC_FAILURE_LOGGING != ConfigEngineConfig.LoggingLevel.None) {
-                    val cfg = e.configClass.getAnnotation(Config.class);
-                    FPLog.LOG.error("Failed to sync config: {}:{}", cfg.modid(), cfg.category());
-                    val t = e.error;
-                    if (t != null) {
-                        FPLog.LOG.error(t.getMessage(), t);
-                    }
-            }
-        }
-    }
 }
