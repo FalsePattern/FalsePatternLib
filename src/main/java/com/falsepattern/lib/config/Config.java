@@ -23,6 +23,7 @@
 package com.falsepattern.lib.config;
 
 import com.falsepattern.lib.StableAPI;
+import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -342,6 +343,7 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface Pattern {
+        @Language("RegExp")
         @StableAPI.Expose String value();
     }
 
