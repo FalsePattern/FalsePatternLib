@@ -55,7 +55,7 @@ import static com.falsepattern.lib.mixin.MixinInfo.isClassPresentSafe;
  */
 @MCVersion("1.7.10")
 @Name(Tags.MODID)
-@SortingIndex(500)
+@SortingIndex(1100)
 @IFMLLoadingPlugin.TransformerExclusions({Tags.GROUPNAME + ".internal.asm", Tags.GROUPNAME + ".asm", Tags.GROUPNAME + ".turboasm"})
 public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     @Getter
