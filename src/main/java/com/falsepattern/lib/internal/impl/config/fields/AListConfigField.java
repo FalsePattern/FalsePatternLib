@@ -123,7 +123,7 @@ public abstract class AListConfigField<T, E extends Annotation> extends AConfigF
     @Override
     public void receive(DataInput input) throws IOException {
         int length = input.readInt();
-        if (length > maxLength || fixedLength && length(getDefault()) != length) {
+        if ((fixedLength && length(getDefault()) != length) || (maxLength >= 0 && length > maxLength) || length < 0) {
             throw new IOException("Error while retrieving config value for field "
                                   + field.getName()
                                   + " in class "
