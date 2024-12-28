@@ -69,6 +69,7 @@ import java.util.function.BiConsumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConfigurationManagerImpl {
     private static final Map<Path, Configuration> configs = new HashMap<>();
+    private static final Map<String, Set<Class<?>>> modConfigs = new HashMap<>();
     private static final Map<Configuration, Set<Class<?>>> configToClassMap = new HashMap<>();
     private static final Map<Class<?>, ParsedConfiguration> parsedConfigMap = new HashMap<>();
     private static final BiMap<String, Class<?>> serializedNames = HashBiMap.create();
@@ -82,6 +83,7 @@ public final class ConfigurationManagerImpl {
             configToClassMap.computeIfAbsent(parsedConfig.rawConfig, (ignored) -> new HashSet<>()).add(configClass);
             parsedConfigMap.put(configClass, parsedConfig);
             serializedNames.put(parsedConfig.modid + "$" + parsedConfig.category, configClass);
+            modConfigs.computeIfAbsent(parsedConfig.modid, (x) -> new HashSet<>()).add(configClass);
         }
     }
 
@@ -286,14 +288,10 @@ public final class ConfigurationManagerImpl {
 
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         init();
-        val rawConfig = configs.get(event.modID);
-        if (rawConfig == null) {
+        val configs = modConfigs.get(event.modID);
+        if (configs == null) {
             return;
         }
-        val configClasses = configToClassMap.get(rawConfig);
-        for (val clazz : configClasses) {
-            val config = parsedConfigMap.get(clazz);
-            config.configChanged();
-        }
+        configs.stream().map(parsedConfigMap::get).distinct().forEach(ParsedConfiguration::configChanged);
     }
 }
