@@ -52,6 +52,7 @@ public class DoubleListConfigField extends AListConfigField<double[], Config.Def
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeDouble.class));
         min = range.map(Config.RangeDouble::min).orElse(-Double.MAX_VALUE);
         max = range.map(Config.RangeDouble::max).orElse(Double.MAX_VALUE);
+        val property = getProperty();
         property.setMinValue(min);
         property.setMaxValue(max);
         try {
@@ -116,12 +117,12 @@ public class DoubleListConfigField extends AListConfigField<double[], Config.Def
 
     @Override
     protected double[] getConfig() {
-        return property.getDoubleList();
+        return getProperty().getDoubleList();
     }
 
     @Override
     protected void putConfig(double[] value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

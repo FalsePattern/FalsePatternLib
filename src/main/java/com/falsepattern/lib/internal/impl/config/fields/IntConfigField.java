@@ -52,6 +52,7 @@ public class IntConfigField extends AConfigField<Integer> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultInt.class))
                                .map(Config.DefaultInt::value)
                                .orElseThrow(() -> noDefault(field, "DefaultInt"));
+        val property = getProperty();
         property.setDefaultValue(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
@@ -79,12 +80,12 @@ public class IntConfigField extends AConfigField<Integer> {
 
     @Override
     protected Integer getConfig() {
-        return property.getInt();
+        return getProperty().getInt();
     }
 
     @Override
     protected void putConfig(Integer value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

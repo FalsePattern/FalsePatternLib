@@ -52,6 +52,7 @@ public class DoubleConfigField extends AConfigField<Double> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultDouble.class))
                                .map(Config.DefaultDouble::value)
                                .orElseThrow(() -> noDefault(field, "DefaultDouble"));
+        val property = getProperty();
         property.setDefaultValue(defaultValue);
         property.setMinValue(min);
         property.setMaxValue(max);
@@ -79,12 +80,12 @@ public class DoubleConfigField extends AConfigField<Double> {
 
     @Override
     protected Double getConfig() {
-        return property.getDouble();
+        return getProperty().getDouble();
     }
 
     @Override
     protected void putConfig(Double value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

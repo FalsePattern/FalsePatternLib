@@ -294,7 +294,7 @@ public class ParsedConfiguration {
                                           + "! Did you forget an @Ignore annotation?");
             }
             configField.init();
-            elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField.getProperty(), configField.getComment(), () -> {
+            elements.computeIfAbsent(name, (name2) -> new ConfigElementProxy<>(configField::getProperty, configField.getComment(), () -> {
                 configField.load();
                 configField.save();
             }));

@@ -26,6 +26,7 @@ import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
 import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.SneakyThrows;
+import lombok.val;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -46,6 +47,7 @@ public class BooleanConfigField extends AConfigField<Boolean> {
         defaultValue = Optional.ofNullable(field.getAnnotation(Config.DefaultBoolean.class))
                                .map(Config.DefaultBoolean::value)
                                .orElseThrow(() -> noDefault(field, "DefaultBoolean"));
+        val property = getProperty();
         property.setDefaultValue(defaultValue);
         if (!property.isBooleanValue()) {
             setToDefault();
@@ -71,12 +73,12 @@ public class BooleanConfigField extends AConfigField<Boolean> {
 
     @Override
     protected Boolean getConfig() {
-        return property.getBoolean();
+        return getProperty().getBoolean();
     }
 
     @Override
     protected void putConfig(Boolean value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

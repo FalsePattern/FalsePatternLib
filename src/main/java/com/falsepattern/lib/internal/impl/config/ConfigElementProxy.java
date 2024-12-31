@@ -31,47 +31,53 @@ import cpw.mods.fml.client.config.GuiEditArrayEntries;
 import cpw.mods.fml.client.config.IConfigElement;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class ConfigElementProxy<T> implements IConfigElement<T> {
-    private final ConfigElement<T> element;
+    private final Supplier<Property> prop;
     private final String comment;
     private final Runnable syncCallback;
 
-    public ConfigElementProxy(Property prop, String comment, Runnable syncCallback) {
-        this.element = new ConfigElement<>(prop);
+    public ConfigElementProxy(Supplier<Property> prop, String comment, Runnable syncCallback) {
+        this.prop = prop;
         this.comment = comment;
         this.syncCallback = syncCallback;
     }
 
-    @Override
-    public boolean isProperty() {
-        return element.isProperty();
+    private ConfigElement<T> element() {
+        return new ConfigElement<>(prop.get());
     }
 
     @Override
+    public boolean isProperty() {
+        return element().isProperty();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
     public Class<? extends GuiConfigEntries.IConfigEntry> getConfigEntryClass() {
-        return element.getConfigEntryClass();
+        return element().getConfigEntryClass();
     }
 
     @Override
     public Class<? extends GuiEditArrayEntries.IArrayEntry> getArrayEntryClass() {
-        return element.getArrayEntryClass();
+        return element().getArrayEntryClass();
     }
 
     @Override
     public String getName() {
-        return element.getName();
+        return element().getName();
     }
 
     @Override
     public String getQualifiedName() {
-        return element.getQualifiedName();
+        return element().getQualifiedName();
     }
 
     @Override
     public String getLanguageKey() {
-        return element.getLanguageKey();
+        return element().getLanguageKey();
     }
 
     @Override
@@ -79,107 +85,108 @@ public class ConfigElementProxy<T> implements IConfigElement<T> {
         return comment;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public List<IConfigElement> getChildElements() {
-        return element.getChildElements();
+        return element().getChildElements();
     }
 
     // Caller sensitive
     @Override
     public ConfigGuiType getType() {
-        return element.getType();
+        return element().getType();
     }
 
     @Override
     public boolean isList() {
-        return element.isList();
+        return element().isList();
     }
 
     @Override
     public boolean isListLengthFixed() {
-        return element.isListLengthFixed();
+        return element().isListLengthFixed();
     }
 
     @Override
     public int getMaxListLength() {
-        return element.getMaxListLength();
+        return element().getMaxListLength();
     }
 
     @Override
     public boolean isDefault() {
-        return element.isDefault();
+        return element().isDefault();
     }
 
     @Override
     public Object getDefault() {
-        return element.getDefault();
+        return element().getDefault();
     }
 
     @Override
     public Object[] getDefaults() {
-        return element.getDefaults();
+        return element().getDefaults();
     }
 
     @Override
     public void setToDefault() {
-        element.setToDefault();
+        element().setToDefault();
         syncCallback.run();
     }
 
     @Override
     public boolean requiresWorldRestart() {
-        return element.requiresWorldRestart();
+        return element().requiresWorldRestart();
     }
 
     @Override
     public boolean showInGui() {
-        return element.showInGui();
+        return element().showInGui();
     }
 
     @Override
     public boolean requiresMcRestart() {
-        return element.requiresMcRestart();
+        return element().requiresMcRestart();
     }
 
     @Override
     public Object get() {
-        return element.get();
+        return element().get();
     }
 
     @Override
     public Object[] getList() {
-        return element.getList();
+        return element().getList();
     }
 
     @Override
     public void set(T value) {
-        element.set(value);
+        element().set(value);
         syncCallback.run();
     }
 
     @Override
     public void set(T[] aVal) {
-        element.set(aVal);
+        element().set(aVal);
         syncCallback.run();
     }
 
     @Override
     public String[] getValidValues() {
-        return element.getValidValues();
+        return element().getValidValues();
     }
 
     @Override
     public T getMinValue() {
-        return element.getMinValue();
+        return element().getMinValue();
     }
 
     @Override
     public T getMaxValue() {
-        return element.getMaxValue();
+        return element().getMaxValue();
     }
 
     @Override
     public Pattern getValidationPattern() {
-        return element.getValidationPattern();
+        return element().getValidationPattern();
     }
 }

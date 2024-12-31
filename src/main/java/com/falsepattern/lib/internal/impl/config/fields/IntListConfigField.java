@@ -52,6 +52,7 @@ public class IntListConfigField extends AListConfigField<int[], Config.DefaultIn
         val range = Optional.ofNullable(field.getAnnotation(Config.RangeInt.class));
         min = range.map(Config.RangeInt::min).orElse(Integer.MIN_VALUE);
         max = range.map(Config.RangeInt::max).orElse(Integer.MAX_VALUE);
+        val property = getProperty();
         property.setMinValue(min);
         property.setMaxValue(max);
         if (!property.isIntList()) {
@@ -112,12 +113,12 @@ public class IntListConfigField extends AListConfigField<int[], Config.DefaultIn
 
     @Override
     protected int[] getConfig() {
-        return property.getIntList();
+        return getProperty().getIntList();
     }
 
     @Override
     protected void putConfig(int[] value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

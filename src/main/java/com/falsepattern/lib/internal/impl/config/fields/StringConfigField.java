@@ -54,6 +54,7 @@ public class StringConfigField extends AConfigField<String> {
         maxLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                             .map(Config.StringMaxLength::value)
                             .orElse(-1);
+        val property = getProperty();
         property.setDefaultValue(defaultValue);
         property.comment += generateStringComment(maxLength, pattern, defaultValue);
     }
@@ -137,12 +138,12 @@ public class StringConfigField extends AConfigField<String> {
 
     @Override
     protected String getConfig() {
-        return property.getString();
+        return getProperty().getString();
     }
 
     @Override
     protected void putConfig(String value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

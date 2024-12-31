@@ -55,6 +55,7 @@ public class StringListConfigField extends AListConfigField<String[], Config.Def
         maxStringLength = Optional.ofNullable(field.getAnnotation(Config.StringMaxLength.class))
                                   .map(Config.StringMaxLength::value)
                                   .orElse(-1);
+        val property = getProperty();
         if (!property.isList()) {
             setToDefault();
         }
@@ -122,12 +123,12 @@ public class StringListConfigField extends AListConfigField<String[], Config.Def
 
     @Override
     protected String[] getConfig() {
-        return property.getStringList();
+        return getProperty().getStringList();
     }
 
     @Override
     protected void putConfig(String[] value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

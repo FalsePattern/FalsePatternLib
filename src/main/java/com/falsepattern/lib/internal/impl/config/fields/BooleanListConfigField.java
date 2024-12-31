@@ -46,6 +46,7 @@ public class BooleanListConfigField extends AListConfigField<boolean[], Config.D
               Config.DefaultBooleanList::value,
               Property::setDefaultValues
               );
+        val property = getProperty();
         if (!property.isBooleanList()) {
             setToDefault();
         }
@@ -91,12 +92,12 @@ public class BooleanListConfigField extends AListConfigField<boolean[], Config.D
 
     @Override
     protected boolean[] getConfig() {
-        return property.getBooleanList();
+        return getProperty().getBooleanList();
     }
 
     @Override
     protected void putConfig(boolean[] value) {
-        property.set(value);
+        getProperty().set(value);
     }
 
     @Override

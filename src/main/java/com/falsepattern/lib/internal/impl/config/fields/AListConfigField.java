@@ -55,6 +55,7 @@ public abstract class AListConfigField<T, E extends Annotation> extends AConfigF
             throws ConfigException {
         super(params, type, true);
         fixedLength = field.isAnnotationPresent(Config.ListFixedLength.class);
+        val property = getProperty();
         property.setIsListLengthFixed(fixedLength);
         defaultValue = Optional.ofNullable(field.getAnnotation(defaultAnnotation))
                                .map(defaultValueGetter)

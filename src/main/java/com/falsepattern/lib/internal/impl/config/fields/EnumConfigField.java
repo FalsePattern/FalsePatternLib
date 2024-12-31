@@ -72,6 +72,7 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
                                                                     + enumClass.getName())))
                                .orElseThrow(() -> noDefault(field, "DefaultEnum"));
         maxLength = enumNameMap.keySet().stream().mapToInt(String::length).max().orElse(0);
+        val property = getProperty();
         property.setDefaultValue(defaultValue.name());
         property.setValidValues(enumNameMap.keySet().toArray(new String[0]));
         if (!enumNameMap.containsValue(getConfig())) {
@@ -109,17 +110,13 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
 
     private T getEnumByName(String name) {
         if (!enumNameMap.containsKey(name)) {
-            FPLog.LOG.warn("Invalid value "
-                           + name
-                           + " for enum configuration field "
-                           + field.getName()
-                           + " of type "
-                           + enumClass.getName()
-                           + " in config class "
-                           + field.getDeclaringClass().getName()
-                           + "! Using default value of "
-                           + defaultValue.name()
-                           + "!");
+            FPLog.LOG.warn(
+                    "Invalid value {} for enum configuration field {} of type {} in config class {}! Using default value of {}!",
+                    name,
+                    field.getName(),
+                    enumClass.getName(),
+                    field.getDeclaringClass().getName(),
+                    defaultValue.name());
             return defaultValue;
         }
         return enumNameMap.get(name);
@@ -139,12 +136,12 @@ public class EnumConfigField<T extends Enum<T>> extends AConfigField<T> {
 
     @Override
     protected T getConfig() {
-        return getEnumByName(property.getString());
+        return getEnumByName(getProperty().getString());
     }
 
     @Override
     protected void putConfig(T value) {
-        property.set(value.name());
+        getProperty().set(value.name());
     }
 
     @Override

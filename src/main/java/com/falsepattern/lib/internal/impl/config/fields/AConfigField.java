@@ -47,8 +47,6 @@ public abstract class AConfigField<T> {
     protected final String langKey;
     protected final Property.Type type;
     @Getter
-    protected final Property property;
-    @Getter
     protected final String comment;
     private boolean uninitialized;
 
@@ -85,6 +83,7 @@ public abstract class AConfigField<T> {
         this.type = type;
         val cat = configuration.getCategory(category);
         uninitialized = !cat.containsKey(name);
+        final Property property;
         if (isList) {
             property = configuration.get(category, name, new String[0], comment, type);
         } else {
@@ -137,6 +136,10 @@ public abstract class AConfigField<T> {
         } else {
             load();
         }
+    }
+
+    public Property getProperty() {
+        return configuration.getCategory(category).get(name);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
