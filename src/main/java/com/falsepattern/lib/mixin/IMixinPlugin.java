@@ -74,10 +74,10 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
             File found = null;
             for (URL url : Launch.classLoader.getURLs()) {
                 try {
-                    String file = url.getFile();
-                    Path path = Paths.get(file);
+                    val file = new File(url.toURI());
+                    Path path = file.toPath();
                     if (mod.isMatchingJar(path)) {
-                        found = path.toFile();
+                        found = file;
                         break;
                     }
                 } catch (Exception ignored) {
@@ -102,10 +102,10 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         }
         for (URL url : Launch.classLoader.getURLs()) {
             try {
-                String file = url.getFile();
-                Path path = Paths.get(file);
+                val file = new File(url.toURI());
+                Path path = file.toPath();
                 if (mod.isMatchingJar(path)) {
-                    results.add(path.toFile());
+                    results.add(file);
                     break;
                 }
             } catch (Exception ignored) {
