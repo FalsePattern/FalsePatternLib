@@ -628,9 +628,16 @@ public class DependencyLoaderImpl {
             final var vizThread = getVizThread(doViz, progresses, theFrame);
             vizThread.start();
         }
-        theFuture.join();
-        if (theFrame != null) {
-            doViz.set(false);
+        try {
+            theFuture.join();
+        } catch (Error e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new Error(t);
+        } finally {
+            if (theFrame != null) {
+                doViz.set(false);
+            }
         }
     }
 
@@ -658,6 +665,7 @@ public class DependencyLoaderImpl {
             }
             theFrame.dispose();
         });
+        vizThread.setDaemon(true);
         vizThread.setName("FalsePatternLib Download Visualizer");
         return vizThread;
     }
@@ -689,26 +697,22 @@ public class DependencyLoaderImpl {
         public volatile long downloaded = 0;
 
         private void load() {
-            try {
-                setupLibraryNames();
-                if (loadedLibraries.containsKey(artifact)) {
-                    alreadyLoaded();
-                    return;
-                }
-                setupPaths();
-                if (tryLoadingExistingFile()) {
-                    return;
-                }
-                validateDownloadsAllowed();
-                for (var repo : mavenRepositories) {
-                    if (tryDownloadFromMaven(repo)) {
-                        return;
-                    }
-                }
-                crashCouldNotDownload();
-            } catch (Exception e) {
-                LOG.fatal(e);
+            setupLibraryNames();
+            if (loadedLibraries.containsKey(artifact)) {
+                alreadyLoaded();
+                return;
             }
+            setupPaths();
+            if (tryLoadingExistingFile()) {
+                return;
+            }
+            validateDownloadsAllowed();
+            for (var repo : mavenRepositories) {
+                if (tryDownloadFromMaven(repo)) {
+                    return;
+                }
+            }
+            crashCouldNotDownload();
         }
 
         private void crashCouldNotDownload() {
