@@ -25,6 +25,7 @@ package com.falsepattern.lib.internal.asm;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import com.falsepattern.lib.internal.impl.dependencies.LetsEncryptHelper;
 import com.falsepattern.lib.internal.logging.CrashImprover;
 import com.falsepattern.lib.internal.logging.NotEnoughVerbosity;
 import com.falsepattern.lib.mapping.MappingManager;
@@ -62,6 +63,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     private static boolean obfuscated;
 
     static {
+        LetsEncryptHelper.replaceSSLContext();
         FPLog.LOG.info("Removing skill issues...");
         try {
             Class.forName("thermos.Thermos");

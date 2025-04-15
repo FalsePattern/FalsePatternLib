@@ -50,6 +50,10 @@ public class EarlyConfig {
     @StableAPI.Expose(since = "__INTERNAL__")
     private boolean enableLibraryDownloads;
 
+    @Expose
+    @StableAPI.Expose(since = "__INTERNAL__")
+    private boolean enableLetsEncryptRoot;
+
     private static volatile EarlyConfig instance = null;
 
     private static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " Early Config");
@@ -83,6 +87,7 @@ public class EarlyConfig {
         if (config == null) {
             config = new EarlyConfig();
             config.enableLibraryDownloads(true);
+            config.enableLetsEncryptRoot(true);
             try {
                 Files.write(configFile, gson.toJson(config).getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {

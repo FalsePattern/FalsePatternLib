@@ -25,10 +25,12 @@ package com.falsepattern.lib.internal.asm;
 
 import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import com.falsepattern.lib.internal.impl.dependencies.LetsEncryptHelper;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 
 public class RFBLoadingPlugin implements RfbPlugin {
     static {
+        LetsEncryptHelper.replaceSSLContext();
         LowLevelCallMultiplexer.rfbDetected();
         DependencyLoaderImpl.executeDependencyLoading(false);
     }
