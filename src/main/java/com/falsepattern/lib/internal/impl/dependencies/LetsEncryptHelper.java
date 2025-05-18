@@ -48,11 +48,14 @@ public class LetsEncryptHelper {
     @SuppressWarnings("java:S6437")
     public static void replaceSSLContext() {
         if (!EarlyConfig.getInstance().enableLetsEncryptRoot()) {
+            FPLog.LOG.info("[LetsEncryptHelper] Disabled by config");
             return;
         }
         if (patched) {
+            FPLog.LOG.info("[LetsEncryptHelper] Already patched");
             return;
         }
+        FPLog.LOG.info("[LetsEncryptHelper] Starting patcher");
         patched = true;
 
         try (val x1 = LetsEncryptHelper.class.getResourceAsStream("/letsencrypt/isrgrootx1.pem");
@@ -79,6 +82,9 @@ public class LetsEncryptHelper {
             FPLog.LOG.error("[LetsEncryptHelper] Failed to load certificates from classpath.", e);
         } catch (GeneralSecurityException e) {
             FPLog.LOG.error("[LetsEncryptHelper] Failed to load default keystore.", e);
+        } catch (Throwable t) {
+            FPLog.LOG.error("[LetsEncryptHelper] Unknown error", t);
+            throw t;
         }
     }
 }

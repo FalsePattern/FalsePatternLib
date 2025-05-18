@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -44,33 +45,12 @@ public class Internet {
 
     public static void connect(URL URL, Map<String, String> headers, Consumer<Exception> onError, Consumer<InputStream> onSuccess, Consumer<Long> contentLengthCallback) {
         try {
-            val connection = (HttpURLConnection) URL.openConnection();
-            connection.setConnectTimeout(3500);
-            connection.setReadTimeout(5000);
-            connection.setRequestProperty("User-Agent",
-                                          Tags.MODNAME
-                                          + " "
-                                          + Tags.VERSION
-                                          + " Internet Connector"
-                                          + " (https://github.com/FalsePattern/FalsePatternLib)");
-            for (val header : headers.entrySet()) {
-                val key = header.getKey();
-                val value = header.getValue();
-                if (key == null || value == null) {
-                    throw new IllegalArgumentException("Null key or value");
-                }
-                if (key.isEmpty()) {
-                    throw new IllegalArgumentException("Empty key");
-                }
-                connection.setRequestProperty(key, value);
-            }
-            if (connection.getResponseCode() != 200) {
-                onError.accept(new Exception("HTTP response code " + connection.getResponseCode()));
+            val urlConnection = URL.openConnection();
+            if (urlConnection instanceof HttpURLConnection) {
+                connectHTTP((HttpURLConnection) urlConnection, headers, onError, onSuccess, contentLengthCallback);
             } else {
-                contentLengthCallback.accept(connection.getContentLengthLong());
-                onSuccess.accept(connection.getInputStream());
+                executeTransfer(urlConnection, onSuccess, contentLengthCallback);
             }
-            connection.disconnect();
         } catch (Exception e) {
             //Check if NonUpdate is present
             try {
@@ -84,6 +64,39 @@ public class Internet {
             }
             onError.accept(e);
         }
+    }
+
+    private static void connectHTTP(HttpURLConnection connection, Map<String, String> headers, Consumer<Exception> onError, Consumer<InputStream> onSuccess, Consumer<Long> contentLengthCallback) throws IOException {
+        connection.setConnectTimeout(3500);
+        connection.setReadTimeout(5000);
+        connection.setRequestProperty("User-Agent",
+                                      Tags.MODNAME
+                                      + " "
+                                      + Tags.VERSION
+                                      + " Internet Connector"
+                                      + " (https://github.com/FalsePattern/FalsePatternLib)");
+        for (val header : headers.entrySet()) {
+            val key = header.getKey();
+            val value = header.getValue();
+            if (key == null || value == null) {
+                throw new IllegalArgumentException("Null key or value");
+            }
+            if (key.isEmpty()) {
+                throw new IllegalArgumentException("Empty key");
+            }
+            connection.setRequestProperty(key, value);
+        }
+        if (connection.getResponseCode() != 200) {
+            onError.accept(new Exception("HTTP response code " + connection.getResponseCode()));
+        } else {
+            executeTransfer(connection, onSuccess, contentLengthCallback);
+        }
+        connection.disconnect();
+    }
+
+    private static void executeTransfer(URLConnection connection, Consumer<InputStream> onSuccess, Consumer<Long> contentLengthCallback) throws IOException {
+        contentLengthCallback.accept(connection.getContentLengthLong());
+        onSuccess.accept(connection.getInputStream());
     }
 
     public static void transferAndClose(InputStream is, OutputStream target, Consumer<Integer> downloadSizeCallback)

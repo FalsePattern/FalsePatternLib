@@ -96,7 +96,8 @@ public class DependencyLoaderImpl {
     private static final String[] CHECKSUM_TYPES = new String[]{"sha512", "sha256", "sha1", "md5"};
     private static final Map<String, Version> loadedLibraries = new ConcurrentHashMap<>();
     private static final Map<String, String> loadedLibraryMods = new ConcurrentHashMap<>();
-    private static final Set<String> mavenRepositories = new ConcurrentSet<>();
+    private static final Set<String> remoteMavenRepositories = new ConcurrentSet<>();
+    private static final Set<String> localMavenRepositories = new ConcurrentSet<>();
     private static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " Library Loader");
 
     private static final AtomicLong counter = new AtomicLong(0);
@@ -176,7 +177,7 @@ public class DependencyLoaderImpl {
     }
 
     public static void addMavenRepo(String url) {
-        mavenRepositories.add(url);
+        remoteMavenRepositories.add(url);
     }
 
     private static String bytesToHex(byte[] hash) {
@@ -262,7 +263,7 @@ public class DependencyLoaderImpl {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
-    private static boolean scanForDepSpecs(URL source, List<URL> output) {
+    private static boolean scanForDepSpecs(URL source, List<URL> output, List<URL> jijURLs) {
         if (!source.getProtocol().equals("file")) {
             return false;
         }
@@ -274,14 +275,22 @@ public class DependencyLoaderImpl {
                  val jarFile = new JarInputStream(inputStream, false)) {
                 ZipEntry entry;
                 while ((entry = jarFile.getNextEntry()) != null) {
-                    if (!entry.getName().startsWith("META-INF") || !entry.getName().endsWith(".json")) {
+                    val name = entry.getName();
+                    if (!name.startsWith("META-INF/"))
                         continue;
-                    }
-                    try {
-                        output.add(new URL("jar:" + source + "!/" + entry.getName()));
-                        found = true;
-                    } catch (MalformedURLException e) {
-                        LOG.error("Failed to add json source {} to dependency source list: {}", entry.getName(), e);
+                    if (name.endsWith(".json") && name.matches("META-INF/\\w+.json")) {
+                        try {
+                            output.add(new URL("jar:" + source + "!/" + entry.getName()));
+                            found = true;
+                        } catch (MalformedURLException e) {
+                            LOG.error("Failed to add json source {} to dependency source list: {}", entry.getName(), e);
+                        }
+                    } else if (name.equals("META-INF/falsepatternlib_repo/")) {
+                        try {
+                            jijURLs.add(new URL("jar:" + source + "!/" + entry.getName()));
+                        } catch (MalformedURLException e) {
+                            LOG.error("Failed to add jar-in-jar repo {}: {}", entry.getName(), e);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -306,14 +315,22 @@ public class DependencyLoaderImpl {
             }
             try (val files = Files.list(metaInf)) {
                 found = files.reduce(false, (prev,file) -> {
-                    if (!file.endsWith(".json")) {
-                        return prev;
-                    }
-                    try {
-                        output.add(file.toUri().toURL());
-                        return true;
-                    } catch (MalformedURLException e) {
-                        LOG.error("Failed to add json source {} to dependency source list: {}", file.getFileName(), e);
+                    val entryFileName = file.getFileName().toString();
+                    if (entryFileName.endsWith(".json")) {
+                        try {
+                            output.add(file.toUri().toURL());
+                            return true;
+                        } catch (MalformedURLException e) {
+                            LOG.error("Failed to add json source {} to dependency source list: {}",
+                                      file.toString(),
+                                      e);
+                        }
+                    } else if (entryFileName.equals("falsepatternlib_repo")) {
+                        try {
+                            jijURLs.add(file.toUri().toURL());
+                        } catch (MalformedURLException e) {
+                            LOG.error("Failed to add jar-in-jar repo {}: {}", file.toString(), e);
+                        }
                     }
                     return prev;
                 }, (a,b) -> a || b);
@@ -420,8 +437,9 @@ public class DependencyLoaderImpl {
                                .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
                                .collect(Collectors.toList());
         val urls = new ArrayList<URL>();
+        val jijURLs = new ArrayList<URL>();
         for (val candidate : candidates) {
-            if (!scanForDepSpecs(candidate, urls)) {
+            if (!scanForDepSpecs(candidate, urls, jijURLs)) {
                 urlsWithoutDeps.add(candidate.toString());
             }
         }
@@ -459,9 +477,11 @@ public class DependencyLoaderImpl {
         }).filter(Objects::nonNull).collect(Collectors.toSet());
         long end = System.currentTimeMillis();
         LOG.debug("Discovered {} dependency source candidates in {}ms", dependencySpecs.size(), end - start);
-        mavenRepositories.addAll(dependencySpecs.stream()
-                                                .flatMap((dep) -> dep.repositories().stream())
-                                                .collect(Collectors.toSet()));
+        remoteMavenRepositories.addAll(dependencySpecs.stream()
+                                                      .flatMap((dep) -> dep.repositories().stream())
+                                                      .map(repo -> repo.endsWith("/") ? repo : repo + "/")
+                                                      .collect(Collectors.toSet()));
+        localMavenRepositories.addAll(jijURLs.stream().map(URL::toString).map(repo -> repo.endsWith("/") ? repo : repo + "/").collect(Collectors.toSet()));
         val artifacts = dependencySpecs.stream()
                                        .map((root) -> new Pair<>(root.source(), root.dependencies()))
                                        .flatMap(pair -> flatMap(pair,
@@ -706,8 +726,13 @@ public class DependencyLoaderImpl {
             if (tryLoadingExistingFile()) {
                 return;
             }
+            for (val repo: localMavenRepositories) {
+                if (tryDownloadFromMaven(repo)) {
+                    return;
+                }
+            }
             validateDownloadsAllowed();
-            for (var repo : mavenRepositories) {
+            for (var repo : remoteMavenRepositories) {
                 if (tryDownloadFromMaven(repo)) {
                     return;
                 }
