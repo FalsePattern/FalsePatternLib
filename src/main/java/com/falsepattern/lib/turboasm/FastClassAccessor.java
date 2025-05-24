@@ -22,14 +22,14 @@
 
 package com.falsepattern.lib.turboasm;
 
-import java.lang.reflect.Modifier;
-
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.StableAPI.Expose;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+
+import java.lang.reflect.Modifier;
 
 /** An accessor to metadata about a class that is quickly accessible without fully parsing one. */
 @StableAPI(since = "__EXPERIMENTAL__")

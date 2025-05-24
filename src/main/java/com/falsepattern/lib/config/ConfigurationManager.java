@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 
-import cpw.mods.fml.client.config.DummyConfigElement;
 import cpw.mods.fml.client.config.IConfigElement;
 
 import java.lang.reflect.Field;

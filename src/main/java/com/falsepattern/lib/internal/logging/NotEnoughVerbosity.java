@@ -22,6 +22,18 @@
 
 package com.falsepattern.lib.internal.logging;
 
+import com.falsepattern.lib.internal.FPLog;
+import com.falsepattern.lib.internal.Tags;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.impl.Log4jContextFactory;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
+
+import net.minecraft.launchwrapper.Launch;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,18 +47,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.Tags;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.impl.Log4jContextFactory;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
-
-import net.minecraft.launchwrapper.Launch;
 
 // This class is a port of NotEnoughVerbosity, licensed under the Unlicense
 // It has been merged into FalsePatternLib so that it's available inside more modpacks

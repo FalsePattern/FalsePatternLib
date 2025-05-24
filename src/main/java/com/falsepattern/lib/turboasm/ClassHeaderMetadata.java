@@ -22,16 +22,16 @@
 
 package com.falsepattern.lib.turboasm;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.StableAPI.Expose;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 /**
  * Utilities for quickly processing class files without fully parsing them.

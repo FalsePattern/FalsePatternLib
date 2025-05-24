@@ -34,10 +34,8 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import net.minecraft.launchwrapper.Launch;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

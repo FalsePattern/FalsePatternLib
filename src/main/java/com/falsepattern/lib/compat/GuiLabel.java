@@ -24,7 +24,6 @@ package com.falsepattern.lib.compat;
 import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.val;
-import lombok.var;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;

@@ -25,8 +25,6 @@ package com.falsepattern.lib.internal;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraft.launchwrapper.Launch;
 

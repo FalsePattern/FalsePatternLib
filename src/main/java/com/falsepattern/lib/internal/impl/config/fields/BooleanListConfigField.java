@@ -26,15 +26,12 @@ import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.internal.impl.config.ConfigFieldParameters;
 import lombok.val;
 
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Optional;
 
 public class BooleanListConfigField extends AListConfigField<boolean[], Config.DefaultBooleanList> {
 

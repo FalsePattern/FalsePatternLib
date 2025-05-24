@@ -24,7 +24,6 @@ package com.falsepattern.lib.text;
 import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.val;
-import lombok.var;
 
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;

@@ -26,7 +26,6 @@ import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 
 public class TypeDiscovererModuleInfoSilencer implements TurboClassTransformer {

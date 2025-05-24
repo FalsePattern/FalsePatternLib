@@ -23,14 +23,11 @@
 package com.falsepattern.lib.internal.config;
 
 import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.internal.FalsePatternLib;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import lombok.Data;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;

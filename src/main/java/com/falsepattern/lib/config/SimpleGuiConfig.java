@@ -24,7 +24,6 @@ package com.falsepattern.lib.config;
 import com.falsepattern.lib.StableAPI;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

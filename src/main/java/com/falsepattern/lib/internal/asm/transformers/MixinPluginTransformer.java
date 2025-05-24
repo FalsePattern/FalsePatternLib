@@ -23,7 +23,6 @@
 package com.falsepattern.lib.internal.asm.transformers;
 
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.internal.asm.FPTransformer;
 import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;

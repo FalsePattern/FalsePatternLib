@@ -41,14 +41,8 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.Map;
-
-import static com.falsepattern.lib.mixin.MixinInfo.isClassPresentSafe;
 
 /**
  * Coremod stub so that forge loads the jar early

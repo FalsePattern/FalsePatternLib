@@ -23,10 +23,6 @@
 package com.falsepattern.lib.internal.asm.transformers;
 
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.mapping.MappingManager;
-import com.falsepattern.lib.mapping.types.MappingType;
-import com.falsepattern.lib.mapping.types.NameType;
-import com.falsepattern.lib.mapping.types.UniversalClass;
 import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;

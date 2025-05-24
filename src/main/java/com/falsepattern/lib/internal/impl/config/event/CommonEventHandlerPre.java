@@ -22,16 +22,11 @@
 
 package com.falsepattern.lib.internal.impl.config.event;
 
-import com.falsepattern.lib.config.Config;
-import com.falsepattern.lib.config.event.ConfigSyncEvent;
 import com.falsepattern.lib.config.event.ConfigValidationFailureEvent;
-import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.config.ConfigEngineConfig;
-import com.falsepattern.lib.internal.config.MiscConfig;
 import com.falsepattern.lib.internal.impl.config.ConfigurationManagerImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.val;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;

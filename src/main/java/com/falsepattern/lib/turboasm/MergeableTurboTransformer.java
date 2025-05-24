@@ -23,7 +23,6 @@ package com.falsepattern.lib.turboasm;
 
 import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import net.minecraft.launchwrapper.IClassTransformer;
