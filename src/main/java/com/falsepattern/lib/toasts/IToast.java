@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 
@@ -32,27 +31,20 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public interface IToast {
-    @StableAPI.Expose
     Object NO_TOKEN = new Object();
 
-    @StableAPI.Expose
     Visibility draw(GuiToastImpl toastGui, long delta);
 
-    @StableAPI.Expose
     int width();
 
-    @StableAPI.Expose
     int height();
 
-    @StableAPI.Expose
     default Object getType() {
         return NO_TOKEN;
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI(since = "0.10.0")
     enum Visibility {
         SHOW(new ResourceLocation(Tags.MODID, "ui.toast.in")),
         HIDE(new ResourceLocation(Tags.MODID, "ui.toast.out"));
@@ -63,7 +55,6 @@ public interface IToast {
             this.sound = soundIn;
         }
 
-        @StableAPI.Expose
         public void playSound(SoundHandler handler) {
             handler.playSound(PositionedSoundRecord.func_147674_a(this.sound, 1.0F));
         }

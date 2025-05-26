@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.util;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -31,19 +30,18 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @since 0.8.0
+ */
 @UtilityClass
-@StableAPI(since = "0.8.0")
 public final class LangUtil {
-    @StableAPI.Expose
     public static final String DEFAULT_LOCALE = "en_US";
     private static final ThreadLocal<HashMap<String, String>> tempMap = ThreadLocal.withInitial(HashMap::new);
 
-    @StableAPI.Expose
     public static void defaultLocalization(@NonNull Map<String, String> localeMap) {
         localeMap.forEach(LangUtil::defaultLocalization);
     }
 
-    @StableAPI.Expose
     public static void defaultLocalization(@NonNull String key, @NonNull String value) {
         if (!LanguageRegistry.instance().getStringLocalization(key, DEFAULT_LOCALE).isEmpty()) {
             return;

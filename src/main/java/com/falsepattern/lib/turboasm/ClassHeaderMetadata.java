@@ -22,8 +22,6 @@
 
 package com.falsepattern.lib.turboasm;
 
-import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.StableAPI.Expose;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,42 +34,28 @@ import java.io.IOException;
 /**
  * Utilities for quickly processing class files without fully parsing them.
  */
-@StableAPI(since = "__EXPERIMENTAL__")
 public final class ClassHeaderMetadata implements FastClassAccessor {
 
-    @Expose
     public final int minorVersion;
-    @Expose
     public final int majorVersion;
-    @Expose
     public final int constantPoolEntryCount;
     /** Byte offsets of where each constant pool entry starts (index of the tag byte), zero-indexed! */
-    @Expose
     public final int @NotNull [] constantPoolEntryOffsets;
     /** Type of each parsed constant pool entry, zero-indexed! */
-    @Expose
     public final ConstantPoolEntryTypes @NotNull [] constantPoolEntryTypes;
 
-    @Expose
     public final int constantPoolEndOffset;
-    @Expose
     public final int accessFlags;
-    @Expose
     public final int thisClassIndex;
-    @Expose
     public final int superClassIndex;
-    @Expose
     public final int interfacesCount;
-    @Expose
     public final @NotNull String binaryThisName;
-    @Expose
     public final @Nullable String binarySuperName;
 
     /**
      * Attempts to parse a class header.
      * @param bytes The class bytes to parse.
      */
-    @Expose
     public ClassHeaderMetadata(byte @NotNull [] bytes) {
         if (!isValidClass(bytes)) {
             throw new IllegalArgumentException("Invalid class detected");
@@ -143,7 +127,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * @param off Offset to the 16-bit length field.
      * @return The decoded String.
      */
-    @Expose
     public static @NotNull String modifiedUtf8(byte @NotNull [] arr, int off) {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(arr, off, arr.length - off);
                 DataInputStream dis = new DataInputStream(bais)) {
@@ -174,85 +157,57 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * attribute_info attributes[attributes_count];
      * }
      */
-    @StableAPI(since = "__EXPERIMENTAL__")
     public static final class Offsets {
         private Offsets() {}
         /** The magic item supplies the magic number identifying the class file format; it has the value 0xCAFEBABE */
-        @Expose
         public static final int magicU32 = 0;
         /**  The values of the minor_version and major_version items are the minor and major version numbers of this class file. Together, a major and a minor version number determine the version of the class file format. If a class file has major version number M and minor version number m, we denote the version of its class file format as M.m */
-        @Expose
         public static final int minorVersionU16 = magicU32 + 4;
         /**  The values of the minor_version and major_version items are the minor and major version numbers of this class file. Together, a major and a minor version number determine the version of the class file format. If a class file has major version number M and minor version number m, we denote the version of its class file format as M.m */
-        @Expose
         public static final int majorVersionU16 = minorVersionU16 + 2;
         /**  The value of the constant_pool_count item is equal to the number of entries in the constant_pool table plus one. A constant_pool index is considered valid if it is greater than zero and less than constant_pool_count, with the exception for constants of type long and double noted in §4.4.5. */
-        @Expose
         public static final int constantPoolCountU16 = majorVersionU16 + 2;
         /**
          * The constant_pool is a table of structures (§4.4) representing various string constants, class and interface names, field names, and other constants that are referred to within the ClassFile structure and its substructures. The format of each constant_pool table entry is indicated by its first "tag" byte.
          * <p>
          * The constant_pool table is indexed from 1 to constant_pool_count - 1.
          */
-        @Expose
         public static final int constantPoolStart = constantPoolCountU16 + 2;
         /**
          * The value of the access_flags item is a mask of flags used to denote access permissions to and properties of this class or interface. The interpretation of each flag, when set, is specified in Table 4.1-B.
          */
-        @Expose
         public static final int pastCpAccessFlagsU16 = 0;
         /**
          *  The value of the this_class item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Class_info structure (§4.4.1) representing the class or interface defined by this class file.
          */
-        @Expose
         public static final int pastCpThisClassU16 = pastCpAccessFlagsU16 + 2;
         /**
          * For a class, the value of the super_class item either must be zero or must be a valid index into the constant_pool table. If the value of the super_class item is nonzero, the constant_pool entry at that index must be a CONSTANT_Class_info structure representing the direct superclass of the class defined by this class file. Neither the direct superclass nor any of its superclasses may have the ACC_FINAL flag set in the access_flags item of its ClassFile structure. <p>
          * If the value of the super_class item is zero, then this class file must represent the class Object, the only class or interface without a direct superclass. <p>
          * For an interface, the value of the super_class item must always be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Class_info structure representing the class Object.
          */
-        @Expose
         public static final int pastCpSuperClassU16 = pastCpThisClassU16 + 2;
         /** The value of the interfaces_count item gives the number of direct superinterfaces of this class or interface type */
-        @Expose
         public static final int pastCpInterfacesCountU16 = pastCpSuperClassU16 + 2;
     }
 
-    @StableAPI(since = "__EXPERIMENTAL__")
     public enum ConstantPoolEntryTypes {
-        @Expose
         Utf8(1, 45, -1),
-        @Expose
         Integer(3, 45, 4),
-        @Expose
         Float(4, 45, 4),
-        @Expose
         Long(5, 45, 8),
-        @Expose
         Double(6, 45, 8),
-        @Expose
         Class(7, 49, 2),
-        @Expose
         String(8, 45, 2),
-        @Expose
         FieldRef(9, 45, 4),
-        @Expose
         MethodRef(10, 45, 4),
-        @Expose
         InterfaceMethodRef(11, 45, 4),
-        @Expose
         NameAndType(12, 45, 4),
-        @Expose
         MethodHandle(15, 51, 3),
-        @Expose
         MethodType(16, 51, 2),
-        @Expose
         Dynamic(17, 55, 4),
-        @Expose
         InvokeDynamic(18, 51, 4),
-        @Expose
         Module(19, 53, 2),
-        @Expose
         Package(20, 53, 2),
         ;
         private static final ConstantPoolEntryTypes[] lookup;
@@ -267,10 +222,8 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
             lookup = lut;
         }
 
-        @Expose
         public final int tag, minMajorVersion;
         /** Length in bytes of the entry (excluding the 1 byte tag), or -1 if length-encoded */
-        @Expose
         public final int maybeByteLength;
 
         ConstantPoolEntryTypes(int tag, int minMajorVersion, int maybeByteLength) {
@@ -284,7 +237,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
          * @param offset The offset where the entry starts
          * @return The total length of the entry, including the tag byte
          */
-        @Expose
         public int byteLength(final byte @NotNull [] classFile, final int offset) {
             if (this == ConstantPoolEntryTypes.Utf8) {
                 return 3 + u16(classFile, offset + 1);
@@ -295,7 +247,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
             return 1 + maybeByteLength;
         }
 
-        @Expose
         public static @NotNull ConstantPoolEntryTypes parse(final byte @NotNull [] classFile, final int offset) {
             final int tag = u8(classFile, offset);
             final ConstantPoolEntryTypes type = tag >= lookup.length ? null : lookup[tag];
@@ -312,7 +263,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * @return If the class passes simple sanity checks.
      */
     @Contract("null -> false")
-    @Expose
     public static boolean isValidClass(byte @Nullable [] classBytes) {
         if (classBytes == null) {
             return false;
@@ -329,7 +279,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * @param classBytes Class data
      * @return The major version number of the class file. See {@link org.objectweb.asm.Opcodes#V1_8}
      */
-    @Expose
     public static int majorVersion(byte @NotNull [] classBytes) {
         return u16(classBytes, Offsets.majorVersionU16);
     }
@@ -340,7 +289,6 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * @param substring The short substring to search for.
      * @return If the substring was found somewhere in the long string.
      */
-    @Expose
     public static boolean hasSubstring(final byte @Nullable [] classBytes, final byte @NotNull [] substring) {
         if (classBytes == null) {
             return false;

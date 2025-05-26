@@ -21,18 +21,15 @@
  */
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.val;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-@StableAPI(since = "0.6.0")
 public class ComplexVersion extends Version {
     final Version[] versions;
 
-    @StableAPI.Expose
     public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {
         this.versions = new Version[subVersions.length + 1];
         this.versions[0] = mainVersion;

@@ -21,27 +21,25 @@
  */
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
 
-@StableAPI(since = "0.6.0")
 public class SemanticVersion extends Version {
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     private final int majorVersion;
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     private final int minorVersion;
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     private final int patchVersion;
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     private final String preRelease;
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     private final String build;
 
-    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease, String build) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
@@ -52,27 +50,29 @@ public class SemanticVersion extends Version {
         this.build = "".equals(build) ? null : build;
     }
 
-    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion, String preRelease) {
         this(majorVersion, minorVersion, patchVersion, preRelease, null);
     }
 
-    @StableAPI.Expose
     public SemanticVersion(int majorVersion, int minorVersion, int patchVersion) {
         this(majorVersion, minorVersion, patchVersion, null, null);
     }
 
-    @StableAPI.Expose(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public SemanticVersion(int majorVersion, int minorVersion) {
         this(majorVersion, minorVersion, -1, null, null);
     }
 
-    @StableAPI.Expose(since = "0.10.0")
+
+    /**
+     * @since 0.10.0
+     */
     public SemanticVersion(int majorVersion) {
         this(majorVersion, -1, -1, null, null);
     }
 
-    @StableAPI.Expose
     public static SemanticVersionBuilder builder() {
         return new SemanticVersionBuilder();
     }
@@ -119,7 +119,9 @@ public class SemanticVersion extends Version {
         // @formatter:on
     }
 
-    @StableAPI(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public static class SemanticVersionBuilder {
         private int majorVersion;
         private int minorVersion = -1;
@@ -127,41 +129,35 @@ public class SemanticVersion extends Version {
         private String preRelease;
         private String build;
 
-        @StableAPI.Internal
+        @ApiStatus.Internal
         SemanticVersionBuilder() {
         }
 
-        @StableAPI.Expose
         public SemanticVersionBuilder majorVersion(int majorVersion) {
             this.majorVersion = majorVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public SemanticVersionBuilder minorVersion(int minorVersion) {
             this.minorVersion = minorVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public SemanticVersionBuilder patchVersion(int patchVersion) {
             this.patchVersion = patchVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public SemanticVersionBuilder preRelease(String preRelease) {
             this.preRelease = preRelease;
             return this;
         }
 
-        @StableAPI.Expose
         public SemanticVersionBuilder build(String build) {
             this.build = build;
             return this;
         }
 
-        @StableAPI.Expose
         public SemanticVersion build() {
             return new SemanticVersion(majorVersion, minorVersion, patchVersion, preRelease, build);
         }

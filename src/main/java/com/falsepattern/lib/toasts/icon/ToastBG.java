@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts.icon;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.Tags;
 import lombok.NonNull;
 import org.lwjgl.opengl.GL11;
@@ -34,40 +33,30 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class ToastBG extends ToastTexture {
-    @StableAPI.Expose
     public static final ToastBG TOAST_DARK =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark.png"), 160, 32, 0xFFFFFFFF);
-    @StableAPI.Expose
     public static final ToastBG TOAST_DARK_ROUNDED =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_dark_rounded.png"), 160, 32, 0xFFFFFFFF);
-    @StableAPI.Expose
     public static final ToastBG TOAST_NARRATOR =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator.png"), 160, 32, 0xFFAAAA00);
-    @StableAPI.Expose
     public static final ToastBG TOAST_NARRATOR_ROUNDED =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_narrator_rounded.png"),
                         160,
                         32,
                         0xFFAAAA00);
-    @StableAPI.Expose
     public static final ToastBG TOAST_WHITE =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white.png"), 160, 32, 0xFF500050);
-    @StableAPI.Expose
     public static final ToastBG TOAST_WHITE_ROUNDED =
             new ToastBG(new ResourceLocation(Tags.MODID, "textures/gui/toast_white_rounded.png"), 160, 32, 0xFF500050);
 
-    @StableAPI.Expose
     public final int defaultTextColor;
 
-    @StableAPI.Expose
     public ToastBG(@NonNull ResourceLocation texture, int width, int height, int defaultTextColor) {
         super(texture, width, height);
         this.defaultTextColor = defaultTextColor;
     }
 
-    @StableAPI.Expose
     public ToastBG(@NonNull ResourceLocation texture, @NonNull IIcon icon, int defaultTextColor) {
         super(texture, icon);
         this.defaultTextColor = defaultTextColor;

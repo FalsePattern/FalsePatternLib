@@ -21,9 +21,9 @@
  */
 package com.falsepattern.lib.config.event;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.EventUtil;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
@@ -35,37 +35,34 @@ import cpw.mods.fml.relauncher.SideOnly;
  * This is a client-only event, and is never triggered serverside!
  */
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class ConfigSyncEvent extends Event {
-    @StableAPI.Expose
     public final Class<?> configClass;
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public ConfigSyncEvent(Class<?> configClass) {
         this.configClass = configClass;
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public static boolean postStart(Class<?> configClass) {
         val event = new Start(configClass);
         return EventUtil.postOnCommonBus(event);
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public static void postEndSuccess(Class<?> configClass) {
         EventUtil.postOnCommonBus(new End(configClass, true, null));
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public static void postEndFailure(Class<?> configClass, Throwable error) {
         EventUtil.postOnCommonBus(new End(configClass, false, error));
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI(since = "0.10.0")
     public static final class Start extends ConfigSyncEvent {
 
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public Start(Class<?> configClass) {
             super(configClass);
         }
@@ -77,15 +74,11 @@ public class ConfigSyncEvent extends Event {
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI(since = "0.10.0")
     public static final class End extends ConfigSyncEvent {
-        @StableAPI.Expose
         public final boolean successful;
-
-        @StableAPI.Expose
         public final Throwable error;
 
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public End(Class<?> configClass, boolean successful, Throwable error) {
             super(configClass);
             this.successful = successful;

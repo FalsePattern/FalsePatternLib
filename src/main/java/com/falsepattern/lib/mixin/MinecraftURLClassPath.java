@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.mixin.UCPImpl;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,11 +31,11 @@ import java.io.File;
  * Backport from spongemixins 1.3 for compat with the curseforge 1.2.0 version.
  * <p>
  * Also added Grimoire protection.
+ *
+ * @since 0.10.0
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@StableAPI(since = "0.10.0")
 public final class MinecraftURLClassPath {
-    @StableAPI.Expose
     public static void addJar(File pathToJar) throws Exception {
         UCPImpl.addJar(pathToJar);
     }

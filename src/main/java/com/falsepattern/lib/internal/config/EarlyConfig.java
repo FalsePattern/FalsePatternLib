@@ -22,7 +22,6 @@
 
 package com.falsepattern.lib.internal.config;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
 import com.google.gson.GsonBuilder;
@@ -43,11 +42,9 @@ import java.nio.file.Files;
 @Accessors(fluent = true)
 public class EarlyConfig {
     @Expose
-    @StableAPI.Expose(since = "__INTERNAL__")
     private boolean enableLibraryDownloads;
 
     @Expose
-    @StableAPI.Expose(since = "__INTERNAL__")
     private boolean enableLetsEncryptRoot;
 
     private static volatile EarlyConfig instance = null;

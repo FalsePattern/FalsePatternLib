@@ -28,6 +28,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * DEPRECATED: Use the jetbrains annotations/jspecify instead!
+ * <p>
  * Anything annotated with this annotation will be considered stable, and the class/method/field will not get breaking
  * changes without a full deprecation cycle.
  * <p>
@@ -52,18 +54,21 @@ import java.lang.annotation.Target;
  * is highly experimental and may be removed or change at any time, however, using it in third party projects is not an
  * error, unlike __INTERNAL__, but if any issues arise from the usage of the API or the API changing, the API developer
  * shall not be blamed for it.
+ * @since 0.6.0
  */
+@Deprecated(since = "1.7.0")
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@StableAPI(since = "0.6.0")
 public @interface StableAPI {
     /**
      * The version this API was introduced/stabilized in. Used for library version tracking.
      */
-    @StableAPI.Expose String since();
+    String since();
 
     /**
+     * DEPRECATED: Use the jetbrains annotations/jspecify instead!
+     * <p>
      * You may use this annotation if you want a member to have an equal effective {@link #since()} value as its owner
      * class.
      * <p>
@@ -72,24 +77,30 @@ public @interface StableAPI {
      * <p>
      * Also note that this only works for class members (methods and fields),
      * inner classes still need to use {@link StableAPI}.
+     *
+     * @since 0.10.0
      */
+    @Deprecated(since = "1.7.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
-    @StableAPI(since = "0.10.0")
     @interface Expose {
-        @StableAPI.Expose String since() default "__PARENT__";
+        String since() default "__PARENT__";
     }
 
     /**
+     * DEPRECATED: Use the jetbrains annotations/jspecify instead!
+     * <p>
      * Use this if you want to explicitly mark specific members of a {@link StableAPI} class as internal-use only.
      * <p>
      * Library consumers should never use class members marked with this annotation, as said members can be freely
      * changed or removed in any version in the library without prior notice.
+     *
+     * @since 0.10.0
      */
+    @Deprecated(since = "1.7.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
-    @StableAPI(since = "0.10.0")
     @interface Internal {}
 }

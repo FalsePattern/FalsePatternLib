@@ -21,23 +21,17 @@
  */
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.StableAPI;
 import com.google.common.io.Files;
 
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
-@StableAPI(since = "0.8.0")
 public interface ITargetedMod {
-
-    @StableAPI.Expose
     String getModName();
 
-    @StableAPI.Expose
     boolean isLoadInDevelopment();
 
     @SuppressWarnings("UnstableApiUsage")
-    @StableAPI.Expose
     default boolean isMatchingJar(Path path) {
         String pathString = path.toString();
         String nameLowerCase = Files.getNameWithoutExtension(pathString).toLowerCase();
@@ -46,22 +40,17 @@ public interface ITargetedMod {
         return "jar".equals(fileExtension) && getCondition().test(nameLowerCase);
     }
 
-    @StableAPI.Expose
     Predicate<String> getCondition();
 
-    @StableAPI(since = "0.5.0")
     final class PredicateHelpers {
-        @StableAPI.Expose
         public static Predicate<String> startsWith(String subString) {
             return (name) -> name.startsWith(subString.toLowerCase());
         }
 
-        @StableAPI.Expose
         public static Predicate<String> contains(String subString) {
             return (name) -> name.contains(subString.toLowerCase());
         }
 
-        @StableAPI.Expose
         public static Predicate<String> matches(String regex) {
             return (name) -> name.matches(regex);
         }

@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.val;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
@@ -30,16 +29,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@StableAPI(since = "0.8.0")
 public interface IMixin {
-
-    @StableAPI.Expose
     String getMixin();
-
-    @StableAPI.Expose
     Side getSide();
-
-    @StableAPI.Expose
     Predicate<List<ITargetedMod>> getFilter();
 
     default boolean shouldLoad(List<ITargetedMod> loadedMods) {
@@ -49,36 +41,35 @@ public interface IMixin {
                 || side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
     }
 
-    @StableAPI(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     enum Side {
-        @StableAPI.Expose COMMON,
-        @StableAPI.Expose CLIENT,
-        @StableAPI.Expose SERVER
+        COMMON,
+        CLIENT,
+        SERVER
     }
 
-    @StableAPI(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     final class PredicateHelpers {
-        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> never() {
             return (list) -> false;
         }
 
-        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> condition(Supplier<Boolean> condition) {
             return (list) -> condition.get();
         }
 
-        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> always() {
             return (list) -> true;
         }
 
-        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> require(ITargetedMod mod) {
             return (list) -> list.contains(mod);
         }
 
-        @StableAPI.Expose
         public static Predicate<List<ITargetedMod>> avoid(ITargetedMod mod) {
             return (list) -> !list.contains(mod);
         }

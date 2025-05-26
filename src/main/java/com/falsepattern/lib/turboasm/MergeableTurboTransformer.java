@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.turboasm;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import lombok.val;
 
@@ -30,7 +29,6 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import java.util.ArrayList;
 import java.util.List;
 
-@StableAPI(since = "__EXPERIMENTAL__")
 public class MergeableTurboTransformer implements IClassTransformer {
     private final List<TurboClassTransformer> transformers;
 

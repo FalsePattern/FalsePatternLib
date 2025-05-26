@@ -22,26 +22,21 @@
 
 package com.falsepattern.lib.turboasm;
 
-import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.StableAPI.Expose;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A simple transformer that takes in class bytes and outputs different class bytes.
  * It should be thread-safe, and not change class names. It should also have a public no-arguments constructor.
  */
-@StableAPI(since = "__EXPERIMENTAL__")
 public interface TurboClassTransformer {
     /**
      * @return The user-friendly owner name of this transformer. Usually a mod id.
      */
-    @Expose
     String owner();
 
     /**
      * @return The user-friendly name of this transformer. Used in logs.
      */
-    @Expose
     String name();
 
     /**
@@ -50,7 +45,6 @@ public interface TurboClassTransformer {
      * @param classNode The handle to the class data and parsed metadata, try to avoid triggering the lazy ASM parse if possible for performance.
      * @return true if the class will be transformed by this class transformer.
      */
-    @Expose
     boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode);
 
     /**
@@ -60,6 +54,5 @@ public interface TurboClassTransformer {
      * @return True if the class has been modified in any way by this transformer. If all transformers return false,
      * then the ClassNode instance will not be re-serialized.
      */
-    @Expose
     boolean transformClass(@NotNull String className, @NotNull ClassNodeHandle classNode);
 }

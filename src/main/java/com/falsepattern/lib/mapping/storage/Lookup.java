@@ -21,12 +21,12 @@
  */
 package com.falsepattern.lib.mapping.storage;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.mapping.types.MappingType;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +36,6 @@ import java.util.Set;
 
 @Accessors(fluent = true)
 @EqualsAndHashCode
-@StableAPI(since = "0.10.0")
 public class Lookup<T> {
     private final Set<T> values = new HashSet<>();
     private final Map<String, T> notch = new HashMap<>();
@@ -53,12 +52,10 @@ public class Lookup<T> {
         }
     }
 
-    @StableAPI.Expose
     public boolean contains(T value) {
         return values.contains(value);
     }
 
-    @StableAPI.Expose
     public boolean containsKey(MappingType mappingType, String key) {
         switch (mappingType) {
             case Notch:
@@ -72,7 +69,6 @@ public class Lookup<T> {
         }
     }
 
-    @StableAPI.Expose
     public void unwrap(@NonNull MappedString mappedString, @NonNull T value) {
         if (contains(value)) {
             //Collision avoidance.
@@ -87,7 +83,6 @@ public class Lookup<T> {
         mcp.put(mappedString.mcp, value);
     }
 
-    @StableAPI.Expose
     public T get(MappingType mappingType, String key) throws LookupException {
         T result;
         switch (mappingType) {
@@ -109,8 +104,8 @@ public class Lookup<T> {
         return result;
     }
 
-    @StableAPI(since = "0.10.0")
     public static class LookupException extends Exception {
+        @ApiStatus.Internal
         public LookupException(String message) {
             super(message);
         }

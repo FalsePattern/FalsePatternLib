@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.mapping;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.asm.CoreLoadingPlugin;
 import com.falsepattern.lib.mapping.storage.Lookup;
@@ -39,7 +38,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@StableAPI(since = "0.10.0")
 public class MappingManager {
     private static Lookup<UniversalClass> internalLookup;
     private static Lookup<UniversalClass> regularLookup;
@@ -117,7 +115,6 @@ public class MappingManager {
         }
     }
 
-    @StableAPI.Expose
     public static UniversalClass classForName(NameType nameType, MappingType mappingType, String className)
             throws ClassNotFoundException {
         initialize();
@@ -142,7 +139,6 @@ public class MappingManager {
         }
     }
 
-    @StableAPI.Expose
     public static boolean containsClass(NameType nameType, MappingType mappingType, String className) {
         initialize();
         switch (nameType) {
@@ -155,7 +151,6 @@ public class MappingManager {
         }
     }
 
-    @StableAPI.Expose
     public static UniversalField getField(FieldInsnNode instruction)
             throws ClassNotFoundException, NoSuchFieldException {
         initialize();
@@ -186,7 +181,6 @@ public class MappingManager {
         }
     }
 
-    @StableAPI.Expose
     public static UniversalMethod getMethod(MethodInsnNode instruction)
             throws ClassNotFoundException, NoSuchMethodException {
         initialize();

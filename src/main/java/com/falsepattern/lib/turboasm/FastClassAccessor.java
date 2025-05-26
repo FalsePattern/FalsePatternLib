@@ -22,8 +22,6 @@
 
 package com.falsepattern.lib.turboasm;
 
-import com.falsepattern.lib.StableAPI;
-import com.falsepattern.lib.StableAPI.Expose;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -32,49 +30,36 @@ import org.objectweb.asm.tree.ClassNode;
 import java.lang.reflect.Modifier;
 
 /** An accessor to metadata about a class that is quickly accessible without fully parsing one. */
-@StableAPI(since = "__EXPERIMENTAL__")
 public interface FastClassAccessor {
     /** Accessible from outside its package */
-    @Expose
     boolean isPublic();
     /** No subclasses allowed */
-    @Expose
     boolean isFinal();
     /** Is an interface instead of a class */
-    @Expose
     boolean isInterface();
     /** Is an abstract class that should not be instantiated */
-    @Expose
     boolean isAbstract();
     /** Is not present in source code (often used by obfuscated code too) */
-    @Expose
     boolean isSynthetic();
     /** Is an annotation interface */
-    @Expose
     boolean isAnnotation();
     /** Is an enum class */
-    @Expose
     boolean isEnum();
     /** Binary (slash-separated packages) name of the class */
     @NotNull
-    @Expose
     String binaryThisName();
     /** Binary (slash-separated packages) name of the super-class, null for the Object class */
     @Nullable
-    @Expose
     String binarySuperName();
 
-    @Expose
     static OfLoaded ofLoaded(Class<?> loadedClass) {
         return new OfLoaded(loadedClass);
     }
 
-    @Expose
     static OfAsmNode ofAsmNode(ClassNode handle) {
         return new OfAsmNode(handle);
     }
 
-    @StableAPI(since = "__EXPERIMENTAL__")
     final class OfAsmNode implements FastClassAccessor {
         public final ClassNode handle;
 
@@ -128,7 +113,6 @@ public interface FastClassAccessor {
         }
     }
 
-    @StableAPI(since = "__EXPERIMENTAL__")
     final class OfLoaded implements FastClassAccessor {
         public final Class<?> handle;
 

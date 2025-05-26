@@ -21,8 +21,6 @@
  */
 package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.StableAPI;
-
 import net.minecraft.client.Minecraft;
 import cpw.mods.fml.client.IModGuiFactory;
 import cpw.mods.fml.relauncher.Side;
@@ -30,8 +28,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import java.util.Set;
 
+/**
+ * @since 0.9.0
+ */
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.9.0")
 public interface SimpleGuiFactory extends IModGuiFactory {
     @Override
     default void initialize(Minecraft minecraftInstance) {

@@ -21,12 +21,11 @@
  */
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.DeprecationDetails;
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.FileUtil;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -47,19 +46,14 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.Files.walk;
 
-@StableAPI(since = "0.8.0")
 public interface IMixinPlugin extends IMixinConfigPlugin {
-    @StableAPI.Expose
     Path MODS_DIRECTORY_PATH = FileUtil.getMinecraftHome().toPath().resolve("mods");
 
-    @StableAPI.Expose
     static Logger createLogger(String modName) {
         return LogManager.getLogger(modName + " Mixin Loader");
     }
 
-    @Deprecated
-    @DeprecationDetails(deprecatedSince = "1.4.0")
-    @StableAPI.Expose
+    @Deprecated(since = "1.4.0")
     static File findJarOf(final ITargetedMod mod) {
         File result = null;
         try (val stream = walk(MODS_DIRECTORY_PATH)) {
@@ -85,7 +79,9 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return result;
     }
 
-    @StableAPI.Expose(since = "1.4.0")
+    /**
+     * @since 1.4.0
+     */
     static Set<File> findJarsOf(IMixinPlugin self, final ITargetedMod mod) {
         if (!self.useNewFindJar()) {
             val jar = findJarOf(mod);
@@ -111,46 +107,45 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return results;
     }
 
-    @StableAPI.Expose
     Logger getLogger();
 
-    @StableAPI.Expose
     IMixin[] getMixinEnumValues();
 
-    @StableAPI.Expose
     ITargetedMod[] getTargetedModEnumValues();
 
-    @StableAPI.Expose(since = "1.4.0")
+    /**
+     * @since 1.4.0
+     */
     default boolean useNewFindJar() {
         return false;
     }
 
     @Override
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default void onLoad(String mixinPackage) {
 
     }
 
     @Override
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default String getRefMapperConfig() {
         return null;
     }
 
     @Override
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         return true;
     }
 
     @Override
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
 
     }
 
     @Override
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default List<String> getMixins() {
         val isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
         val targetedMods = getTargetedModEnumValues();
@@ -185,7 +180,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return mixins;
     }
 
-    @StableAPI.Expose(since = "__INTERNAL__")
+    @ApiStatus.Internal
     default boolean loadJarOf(final ITargetedMod mod) {
         try {
             val jars = findJarsOf(this, mod);
@@ -207,14 +202,14 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return true;
     }
 
-    @StableAPI.Expose(since = "__INTERNAL__")
     @Override
+    @ApiStatus.Internal
     default void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
-    @StableAPI.Expose(since = "__INTERNAL__")
     @Override
+    @ApiStatus.Internal
     default void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }

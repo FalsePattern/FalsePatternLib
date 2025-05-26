@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts.icon;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import org.lwjgl.opengl.GL11;
 
@@ -33,14 +32,11 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class ToastIcon extends ToastTexture {
-    @StableAPI.Expose
     public ToastIcon(@NonNull ResourceLocation texture, int width, int height) {
         super(texture, width, height);
     }
 
-    @StableAPI.Expose
     public ToastIcon(@NonNull ResourceLocation texture, @NonNull IIcon icon) {
         super(texture, icon);
     }

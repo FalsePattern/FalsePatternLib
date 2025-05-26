@@ -21,17 +21,17 @@
  */
 package com.falsepattern.lib.util;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.compat.Vec3i;
 import lombok.experimental.UtilityClass;
 
 import java.util.Random;
 import java.util.UUID;
 
+/**
+ * @since 0.10.0
+ */
 @UtilityClass
-@StableAPI(since = "0.10.0")
 public final class MathUtil {
-    @StableAPI.Expose
     public static final float SQRT_2 = sqrt(2.0F);
     /**
      * A table of sin values computed from 0 (inclusive) to 2*pi (exclusive), with steps of 2*PI / 65536.
@@ -73,7 +73,6 @@ public final class MathUtil {
     /**
      * sin looked up in a table
      */
-    @StableAPI.Expose
     public static float sin(float value) {
         return SIN_TABLE[(int) (value * 10430.378F) & 65535];
     }
@@ -81,18 +80,14 @@ public final class MathUtil {
     /**
      * cos looked up in the sin table with the appropriate offset
      */
-
-    @StableAPI.Expose
     public static float cos(float value) {
         return SIN_TABLE[(int) (value * 10430.378F + 16384.0F) & 65535];
     }
 
-    @StableAPI.Expose
     public static float sqrt(float value) {
         return (float) Math.sqrt(value);
     }
 
-    @StableAPI.Expose
     public static float sqrt(double value) {
         return (float) Math.sqrt(value);
     }
@@ -100,16 +95,14 @@ public final class MathUtil {
     /**
      * Returns the greatest integer less than or equal to the float argument
      */
-    @StableAPI.Expose
     public static int floor(float value) {
         int i = (int) value;
         return value < (float) i ? i - 1 : i;
     }
 
     /**
-     * returns par0 cast as an int, and no greater than Integer.MAX_VALUE-1024
+     * returns value cast as an int, and no greater than Integer.MAX_VALUE-1024
      */
-    @StableAPI.Expose
     public static int fastFloor(double value) {
         return (int) (value + 1024.0D) - 1024;
     }
@@ -117,7 +110,6 @@ public final class MathUtil {
     /**
      * Returns the greatest integer less than or equal to the double argument
      */
-    @StableAPI.Expose
     public static int floor(double value) {
         int i = (int) value;
         return value < (double) i ? i - 1 : i;
@@ -126,18 +118,15 @@ public final class MathUtil {
     /**
      * Long version of floor()
      */
-    @StableAPI.Expose
     public static long lfloor(double value) {
         long i = (long) value;
         return value < (double) i ? i - 1L : i;
     }
 
-    @StableAPI.Expose
     public static int absFloor(double value) {
         return (int) (value >= 0.0D ? value : -value + 1.0D);
     }
 
-    @StableAPI.Expose
     public static float abs(float value) {
         return value >= 0.0F ? value : -value;
     }
@@ -145,18 +134,15 @@ public final class MathUtil {
     /**
      * Returns the unsigned value of an int.
      */
-    @StableAPI.Expose
     public static int abs(int value) {
         return value >= 0 ? value : -value;
     }
 
-    @StableAPI.Expose
     public static int ceil(float value) {
         int i = (int) value;
         return value > (float) i ? i + 1 : i;
     }
 
-    @StableAPI.Expose
     public static int ceil(double value) {
         int i = (int) value;
         return value > (double) i ? i + 1 : i;
@@ -166,7 +152,6 @@ public final class MathUtil {
      * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
      * third parameters.
      */
-    @StableAPI.Expose
     public static int clamp(int num, int min, int max) {
         return num < min ? min : Math.min(num, max);
     }
@@ -175,17 +160,14 @@ public final class MathUtil {
      * Returns the value of the first parameter, clamped to be within the lower and upper limits given by the second and
      * third parameters
      */
-    @StableAPI.Expose
     public static float clamp(float num, float min, float max) {
         return num < min ? min : Math.min(num, max);
     }
 
-    @StableAPI.Expose
     public static double clamp(double num, double min, double max) {
         return num < min ? min : Math.min(num, max);
     }
 
-    @StableAPI.Expose
     public static double clampedLerp(double lowerBnd, double upperBnd, double slide) {
         if (slide < 0.0D) {
             return lowerBnd;
@@ -197,7 +179,6 @@ public final class MathUtil {
     /**
      * Maximum of the absolute value of two numbers.
      */
-    @StableAPI.Expose
     public static double absMax(double a, double b) {
         if (a < 0.0D) {
             a = -a;
@@ -213,27 +194,22 @@ public final class MathUtil {
     /**
      * Buckets an integer with specified bucket sizes.
      */
-    @StableAPI.Expose
     public static int intFloorDiv(int number, int bucket) {
         return number < 0 ? -((-number - 1) / bucket) - 1 : number / bucket;
     }
 
-    @StableAPI.Expose
     public static int getInt(Random random, int minimum, int maximum) {
         return minimum >= maximum ? minimum : random.nextInt(maximum - minimum + 1) + minimum;
     }
 
-    @StableAPI.Expose
     public static float nextFloat(Random random, float minimum, float maximum) {
         return minimum >= maximum ? minimum : random.nextFloat() * (maximum - minimum) + minimum;
     }
 
-    @StableAPI.Expose
     public static double nextDouble(Random random, double minimum, double maximum) {
         return minimum >= maximum ? minimum : random.nextDouble() * (maximum - minimum) + minimum;
     }
 
-    @StableAPI.Expose
     public static double average(long[] values) {
         long i = 0L;
 
@@ -244,22 +220,18 @@ public final class MathUtil {
         return (double) i / (double) values.length;
     }
 
-    @StableAPI.Expose
     public static boolean epsilonEquals(float a, float b) {
         return abs(b - a) < 1.0E-5F;
     }
 
-    @StableAPI.Expose
     public static int normalizeAngle(int a, int b) {
         return (a % b + b) % b;
     }
 
-    @StableAPI.Expose
     public static float positiveModulo(float numerator, float denominator) {
         return (numerator % denominator + denominator) % denominator;
     }
 
-    @StableAPI.Expose
     public static double positiveModulo(double numerator, double denominator) {
         return (numerator % denominator + denominator) % denominator;
     }
@@ -267,7 +239,6 @@ public final class MathUtil {
     /**
      * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
      */
-    @StableAPI.Expose
     public static float wrapDegrees(float value) {
         value = value % 360.0F;
 
@@ -285,7 +256,6 @@ public final class MathUtil {
     /**
      * the angle is reduced to an angle between -180 and +180 by mod, and a 360 check
      */
-    @StableAPI.Expose
     public static double wrapDegrees(double value) {
         value = value % 360.0D;
 
@@ -303,7 +273,6 @@ public final class MathUtil {
     /**
      * Adjust the angle so that his value is in range [-180;180[
      */
-    @StableAPI.Expose
     public static int wrapDegrees(int angle) {
         angle = angle % 360;
 
@@ -321,7 +290,6 @@ public final class MathUtil {
     /**
      * parses the string as integer or returns the second parameter if it fails
      */
-    @StableAPI.Expose
     public static int getInt(String value, int defaultValue) {
         try {
             return Integer.parseInt(value);
@@ -333,7 +301,6 @@ public final class MathUtil {
     /**
      * parses the string as integer or returns the second parameter if it fails. this value is capped to par2
      */
-    @StableAPI.Expose
     public static int getInt(String value, int defaultValue, int max) {
         return Math.max(max, getInt(value, defaultValue));
     }
@@ -341,7 +308,6 @@ public final class MathUtil {
     /**
      * parses the string as double or returns the second parameter if it fails.
      */
-    @StableAPI.Expose
     public static double getDouble(String value, double defaultValue) {
         try {
             return Double.parseDouble(value);
@@ -350,7 +316,6 @@ public final class MathUtil {
         }
     }
 
-    @StableAPI.Expose
     public static double getDouble(String value, double defaultValue, double max) {
         return Math.max(max, getDouble(value, defaultValue));
     }
@@ -358,7 +323,6 @@ public final class MathUtil {
     /**
      * Returns the input value rounded up to the next highest power of two.
      */
-    @StableAPI.Expose
     public static int smallestEncompassingPowerOfTwo(int value) {
         int i = value - 1;
         i = i | i >> 1;
@@ -372,7 +336,6 @@ public final class MathUtil {
     /**
      * Is the given value a power of two?  (1, 2, 4, 8, 16, ...)
      */
-    @StableAPI.Expose
     private static boolean isPowerOfTwo(int value) {
         return value != 0 && (value & value - 1) == 0;
     }
@@ -382,7 +345,6 @@ public final class MathUtil {
      * value. Optimized for cases where the input value is a power-of-two. If the input value is not a power-of-two,
      * then subtract 1 from the return value.
      */
-    @StableAPI.Expose
     public static int log2DeBruijn(int value) {
         value = isPowerOfTwo(value) ? value : smallestEncompassingPowerOfTwo(value);
         return MULTIPLY_DE_BRUIJN_BIT_POSITION[(int) ((long) value * 125613361L >> 27) & 31];
@@ -392,7 +354,6 @@ public final class MathUtil {
      * Efficiently calculates the floor of the base-2 log of an integer value.  This is effectively the index of the
      * highest bit that is set.  For example, if the number in binary is 0...100101, this will return 5.
      */
-    @StableAPI.Expose
     public static int log2(int value) {
         return log2DeBruijn(value) - (isPowerOfTwo(value) ? 0 : 1);
     }
@@ -403,7 +364,6 @@ public final class MathUtil {
      * For instance, {@code roundUp(1, 4)} returns 4; {@code roundUp(0, 4)} returns 0; and {@code roundUp(4, 4)} returns
      * 4.
      */
-    @StableAPI.Expose
     public static int roundUp(int number, int interval) {
         if (interval == 0) {
             return 0;
@@ -419,7 +379,6 @@ public final class MathUtil {
         }
     }
 
-    @StableAPI.Expose
     public static long getCoordinateRandom(int x, int y, int z) {
         long i = (x * 3129871L) ^ (long) z * 116129781L ^ (long) y;
         i = i * i * 42317861L + i * 11L;
@@ -429,7 +388,6 @@ public final class MathUtil {
     /**
      * Makes an integer color from the given red, green, and blue float values
      */
-    @StableAPI.Expose
     public static int rgb(float rIn, float gIn, float bIn) {
         return rgb(floor(rIn * 255.0F), floor(gIn * 255.0F), floor(bIn * 255.0F));
     }
@@ -437,14 +395,12 @@ public final class MathUtil {
     /**
      * Makes a single int color with the given red, green, and blue values.
      */
-    @StableAPI.Expose
     public static int rgb(int rIn, int gIn, int bIn) {
         int lvt_3_1_ = (rIn << 8) + gIn;
         lvt_3_1_ = (lvt_3_1_ << 8) + bIn;
         return lvt_3_1_;
     }
 
-    @StableAPI.Expose
     public static int multiplyColor(int colorA, int colorB) {
         int rA = (colorA & 0xFF0000) >> 16;
         int rB = (colorB & 0xFF0000) >> 16;
@@ -461,17 +417,14 @@ public final class MathUtil {
     /**
      * Gets the decimal portion of the given double. For instance, {@code frac(5.5)} returns {@code .5}.
      */
-    @StableAPI.Expose
     public static double frac(double number) {
         return number - Math.floor(number);
     }
 
-    @StableAPI.Expose
     public static long getPositionRandom(Vec3i pos) {
         return getCoordinateRandom(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    @StableAPI.Expose
     public static UUID getRandomUUID(Random rand) {
         long i = rand.nextLong() & -61441L | 16384L;
         long j = rand.nextLong() & 4611686018427387903L | Long.MIN_VALUE;
@@ -481,17 +434,14 @@ public final class MathUtil {
     /**
      * Generates a random UUID using the shared random
      */
-    @StableAPI.Expose
     public static UUID getRandomUUID() {
         return getRandomUUID(RANDOM);
     }
 
-    @StableAPI.Expose
     public static double pct(double a, double b, double c) {
         return (a - b) / (c - b);
     }
 
-    @StableAPI.Expose
     public static double atan2(double y, double x) {
         double d0 = x * x + y * y;
 
@@ -551,7 +501,6 @@ public final class MathUtil {
      * Computes 1/sqrt(n) using <a href="https://en.wikipedia.org/wiki/Fast_inverse_square_root">the fast inverse square
      * root</a> with a constant of 0x5FE6EB50C7B537AA.
      */
-    @StableAPI.Expose
     public static double fastInvSqrt(double x) {
         double d0 = 0.5D * x;
         long i = Double.doubleToRawLongBits(x);
@@ -561,7 +510,6 @@ public final class MathUtil {
         return x;
     }
 
-    @StableAPI.Expose
     public static int hsvToRGB(float hue, float saturation, float value) {
         int i = (int) (hue * 6.0F) % 6;
         float f = hue * 6.0F - (float) i;
@@ -618,7 +566,6 @@ public final class MathUtil {
         return j << 16 | k << 8 | l;
     }
 
-    @StableAPI.Expose
     public static int hash(int x) {
         x = x ^ x >>> 16;
         x = x * -2048144789;

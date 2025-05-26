@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.util;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.FPLog;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -36,9 +35,10 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * A utility class for reading resources in many ways.
+ *
+ * @since 0.6.0
  */
 @UtilityClass
-@StableAPI(since = "0.6.0")
 public final class ResourceUtil {
 
     /**
@@ -52,7 +52,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static String getResourceStringFromJar(String resourcePath, Class<?> referenceClass) throws IOException {
         return getResourceStringFromJar(resourcePath, referenceClass, StandardCharsets.UTF_8);
     }
@@ -69,7 +68,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static String getResourceStringFromJar(String resourcePath, Class<?> referenceClass, Charset charset)
             throws IOException {
         return new String(getResourceBytesFromJar(resourcePath, referenceClass), charset);
@@ -85,7 +83,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static byte[] getResourceBytesFromJar(String resourcePath, Class<?> referenceClass) throws IOException {
         return readBytesSafe(getResourceFromJar(resourcePath, referenceClass), resourcePath);
     }
@@ -107,7 +104,6 @@ public final class ResourceUtil {
      *
      * @return The resource, or null if it was not found.
      */
-    @StableAPI.Expose
     public static InputStream getResourceFromJar(String resourcePath, Class<?> referenceClass) {
         URL classFile = referenceClass.getResource('/' + referenceClass.getName().replace('.', '/') + ".class");
         lookup:
@@ -145,7 +141,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link InputStream#read(byte[])}
      */
-    @StableAPI.Expose
     public static byte[] readBytes(InputStream stream) throws IOException {
         val out = new ByteArrayOutputStream();
         val buf = new byte[4096];
@@ -165,7 +160,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static String getResourceString(String resourcePath) throws IOException {
         return getResourceString(resourcePath, StandardCharsets.UTF_8);
     }
@@ -180,7 +174,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static String getResourceString(String resourcePath, Charset charset) throws IOException {
         return new String(getResourceBytes(resourcePath), charset);
     }
@@ -194,7 +187,6 @@ public final class ResourceUtil {
      *
      * @throws IOException From {@link #readBytes(InputStream)}
      */
-    @StableAPI.Expose
     public static byte[] getResourceBytes(String resourcePath) throws IOException {
         return readBytesSafe(ResourceUtil.class.getResourceAsStream(resourcePath), resourcePath);
     }

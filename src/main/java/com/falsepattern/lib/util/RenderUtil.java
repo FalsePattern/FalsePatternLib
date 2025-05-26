@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.util;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.render.ClampedIcon;
 import com.falsepattern.lib.internal.render.FullTextureIcon;
@@ -41,9 +40,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static net.minecraft.client.Minecraft.getMinecraft;
 
+/**
+ * @since 0.8.0
+ */
 @SideOnly(CLIENT)
 @UtilityClass
-@StableAPI(since = "0.8.0")
 public final class RenderUtil {
     private static final Timer MINECRAFT_TIMER = getMinecraftTimer();
     private static final ResourceLocation EMPTY_TEXTURE = new ResourceLocation(Tags.MODID, "textures/empty_texture.png");
@@ -54,8 +55,9 @@ public final class RenderUtil {
      * This is useful for rendering things that are not part of the world mesh, but should be rendered as if they were.
      * <p>
      * It's good practice to make this call inside a {@link GL11#glPushMatrix() push}/{@link GL11#glPopMatrix() pop} matrix block.
+     *
+     * @since 0.12.0
      */
-    @StableAPI.Expose(since = "0.12.0")
     public static void setGLTranslationRelativeToPlayer() {
         val player = getMinecraft().thePlayer;
         val partialTick = partialTick();
@@ -77,8 +79,9 @@ public final class RenderUtil {
      * @param height   The icon height in pixels
      *
      * @return The full resolution texture icon.
+     *
+     * @since 0.10.0
      */
-    @StableAPI.Expose(since = "0.10.0")
     public static IIcon getFullTextureIcon(String iconName, int width, int height) {
         return new FullTextureIcon(iconName, width, height);
     }
@@ -91,8 +94,9 @@ public final class RenderUtil {
      * This is helpful when using {@link RenderBlocks} but having different bounds.
      *
      * @param icon The icon to clamp
+     *
+     * @since 0.12.0
      */
-    @StableAPI.Expose(since = "0.12.0")
     public static IIcon wrapAsClampedIcon(IIcon icon) {
         return new ClampedIcon(icon);
     }
@@ -104,8 +108,9 @@ public final class RenderUtil {
      * is sufficient to achieve the same effect.
      * <p>
      * However, when shaders are enabled, disabling textures using this method will have no effect. Therefore this method can be used as a workaround.
+     *
+     * @since 1.3.0
      */
-    @StableAPI.Expose(since = "1.3.0")
     public static void bindEmptyTexture() {
         getMinecraft().renderEngine.bindTexture(EMPTY_TEXTURE);
     }
@@ -117,12 +122,10 @@ public final class RenderUtil {
      *
      * @return The current partial tick
      */
-    @StableAPI.Expose
     public static float partialTick() {
         return MINECRAFT_TIMER.renderPartialTicks;
     }
 
-    @StableAPI.Expose
     @SneakyThrows
     private static Timer getMinecraftTimer() {
         val timerField = ReflectionHelper.findField(Minecraft.class, "timer", "field_71428_T");

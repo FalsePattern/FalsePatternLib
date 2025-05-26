@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.ReflectionUtil;
 import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;
@@ -39,14 +38,13 @@ import java.util.Map;
 @Accessors(fluent = true)
 @ToString
 @EqualsAndHashCode
-@StableAPI(since = "0.10.0")
 public class UniversalField {
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     public final UniversalClass parent;
 
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     public final MappedString name;
 
     private Field javaFieldCache = null;
@@ -57,17 +55,14 @@ public class UniversalField {
         parent.addField(this);
     }
 
-    @StableAPI.Expose
     public static void createAndAddToParent(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
         new UniversalField(parent, names, stringPool);
     }
 
-    @StableAPI.Expose
     public String getName(MappingType mappingType) {
         return name.get(mappingType);
     }
 
-    @StableAPI.Expose
     public Field asJavaField() throws ClassNotFoundException, NoSuchFieldException {
         if (javaFieldCache != null) {
             return javaFieldCache;
@@ -83,13 +78,11 @@ public class UniversalField {
      * you don't need to manually handle exceptions.
      */
     @SuppressWarnings("unchecked")
-    @StableAPI.Expose
     public <T> T get(Object instance) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException {
         val field = asJavaField();
         return (T) field.get(instance);
     }
 
-    @StableAPI.Expose
     public FieldInsnNode asInstruction(int opcode, MappingType mapping, String descriptor) {
         return new FieldInsnNode(opcode, parent.getName(NameType.Internal, mapping), getName(mapping), descriptor);
     }

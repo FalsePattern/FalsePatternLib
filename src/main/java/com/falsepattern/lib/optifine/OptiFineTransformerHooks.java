@@ -22,7 +22,6 @@
 
 package com.falsepattern.lib.optifine;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.optifine.OptiFineTransformerHooksImpl;
 
 /**
@@ -30,10 +29,10 @@ import com.falsepattern.lib.internal.impl.optifine.OptiFineTransformerHooksImpl;
  * If you have a mod that injects code that would otherwise conflict with OptiFine, and you have provably tested that
  * removing certain OptiFine patches from the jar does NOT break anything, you may use this class to disable them
  * without having to do jar file edits.
+ *
+ * @since 1.0.0
  */
-@StableAPI(since = "1.0.0")
 public class OptiFineTransformerHooks {
-    @StableAPI.Expose
     public static void disableOptiFinePatch(String patchName) {
         OptiFineTransformerHooksImpl.disableOptiFinePatch(patchName);
     }

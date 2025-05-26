@@ -22,7 +22,6 @@
 
 package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.asm.transformers.ConfigOrderTransformer;
 import com.falsepattern.lib.internal.asm.transformers.CrashReportImprover;
 import com.falsepattern.lib.internal.asm.transformers.MixinPluginTransformer;
@@ -34,7 +33,6 @@ import lombok.experimental.Accessors;
 import java.util.Arrays;
 
 @Accessors(fluent = true)
-@StableAPI(since = "__INTERNAL__")
 public class FPTransformer extends MergeableTurboTransformer {
     static {
         OptiFineTransformerHooksImpl.init();

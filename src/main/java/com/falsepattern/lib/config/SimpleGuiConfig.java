@@ -21,29 +21,33 @@
  */
 package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.StableAPI;
-
 import net.minecraft.client.gui.GuiScreen;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * @since 0.9.0
+ */
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.9.0")
 public class SimpleGuiConfig extends GuiConfig {
-    @StableAPI.Expose
     public SimpleGuiConfig(GuiScreen parent, Class<?> configClass, String modID, String modName)
             throws ConfigException {
         this(parent, modID, modName, configClass);
     }
 
-    @StableAPI.Expose(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public SimpleGuiConfig(GuiScreen parent, String modID, String title, Class<?>... configClasses)
             throws ConfigException {
         this(parent, modID, title, null, configClasses);
     }
 
-    @StableAPI.Expose(since = "1.5.0")
+
+    /**
+     * @since 1.5.0
+     */
     public SimpleGuiConfig(GuiScreen parent, String modID, String title, String titleLine2, Class<?>... configClasses)
             throws ConfigException {
         super(parent,

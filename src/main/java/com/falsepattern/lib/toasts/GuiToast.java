@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 
 import cpw.mods.fml.relauncher.Side;
@@ -30,20 +29,16 @@ import cpw.mods.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class GuiToast {
     @Nullable
-    @StableAPI.Expose
     public static <T extends IToast> T getToast(Class<? extends T> toastClass, Object type) {
         return GuiToastImpl.getInstance().getToast(toastClass, type);
     }
 
-    @StableAPI.Expose
     public static void clear() {
         GuiToastImpl.getInstance().clear();
     }
 
-    @StableAPI.Expose
     public static void add(IToast toastIn) {
         GuiToastImpl.getInstance().add(toastIn);
     }

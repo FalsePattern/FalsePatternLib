@@ -21,25 +21,24 @@
  */
 package com.falsepattern.lib.config;
 
-import com.falsepattern.lib.StableAPI;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A really basic wrapper for config to simplify handling them in external code.
  */
-@StableAPI(since = "0.6.0")
 public class ConfigException extends Exception {
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public ConfigException(String message) {
         super(message);
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public ConfigException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public ConfigException(Throwable cause) {
         super(cause);
     }

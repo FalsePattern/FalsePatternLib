@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.asm;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.asm.exceptions.AsmClassNotFoundException;
 import com.falsepattern.lib.asm.exceptions.AsmFieldNotFoundException;
 import com.falsepattern.lib.asm.exceptions.AsmMethodNotFoundException;
@@ -44,9 +43,7 @@ import org.objectweb.asm.tree.MethodNode;
 import java.util.Arrays;
 import java.util.Objects;
 
-@StableAPI(since = "0.10.0")
 public class ASMUtil {
-    @StableAPI.Expose
     public static FieldNode findFieldStandard(ClassNode cn, String name, boolean optional) {
         for (final FieldNode ret : cn.fields) {
             if (name.equals(ret.name)) {
@@ -60,7 +57,6 @@ public class ASMUtil {
     }
 
     @SneakyThrows
-    @StableAPI.Expose
     public static FieldNode findFieldFromMCP(ClassNode cn, String fieldName, boolean optional) {
         val classMapping = discoverClassMappingType(cn);
         if (classMapping == null) {
@@ -76,7 +72,6 @@ public class ASMUtil {
                                  optional);
     }
 
-    @StableAPI.Expose
     public static FieldNode findFieldFromUniversal(ClassNode cn, UniversalField field, boolean optional) {
         String[] possibilities = CoreLoadingPlugin.isObfuscated() ? new String[]{field.getName(MappingType.SRG),
                                                                                  field.getName(MappingType.Notch)}
@@ -93,7 +88,6 @@ public class ASMUtil {
                 possibilities.length == 1 ? possibilities[0] : Arrays.toString(possibilities));
     }
 
-    @StableAPI.Expose
     public static MethodNode findMethodStandard(ClassNode cn, String name, String descriptor, boolean optional) {
         for (final MethodNode ret : cn.methods) {
             if (name.equals(ret.name) && descriptor.equals(ret.desc)) {
@@ -107,7 +101,6 @@ public class ASMUtil {
     }
 
     @SneakyThrows
-    @StableAPI.Expose
     public static MethodNode findMethodFromMCP(ClassNode cn, String mcpName, String mcpDescriptor, boolean optional) {
         val classMapping = discoverClassMappingType(cn);
         if (classMapping == null) {
@@ -121,7 +114,6 @@ public class ASMUtil {
         return findMethodStandard(cn, method.getName(classMapping), method.getDescriptor(classMapping), optional);
     }
 
-    @StableAPI.Expose
     public static MethodNode findMethodFromUniversal(ClassNode cn, UniversalMethod method, boolean optional) {
         String[] possibleNames = CoreLoadingPlugin.isObfuscated() ? new String[]{method.getName(MappingType.SRG),
                                                                                  method.getName(MappingType.Notch)}
@@ -142,7 +134,6 @@ public class ASMUtil {
                 possibleDescriptors.length == 1 ? possibleDescriptors[0] : Arrays.toString(possibleDescriptors));
     }
 
-    @StableAPI.Expose
     public static MappingType discoverClassMappingType(ClassNode cn) {
         if (!CoreLoadingPlugin.isObfuscated()) {
             if (MappingManager.containsClass(NameType.Internal, MappingType.MCP, cn.name)) {
@@ -156,7 +147,6 @@ public class ASMUtil {
         return null;
     }
 
-    @StableAPI.Expose
     public static UniversalClass toUniversalClass(ClassNode cn) {
         if (!CoreLoadingPlugin.isObfuscated()) {
             try {
@@ -177,7 +167,6 @@ public class ASMUtil {
         }
     }
 
-    @StableAPI.Expose
     public static ClassNode parseClass(byte[] bytes, int readerFlags) {
         val cn = new ClassNode(Opcodes.ASM5);
         val reader = new ClassReader(bytes);
@@ -185,14 +174,12 @@ public class ASMUtil {
         return cn;
     }
 
-    @StableAPI.Expose
     public static byte[] serializeClass(ClassNode cn, int writerFlags) {
         val writer = new ClassWriter(writerFlags);
         cn.accept(writer);
         return writer.toByteArray();
     }
 
-    @StableAPI.Expose
     public static boolean anyEquals(String str, String... options) {
         for (val option : options) {
             if (Objects.equals(str, option)) {

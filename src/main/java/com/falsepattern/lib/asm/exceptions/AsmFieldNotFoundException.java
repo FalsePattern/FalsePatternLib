@@ -21,11 +21,10 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
-import com.falsepattern.lib.StableAPI;
+import org.jetbrains.annotations.ApiStatus;
 
-@StableAPI(since = "0.10.0")
 public class AsmFieldNotFoundException extends AsmTransformException {
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public AsmFieldNotFoundException(final String field) {
         super("can't find field " + field);
     }

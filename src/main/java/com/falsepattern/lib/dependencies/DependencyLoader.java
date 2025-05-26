@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,19 +30,21 @@ import java.util.concurrent.CompletableFuture;
  * For regular external dependencies, see the DEPENDENCIES.MD files in the root of the resources for more information.
  * If you need more power than the one provided by the json format, you may use this class for granular loading instead.
  */
-@StableAPI(since = "0.6.0")
 public class DependencyLoader {
-    @StableAPI.Expose
     public static void addMavenRepo(String url) {
         DependencyLoaderImpl.addMavenRepo(url);
     }
 
-    @StableAPI.Expose(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         return DependencyLoaderImpl.loadLibrariesAsync(libraries);
     }
 
-    @StableAPI.Expose(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public static void loadLibraries(Library... libraries) {
         DependencyLoaderImpl.loadLibraries(libraries);
     }

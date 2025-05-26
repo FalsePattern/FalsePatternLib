@@ -22,7 +22,6 @@
 
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -32,20 +31,20 @@ import java.util.List;
 /**
  * This is a class you can use to interact with MixinInfo before it gets classloaded.
  * (Originally placed here for future unimixins compat in case they change the class names)
+ *
+ * @since 0.10.15
  */
-@StableAPI(since = "0.10.15")
 public class MixinInfoCompatCompanion {
     /**
      * A list of all mixin classes that are candidates for unimixins.
      * This is used to determine if a mixin plugin is unimixins. Once MixinInfo is classloaded, this list has no effect.
      */
-    @StableAPI.Expose
     public static final List<String> UNIMIXIN_CANDIDATES = new ArrayList<>(Arrays.asList(
             "io.github.legacymoddingmc.unimixins.compat.CompatCore",
             "io.github.legacymoddingmc.unimixins.devcompat.DevCompatCore",
             "io.github.legacymoddingmc.unimixins.all.AllCore",
             "io.github.legacymoddingmc.unimixins.mixin.MixinModule"));
 
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     static boolean mixinInfoClassLoaded = false;
 }

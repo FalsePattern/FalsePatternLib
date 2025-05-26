@@ -21,10 +21,10 @@
  */
 package com.falsepattern.lib.asm.exceptions;
 
-import com.falsepattern.lib.StableAPI;
+import org.jetbrains.annotations.ApiStatus;
 
-@StableAPI(since = "0.10.0")
 public class AsmMethodNotFoundException extends AsmTransformException {
+    @ApiStatus.Internal
     public AsmMethodNotFoundException(final String method) {
         super("can't find method " + method);
     }

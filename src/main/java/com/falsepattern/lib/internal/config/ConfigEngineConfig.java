@@ -22,7 +22,6 @@
 
 package com.falsepattern.lib.internal.config;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 import com.falsepattern.lib.internal.Tags;
@@ -60,8 +59,8 @@ public class ConfigEngineConfig {
     }
 
     public enum LoggingLevel {
-        @StableAPI.Expose(since = "__INTERNAL__") None,
-        @StableAPI.Expose(since = "__INTERNAL__") Log,
-        @StableAPI.Expose(since = "__INTERNAL__") LogAndToast
+        None,
+        Log,
+        LogAndToast
     }
 }

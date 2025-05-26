@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.ReflectionUtil;
 import com.falsepattern.lib.mapping.storage.MappedString;
 import lombok.EqualsAndHashCode;
@@ -41,20 +40,19 @@ import java.util.Map;
 @Accessors(fluent = true)
 @ToString
 @EqualsAndHashCode
-@StableAPI(since = "0.10.0")
 public class UniversalMethod {
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     public final UniversalClass parent;
 
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     public final MappedString name;
 
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     public final MappedString descriptor;
 
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     public final MappedString fusedNameDescriptor;
 
     private Method javaMethodCache = null;
@@ -67,7 +65,6 @@ public class UniversalMethod {
         parent.addMethod(this);
     }
 
-    @StableAPI.Expose
     public static void createAndAddToParent(@NonNull UniversalClass parent, String[] names, Map<String, String> stringPool) {
         new UniversalMethod(parent, names, stringPool);
     }
@@ -135,17 +132,14 @@ public class UniversalMethod {
         return result.toArray(new Class[0]);
     }
 
-    @StableAPI.Expose
     public String getName(MappingType mappingType) {
         return name.get(mappingType);
     }
 
-    @StableAPI.Expose
     public String getDescriptor(MappingType mappingType) {
         return descriptor.get(mappingType);
     }
 
-    @StableAPI.Expose
     public Method asJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
         if (javaMethodCache != null) {
             return javaMethodCache;
@@ -163,18 +157,15 @@ public class UniversalMethod {
      */
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    @StableAPI.Expose
     public <T> T invoke(Object instance, Object... arguments) {
         val m = asJavaMethod();
         return (T) m.invoke(instance, arguments);
     }
 
-    @StableAPI.Expose
     public <T> T invokeStatic(Object... arguments) {
         return invoke(null, arguments);
     }
 
-    @StableAPI.Expose
     public MethodInsnNode asInstruction(int opcode, MappingType mapping, boolean itf) {
         return new MethodInsnNode(opcode,
                                   parent.getName(NameType.Internal, mapping),

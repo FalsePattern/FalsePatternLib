@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.impl.toast.GuiToastImpl;
 import com.falsepattern.lib.toasts.icon.ToastBG;
 import com.falsepattern.lib.toasts.icon.ToastIcon;
@@ -38,7 +37,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class SimpleToast implements IToast {
     private final ToastBG background;
     private final ToastIcon icon;
@@ -51,7 +49,6 @@ public class SimpleToast implements IToast {
     private float displayedProgress;
     private float currentProgress;
 
-    @StableAPI.Expose
     public SimpleToast(@NonNull ToastBG background,
                        @Nullable ToastIcon icon, IChatComponent titleComponent,
                        @Nullable IChatComponent subtitleComponent, boolean drawProgressBar, long timeout) {
@@ -117,12 +114,10 @@ public class SimpleToast implements IToast {
         return background.getIcon().getIconHeight();
     }
 
-    @StableAPI.Expose
     public void hide() {
         visibility = IToast.Visibility.HIDE;
     }
 
-    @StableAPI.Expose
     public void setProgress(float progress) {
         this.currentProgress = progress;
     }

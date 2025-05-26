@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.text;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
 import lombok.val;
 
@@ -52,8 +51,9 @@ import java.util.function.Consumer;
 
 /**
  * Universal escape sequence-based text rendering and chat messages.
+ *
+ * @since 0.6.0
  */
-@StableAPI(since = "0.6.0")
 public final class FormattedText {
     private static final Map<Character, EnumChatFormatting> reverseMap = new HashMap<>();
     private static final Map<EnumChatFormatting, Color> colorMap = new HashMap<>();
@@ -149,7 +149,6 @@ public final class FormattedText {
      *
      * @return The parsed text structure
      */
-    @StableAPI.Expose
     public static FormattedText parse(String text) {
         EnumChatFormatting currentColorStyle = EnumChatFormatting.WHITE;
         val currentFancyStyle = new HashSet<EnumChatFormatting>();
@@ -199,7 +198,6 @@ public final class FormattedText {
         return result;
     }
 
-    @StableAPI.Expose
     public void addChatMessage(ICommandSender target) {
         addChatMessage(target::addChatMessage);
     }
@@ -216,7 +214,6 @@ public final class FormattedText {
      *
      * @return The chat component.
      */
-    @StableAPI.Expose
     public List<ChatComponentText> toChatText() {
         var thisComponent = toChatTextSingle();
         val result = new ArrayList<ChatComponentText>();
@@ -264,33 +261,27 @@ public final class FormattedText {
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI.Expose
     public void addChatMessage(EntityOtherPlayerMP target) {
         addChatMessage(target::addChatMessage);
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI.Expose
     public void addChatMessage(EntityPlayerSP target) {
         addChatMessage(target::addChatMessage);
     }
 
-    @StableAPI.Expose
     public void addChatMessage(CommandBlockLogic target) {
         addChatMessage(target::addChatMessage);
     }
 
-    @StableAPI.Expose
     public void addChatMessage(EntityPlayerMP target) {
         addChatMessage(target::addChatMessage);
     }
 
-    @StableAPI.Expose
     public void addChatMessage(RConConsoleSource target) {
         addChatMessage(target::addChatMessage);
     }
 
-    @StableAPI.Expose
     public void addChatMessage(MinecraftServer target) {
         addChatMessage(target::addChatMessage);
     }
@@ -303,7 +294,6 @@ public final class FormattedText {
      * @param y        Top side
      */
     @SideOnly(Side.CLIENT)
-    @StableAPI.Expose
     public void draw(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, false);
     }
@@ -317,7 +307,6 @@ public final class FormattedText {
      * @param shadow   Whether to have drop shadow under the text
      */
     @SideOnly(Side.CLIENT)
-    @StableAPI.Expose
     public void draw(FontRenderer renderer, int x, int y, boolean shadow) {
         int startX = x;
         x = renderer.drawString(text, x, y, colorMap.get(colorStyle).getRGB(), shadow);
@@ -342,7 +331,6 @@ public final class FormattedText {
      * @param y        Top side
      */
     @SideOnly(Side.CLIENT)
-    @StableAPI.Expose
     public void drawWithShadow(FontRenderer renderer, int x, int y) {
         draw(renderer, x, y, true);
     }

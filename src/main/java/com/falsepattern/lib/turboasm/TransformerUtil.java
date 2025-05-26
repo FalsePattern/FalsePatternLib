@@ -26,9 +26,11 @@ import com.falsepattern.lib.internal.Tags;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
+@ApiStatus.Internal
 public class TransformerUtil {
     private static final boolean DEBUG_VERBOSE_TRANSFORMERS = Boolean.parseBoolean(System.getProperty(Tags.MODID + ".debug.verboseTransformers", "false"));
     private static final Logger LOG = LogManager.getLogger("ASM");

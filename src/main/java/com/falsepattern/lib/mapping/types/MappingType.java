@@ -21,11 +21,8 @@
  */
 package com.falsepattern.lib.mapping.types;
 
-import com.falsepattern.lib.StableAPI;
-
-@StableAPI(since = "0.10.0")
 public enum MappingType {
-    @StableAPI.Expose Notch,
-    @StableAPI.Expose SRG,
-    @StableAPI.Expose MCP
+    Notch,
+    SRG,
+    MCP
 }

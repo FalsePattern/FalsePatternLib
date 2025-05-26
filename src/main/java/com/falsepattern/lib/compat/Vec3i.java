@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.compat;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.MathUtil;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -38,19 +37,14 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 @EqualsAndHashCode
 @AllArgsConstructor
-@StableAPI(since = "0.6.0")
 public class Vec3i implements Comparable<Vec3i> {
     /**
      * A static zero vector
      */
-    @StableAPI.Expose
     public static final Vec3i NULL_VECTOR = new Vec3i(0, 0, 0);
 
-    @StableAPI.Expose
     protected final int x;
-    @StableAPI.Expose
     protected final int y;
-    @StableAPI.Expose
     protected final int z;
 
     /**
@@ -60,7 +54,6 @@ public class Vec3i implements Comparable<Vec3i> {
      * @param y the y
      * @param z the z
      */
-    @StableAPI.Expose
     public Vec3i(double x, double y, double z) {
         this(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
     }
@@ -77,7 +70,6 @@ public class Vec3i implements Comparable<Vec3i> {
      *
      * @return the new resulting vector
      */
-    @StableAPI.Expose
     public Vec3i crossProduct(@NonNull Vec3i vec) {
         return new Vec3i(y * vec.getZ() - z * vec.getY(),
                          z * vec.getX() - x * vec.getZ(),
@@ -93,7 +85,6 @@ public class Vec3i implements Comparable<Vec3i> {
      *
      * @return the distance
      */
-    @StableAPI.Expose
     public double getDistance(int x, int y, int z) {
         return Math.sqrt(distanceSq(x, y, z));
     }
@@ -107,7 +98,6 @@ public class Vec3i implements Comparable<Vec3i> {
      *
      * @return the square distance
      */
-    @StableAPI.Expose
     public double distanceSq(int x, int y, int z) {
         val dX = this.x - x;
         val dY = this.y - y;
@@ -122,7 +112,6 @@ public class Vec3i implements Comparable<Vec3i> {
      *
      * @return the square distance
      */
-    @StableAPI.Expose
     public double distanceSq(@NonNull Vec3i vec) {
         return distanceSq(vec.getX(), vec.getY(), vec.getZ());
     }
@@ -136,7 +125,6 @@ public class Vec3i implements Comparable<Vec3i> {
      *
      * @return the square distance to center
      */
-    @StableAPI.Expose
     public double distanceSqToCenter(double x, double y, double z) {
         val dX = this.x + 0.5D - x;
         val dY = this.y + 0.5D - y;

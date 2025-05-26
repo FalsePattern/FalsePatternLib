@@ -22,34 +22,31 @@
 
 package com.falsepattern.lib.dependencies;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-@StableAPI(since = "0.10.0")
+/**
+ * @since 0.10.0
+ */
 public class Library {
-    @StableAPI.Expose
     @NonNull
     public final String loadingModId;
-    @StableAPI.Expose
     @NonNull
     public final String groupId;
-    @StableAPI.Expose
     @NonNull
     public final String artifactId;
-    @StableAPI.Expose
     @NonNull
     public final Version minVersion;
-    @StableAPI.Expose
+    @Nullable
     public final Version maxVersion;
-    @StableAPI.Expose
     @NonNull
     public final Version preferredVersion;
-    @StableAPI.Expose
+    @Nullable
     public final String regularSuffix;
-    @StableAPI.Expose
+    @Nullable
     public final String devSuffix;
 
-    @StableAPI.Expose
     public Library(@NonNull String loadingModId, @NonNull String groupId, @NonNull String artifactId, @NonNull Version minVersion, Version maxVersion, @NonNull Version preferredVersion, String regularSuffix, String devSuffix) {
         this.loadingModId = loadingModId;
         this.groupId = groupId;
@@ -61,12 +58,13 @@ public class Library {
         this.devSuffix = devSuffix;
     }
 
-    @StableAPI.Expose
     public static LibraryBuilder builder() {
         return new LibraryBuilder();
     }
 
-    @StableAPI(since = "0.10.0")
+    /**
+     * @since 0.10.0
+     */
     public static class LibraryBuilder {
         private String loadingModId;
         private String groupId;
@@ -77,59 +75,50 @@ public class Library {
         private String regularSuffix;
         private String devSuffix;
 
-        @StableAPI.Internal
+        @ApiStatus.Internal
         LibraryBuilder() {
         }
 
-        @StableAPI.Expose
         public LibraryBuilder loadingModId(@NonNull String loadingModId) {
             this.loadingModId = loadingModId;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder groupId(@NonNull String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder artifactId(@NonNull String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder minVersion(@NonNull Version minVersion) {
             this.minVersion = minVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder maxVersion(Version maxVersion) {
             this.maxVersion = maxVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder preferredVersion(@NonNull Version preferredVersion) {
             this.preferredVersion = preferredVersion;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder regularSuffix(String regularSuffix) {
             this.regularSuffix = regularSuffix;
             return this;
         }
 
-        @StableAPI.Expose
         public LibraryBuilder devSuffix(String devSuffix) {
             this.devSuffix = devSuffix;
             return this;
         }
 
-        @StableAPI.Expose
         public Library build() {
             return new Library(loadingModId,
                                groupId,

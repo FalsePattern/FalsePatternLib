@@ -21,9 +21,9 @@
  */
 package com.falsepattern.lib.config.event;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.EventUtil;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
@@ -35,28 +35,26 @@ import cpw.mods.fml.relauncher.SideOnly;
  * This is a client-only event, and is never triggered serverside!
  */
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public class AllConfigSyncEvent extends Event {
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public AllConfigSyncEvent() {
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public static boolean postStart() {
         val event = new Start();
         return EventUtil.postOnCommonBus(event);
     }
 
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public static void postEnd() {
         EventUtil.postOnCommonBus(new End());
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI(since = "0.10.0")
     public static final class Start extends AllConfigSyncEvent {
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public Start() {
         }
 
@@ -67,9 +65,8 @@ public class AllConfigSyncEvent extends Event {
     }
 
     @SideOnly(Side.CLIENT)
-    @StableAPI(since = "0.10.0")
     public static final class End extends AllConfigSyncEvent {
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public End() {
         }
     }

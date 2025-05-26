@@ -21,7 +21,6 @@
  */
 package com.falsepattern.lib.toasts.icon;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.util.RenderUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,19 +32,16 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-@StableAPI(since = "0.10.0")
 public abstract class ToastTexture {
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     protected final IIcon icon;
-    @Getter(onMethod_ = @StableAPI.Expose)
+    @Getter
     protected final ResourceLocation texture;
 
-    @StableAPI.Expose
     public ToastTexture(@NonNull ResourceLocation texture, int width, int height) {
         this(texture, RenderUtil.getFullTextureIcon(texture.toString(), width, height));
     }
 
-    @StableAPI.Expose
     public ToastTexture(@NonNull ResourceLocation texture, @NonNull IIcon icon) {
         this.icon = icon;
         this.texture = texture;
@@ -54,6 +50,5 @@ public abstract class ToastTexture {
     /**
      * Draws the icon at the specified position in the specified Gui
      */
-    @StableAPI.Expose
     public abstract void draw(Gui guiIn, int x, int y);
 }

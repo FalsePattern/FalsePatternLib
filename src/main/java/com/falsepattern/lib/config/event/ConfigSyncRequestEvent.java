@@ -21,8 +21,8 @@
  */
 package com.falsepattern.lib.config.event;
 
-import com.falsepattern.lib.StableAPI;
 import com.falsepattern.lib.internal.EventUtil;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import cpw.mods.fml.common.eventhandler.Event;
@@ -36,39 +36,33 @@ import java.util.List;
  * different game sides. If you want to trigger this on the server, use {@link #postServer}, and if on the client, use
  * {@link #postClient}
  */
-@StableAPI(since = "0.10.0")
 public class ConfigSyncRequestEvent extends Event {
-    @StableAPI.Internal
+    @ApiStatus.Internal
     public ConfigSyncRequestEvent() {
     }
 
-    @StableAPI.Expose
     public static void postClient() {
         EventUtil.postOnCommonBus(new Client());
     }
 
-    @StableAPI.Expose
     public static void postServer(List<EntityPlayerMP> players) {
         EventUtil.postOnCommonBus(new Server(new ArrayList<>(players)));
     }
 
-    @StableAPI(since = "0.10.0")
     public static final class Client extends ConfigSyncRequestEvent {
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public Client() {
         }
     }
 
-    @StableAPI(since = "0.10.0")
     public static final class Server extends ConfigSyncRequestEvent {
         private final List<EntityPlayerMP> players;
 
-        @StableAPI.Internal
+        @ApiStatus.Internal
         public Server(List<EntityPlayerMP> players) {
             this.players = players;
         }
 
-        @StableAPI.Expose
         public List<EntityPlayerMP> getPlayers() {
             return Collections.unmodifiableList(players);
         }

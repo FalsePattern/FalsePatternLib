@@ -2,7 +2,6 @@ A library for 1.7.10 with lots of useful stuff, licensed under the LGPLv3 licens
 
 | Package                                                         | Contents / Purpose                                                                                                                      |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| [.](src/main/java/com/falsepattern/lib)                         | StableAPI and DeprecationDetails annotations                                                                                            |
 | [asm](src/main/java/com/falsepattern/lib/asm)                   | ASM helper code                                                                                                                         |
 | [compat](src/main/java/com/falsepattern/lib/compat)             | Code backported from vanilla 1.12.2                                                                                                     |
 | [config](src/main/java/com/falsepattern/lib/config)             | 1.12.2-style annotation-based config library                                                                                            |
@@ -25,9 +24,6 @@ The contents of the [util](src/main/java/com/falsepattern/lib/util) package so f
 | [ReflectionUtl](src/main/java/com/falsepattern/lib/util/ReflectionUtil.java) | Reflection helper code                                                                                                            |
 | [RenderUtil](src/main/java/com/falsepattern/lib/util/RenderUtil.java)        | Rendering tools. Currently, the only thing implemented is a way to grab the current partial tick time from the minecraft instance |
 | [ResourceUtil](src/main/java/com/falsepattern/lib/util/ResourceUtil.java)    | Methods for efficiently retrieving resources from SPECIFIC jar files instead of the entire classpath                              |
-
-See the [@StableAPI](src/main/java/com/falsepattern/lib/StableAPI.java) annotation's javadoc for more information about
-API stability.
 
 The update checker module and the library downloader module can be toggled with the `ENABLE_UPDATE_CHECKER` and 
 `ENABLE_LIBRARY_DOWNLOADS` booleans in the `falsepatternlib.cfg` config file respectively.

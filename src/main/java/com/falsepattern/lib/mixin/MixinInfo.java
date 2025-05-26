@@ -22,8 +22,8 @@
 
 package com.falsepattern.lib.mixin;
 
-import com.falsepattern.lib.StableAPI;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 import org.spongepowered.asm.launch.MixinBootstrap;
 
 import net.minecraft.launchwrapper.Launch;
@@ -31,9 +31,10 @@ import net.minecraft.launchwrapper.Launch;
 import java.io.IOException;
 import java.util.Optional;
 
-@StableAPI(since = "0.10.2")
+/**
+ * @since 0.10.2
+ */
 public final class MixinInfo {
-    @StableAPI.Expose
     public static final MixinBootstrapperType mixinBootstrapper;
 
     static {
@@ -41,12 +42,10 @@ public final class MixinInfo {
         mixinBootstrapper = detect();
     }
 
-    @StableAPI.Expose
     public static boolean isMixinsInstalled() {
         return mixinBootstrapper != MixinBootstrapperType.None;
     }
 
-    @StableAPI.Expose
     public static boolean isOfficialSpongeMixins() {
         return (mixinBootstrapper == MixinBootstrapperType.SpongeMixins) && getVerUnsafe().equals("0.7.11");
     }
@@ -54,37 +53,36 @@ public final class MixinInfo {
     /**
      * The nh fork of spongemixins breaks some stuff since 1.5.0.
      */
-    @StableAPI.Expose
     public static boolean isTamperedSpongeMixins() {
         return (mixinBootstrapper == MixinBootstrapperType.SpongeMixins) && getVerUnsafe().equals("0.7.12");
     }
 
-    @StableAPI.Expose
     public static boolean isGrimoire() {
         return mixinBootstrapper == MixinBootstrapperType.Grimoire;
     }
 
-    @StableAPI.Expose
     public static boolean isMixinBooterLegacy() {
         return mixinBootstrapper == MixinBootstrapperType.MixinBooterLegacy;
     }
 
-    @StableAPI.Expose(since = "0.10.14")
+    /**
+     * @since 0.10.14
+     */
     public static boolean isGasStation() {
         return mixinBootstrapper == MixinBootstrapperType.GasStation;
     }
 
-    @StableAPI.Expose(since = "0.10.15")
+    /**
+     * @since 0.10.15
+     */
     public static boolean isUniMixin() {
         return mixinBootstrapper == MixinBootstrapperType.UniMixin;
     }
 
-    @StableAPI.Expose
     public static MixinBootstrapperType bootstrapperType() {
         return mixinBootstrapper;
     }
 
-    @StableAPI.Expose
     public static Optional<String> mixinVersion() {
         return mixinBootstrapper != MixinBootstrapperType.None ? Optional.of(getVerUnsafe()) : Optional.empty();
     }
@@ -93,6 +91,7 @@ public final class MixinInfo {
         return MixinBootstrap.VERSION;
     }
 
+    @ApiStatus.Internal
     public static boolean isClassPresentSafe(String clazz) {
         try {
             val bytes = Launch.classLoader.getClassBytes(clazz);
@@ -130,14 +129,18 @@ public final class MixinInfo {
         return MixinBootstrapperType.Other;
     }
 
-    @StableAPI(since = "0.10.2")
+    /**
+     * @since 0.10.2
+     */
     public enum MixinBootstrapperType {
-        @StableAPI.Expose None,
-        @StableAPI.Expose(since = "0.10.9") GasStation,
-        @StableAPI.Expose SpongeMixins,
-        @StableAPI.Expose Grimoire,
-        @StableAPI.Expose MixinBooterLegacy,
-        @StableAPI.Expose Other,
-        @StableAPI.Expose(since = "0.10.15") UniMixin
+        None,
+        /** @since 0.10.9 */
+        GasStation,
+        SpongeMixins,
+        Grimoire,
+        MixinBooterLegacy,
+        Other,
+        /** @since 0.10.15 */
+        UniMixin
     }
 }
