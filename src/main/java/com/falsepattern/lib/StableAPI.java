@@ -54,9 +54,10 @@ import java.lang.annotation.Target;
  * is highly experimental and may be removed or change at any time, however, using it in third party projects is not an
  * error, unlike __INTERNAL__, but if any issues arise from the usage of the API or the API changing, the API developer
  * shall not be blamed for it.
+ * @deprecated since 1.7.0
  * @since 0.6.0
  */
-@Deprecated(since = "1.7.0")
+@Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -78,9 +79,10 @@ public @interface StableAPI {
      * Also note that this only works for class members (methods and fields),
      * inner classes still need to use {@link StableAPI}.
      *
+     * @deprecated since 1.7.0
      * @since 0.10.0
      */
-    @Deprecated(since = "1.7.0")
+    @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
@@ -96,9 +98,10 @@ public @interface StableAPI {
      * Library consumers should never use class members marked with this annotation, as said members can be freely
      * changed or removed in any version in the library without prior notice.
      *
+     * @deprecated since 1.7.0
      * @since 0.10.0
      */
-    @Deprecated(since = "1.7.0")
+    @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})

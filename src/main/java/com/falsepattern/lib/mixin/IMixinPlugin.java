@@ -53,7 +53,10 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return LogManager.getLogger(modName + " Mixin Loader");
     }
 
-    @Deprecated(since = "1.4.0")
+    /**
+     * @deprecated since 1.4.0
+     */
+    @Deprecated
     static File findJarOf(final ITargetedMod mod) {
         File result = null;
         try (val stream = walk(MODS_DIRECTORY_PATH)) {

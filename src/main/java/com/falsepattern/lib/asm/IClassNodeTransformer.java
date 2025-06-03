@@ -26,8 +26,10 @@ import org.objectweb.asm.tree.ClassNode;
 /**
  * See: {@link com.falsepattern.lib.turboasm.TurboClassTransformer}.
  * This class will not be removed, for backwards compatibility reasons.
+ *
+ * @deprecated since 1.2.0
  */
-@Deprecated(since = "1.2.0")
+@Deprecated
 public interface IClassNodeTransformer {
     String getName();
 

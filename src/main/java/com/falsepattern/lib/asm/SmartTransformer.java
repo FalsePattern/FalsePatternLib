@@ -36,8 +36,10 @@ import java.util.List;
 /**
  * See: {@link com.falsepattern.lib.turboasm.MergeableTurboTransformer}.
  * This class will not be removed, for backwards compatibility reasons.
+ *
+ * @deprecated since 1.2.0
  */
-@Deprecated(since = "1.2.0")
+@Deprecated
 public interface SmartTransformer extends IClassTransformer {
     Logger logger();
 

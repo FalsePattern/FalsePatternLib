@@ -32,8 +32,9 @@ import java.lang.annotation.RetentionPolicy;
  * Used together with {@link Deprecated} to specify when an API was marked stable, and when it was marked for deprecation.
  * Deprecated classes MAY be removed after a full deprecation cycle as described inside the {@link StableAPI} javadoc.
  * @since 0.10.0
+ * @deprecated since 1.7.0
  */
-@Deprecated(since = "1.7.0")
+@Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DeprecationDetails {
@@ -50,8 +51,9 @@ public @interface DeprecationDetails {
      * This marks an API for removal in a future version.
      *
      * @since 0.12.0
+     * @deprecated since 1.7.0
      */
-    @Deprecated(since = "1.7.0")
+    @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @interface RemovedInVersion {
