@@ -367,10 +367,11 @@ public class DependencyLoaderImpl {
     }
 
     private static final Pattern VERSION_PATTERN =
-            Pattern.compile("(0|[1-9]\\d*)(?:\\.(0|[1-9]\\d*))?(?:\\.(0|[1-9]\\d*))?"
-                            + "(?:-((?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0)"
-                            + "(?:\\.(?:(?:[0-9]+[a-zA-Z-][\\w-]*)|(?:[a-zA-Z][\\w-]*)|(?:[1-9]\\d*)|0))*))?"
-                            + "(?:\\+([\\w-]+(\\.[\\w-]+)*))?");
+            Pattern.compile("(0|[1-9]\\d*)" +
+                            "(?:\\.(0|[1-9]\\d*))?" +
+                            "(?:\\.(0|[1-9]\\d*))?" +
+                            "(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?" +
+                            "(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?");
 
     private enum DependencySide {
         COMMON,
@@ -505,23 +506,7 @@ public class DependencyLoaderImpl {
                                            }
                                            val groupId = parts[0];
                                            val artifactId = parts[1];
-                                           Version version;
-                                           try {
-                                               val matcher = VERSION_PATTERN.matcher(parts[2]);
-                                               if (!matcher.matches()) {
-                                                   throw new IllegalArgumentException("Invalid version: " + parts[2]);
-                                               }
-                                               val major = Integer.parseInt(matcher.group(1));
-                                               val minor = matcher.group(2) == null ? -1
-                                                                                    : Integer.parseInt(matcher.group(2));
-                                               val patch = matcher.group(3) == null ? -1
-                                                                                    : Integer.parseInt(matcher.group(3));
-                                               val preRelease = matcher.group(4);
-                                               val build = matcher.group(5);
-                                               version = new SemanticVersion(major, minor, patch, preRelease, build);
-                                           } catch (IllegalArgumentException e) {
-                                               version = new RawVersion(parts[2]);
-                                           }
+                                           Version version = parseVersion(parts[2]);
                                            final String classifier = parts.length > 3 ? parts[3] : null;
                                            if (classifier != null) {
                                                LOG.info("Found dependency: {}:{}:{}:{} from {}",
@@ -550,6 +535,25 @@ public class DependencyLoaderImpl {
                                        .filter(Objects::nonNull)
                                        .collect(Collectors.toSet());
         tasks = new ArrayList<>(artifacts);
+    }
+
+    public static Version parseVersion(String versionString) {
+        try {
+            val matcher = VERSION_PATTERN.matcher(versionString);
+            if (!matcher.matches()) {
+                return new RawVersion(versionString);
+            }
+            val major = Integer.parseInt(matcher.group(1));
+            val minor = matcher.group(2) == null ? -1
+                                                 : Integer.parseInt(matcher.group(2));
+            val patch = matcher.group(3) == null ? -1
+                                                 : Integer.parseInt(matcher.group(3));
+            val preRelease = matcher.group(4);
+            val build = matcher.group(5);
+            return new SemanticVersion(major, minor, patch, preRelease, build);
+        } catch (Exception e) {
+            return new RawVersion(versionString);
+        }
     }
 
     private static class SideAwareAssistant {
