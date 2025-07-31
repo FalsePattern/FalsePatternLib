@@ -20,20 +20,22 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal;
+package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.lib.internal.asm.PreShare;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
+import lombok.Getter;
 
-import net.minecraft.launchwrapper.Launch;
+public class PreShare {
+    private static volatile boolean devEnv = false;
+    private static volatile boolean inited = false;
+    public static synchronized void initDevState(boolean state) {
+        if (inited) {
+            return;
+        }
+        inited = true;
+        devEnv = state;
+    }
 
-import java.io.IOException;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Share {
-    public static final boolean DEV_ENV = PreShare.devEnv();
-
-    public static boolean EARLY_INIT_DONE = false;
+    public static synchronized boolean devEnv() {
+        return devEnv;
+    }
 }

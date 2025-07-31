@@ -29,8 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.launchwrapper.Launch;
 
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 @UtilityClass
@@ -64,20 +66,31 @@ public class LowLevelCallMultiplexer {
         }
     }
 
+    public static int javaMajorVersion() {
+        if (rfbDetected) {
+            return RFBLowLevel.javaMajorVersion();
+        } else {
+            return LaunchWrapperLowLevel.javaMajorVersion();
+        }
+    }
+
     //Separate classes to avoid accidental classloading
 
-    @SuppressWarnings("resource")
     private static class RFBLowLevel {
         static void addURLToClassPath(URL url) {
-            RfbApiImpl.INSTANCE.compatClassLoader().addURL(url);
+            RfbApiImpl.INSTANCE.launchClassLoader().addURL(url);
         }
 
         static List<URL> getClassPathSources() {
-            return RfbApiImpl.INSTANCE.compatClassLoader().getSources();
+            return Arrays.asList(((URLClassLoader)RfbApiImpl.INSTANCE.launchClassLoader()).getURLs());
         }
 
         static @NotNull Path gameDir() {
             return RfbApiImpl.INSTANCE.gameDirectory();
+        }
+
+        static int javaMajorVersion() {
+            return RfbApiImpl.INSTANCE.javaMajorVersion();
         }
     }
 
@@ -92,6 +105,17 @@ public class LowLevelCallMultiplexer {
 
         static @NotNull Path gameDir() {
             return Launch.minecraftHome == null ? Paths.get(".") : Launch.minecraftHome.toPath();
+        }
+
+        static int javaMajorVersion() {
+            String version = System.getProperty("java.version");
+            if(version.startsWith("1.")) {
+                version = version.substring(2, 3);
+            } else {
+                int dot = version.indexOf(".");
+                if(dot != -1) { version = version.substring(0, dot); }
+            }
+            return Integer.parseInt(version);
         }
     }
 }

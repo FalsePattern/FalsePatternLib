@@ -1,5 +1,5 @@
 FalsePatternLib JSON dependency file example
-Version 1
+Version 2
 
 An example JSON file that can be used to download dependencies using FalsePatternLib. This replaces the legacy
 DependencyLoader api. This file needs to reside inside the META-INF directory.
@@ -7,6 +7,8 @@ DependencyLoader api. This file needs to reside inside the META-INF directory.
 ```json
 {
   "identifier": "falsepatternlib_dependencies",
+  "minJava": 8,
+  "maxJava": 8,
   "repositories": [
     "https://example.com/"
   ],
@@ -37,6 +39,12 @@ Explanation:
 - `identifier`: The identifier of the json file. This must always be `falsepatternlib_dependencies` for the library
   downloader
   to recognize it.
+- `minJava`: The lowest java major version to load dependencies from this file for (inclusive). Can be omitted, in which case
+  it will load dependencies for any java versions below or equal maxJava.
+- `maxJava`: The highest java major version to load dependencies from this file for (inclusive). If omitted, it will load dependencies
+  for any java versions above or equal minJava.
+- If both `minJava` and `maxJava` are unset, dependencies from the file will be loaded regardless of java version.
+- If you want to load dependencies for multiple different java ranges, use multiple dependency jsons.
 - `repositories`: A list of maven repositories to use when downloading dependencies. These are used in addition to the
   default maven repositories. This is just a list of strings, each string being a https repository url.
   Additionally, every jar with a dependencies json file inside of it is treated as a "jar in jar" maven repository.

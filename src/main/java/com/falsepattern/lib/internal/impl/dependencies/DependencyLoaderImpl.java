@@ -225,12 +225,12 @@ public class DependencyLoaderImpl {
         }
     }
 
-    private static synchronized void addToClasspath(Path file) {
+    private static synchronized void addToClasspath(URL file) {
         try {
-            LowLevelCallMultiplexer.addURLToClassPath(file.toUri().toURL());
+            LowLevelCallMultiplexer.addURLToClassPath(file);
             LOG.debug("Injected file {} into classpath!", file);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to add library to classpath: " + file.toAbsolutePath(), e);
+            throw new RuntimeException("Failed to add library to classpath: " + file, e);
         }
     }
 
@@ -407,13 +407,13 @@ public class DependencyLoaderImpl {
     private static boolean initialScan = false;
     private static List<Pair<ScopeSide, DependencyLoadTask>> tasks;
 
-    public static void executeDependencyLoading(boolean sideAware) {
+    public static void executeDependencyLoading() {
         if (!initialScan) {
             initialScan = true;
             scanDeps();
         }
 
-        executeArtifactLoading(sideAware);
+        executeArtifactLoading();
     }
 
     private static void scanDeps() {
@@ -450,6 +450,7 @@ public class DependencyLoaderImpl {
         } catch (IOException e) {
             LOG.error("Could not write dependency scanner cache", e);
         }
+        val javaVersion = LowLevelCallMultiplexer.javaMajorVersion();
         val dependencySpecs = urls.stream().map((source) -> {
             //Convert source to GSON json
             try (val is = new BufferedInputStream(source.openStream())) {
@@ -468,6 +469,11 @@ public class DependencyLoaderImpl {
                 val gson = builder.create();
                 json.remove("identifier");
                 val root = gson.fromJson(json, DepRoot.class);
+                val minJ = root.minJava();
+                val maxJ = root.maxJava();
+                if (minJ != null && minJ > javaVersion || maxJ != null && maxJ < javaVersion) {
+                    return null;
+                }
                 root.source(source.toString());
                 return root;
             } catch (Exception e) {
@@ -562,8 +568,8 @@ public class DependencyLoaderImpl {
         }
     }
 
-    private static void executeArtifactLoading(boolean sideAware) {
-        val scopeSide = sideAware ? SideAwareAssistant.current() : new ScopeSide(DependencyScope.ALWAYS, DependencySide.COMMON);
+    private static void executeArtifactLoading() {
+        val scopeSide = SideAwareAssistant.current();
         val iter = tasks.iterator();
         val artifactMap = new HashMap<String, DependencyLoadTask>();
         while (iter.hasNext()) {
@@ -621,7 +627,6 @@ public class DependencyLoaderImpl {
                 }
                 jFrame.pack();
                 jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-                jFrame.setVisible(true);
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
                 jFrame.setLocation(dim.width/2-jFrame.getSize().width/2, dim.height/2-jFrame.getSize().height/2);
             } catch (Exception ignored) {
@@ -667,7 +672,14 @@ public class DependencyLoaderImpl {
     @NotNull
     private static Thread getVizThread(AtomicBoolean doViz, HashMap<DependencyLoadTask, JProgressBar> progresses, JFrame theFrame) {
         val vizThread = new Thread(() -> {
+            int waitBeforeShowing = 100;
             while (doViz.get()) {
+                if (waitBeforeShowing > 0) {
+                    waitBeforeShowing--;
+                } else if (waitBeforeShowing == 0) {
+                    theFrame.setVisible(true);
+                    waitBeforeShowing = -1;
+                }
                 for (val progress : progresses.entrySet()) {
                     val task = progress.getKey();
                     val bar = progress.getValue();
@@ -825,11 +837,11 @@ public class DependencyLoaderImpl {
                 return false;
             }
             try {
-                addToClasspath(file);
+                addToClasspath(file.toUri().toURL());
                 loadedLibraries.put(artifact, preferredVersion);
                 LOG.debug("Library {} successfully loaded from disk!", artifactLogName);
                 return true;
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 LOG.warn("Failed to load library {} from file! Re-downloading...", artifactLogName);
                 checkedDelete(file);
                 return false;
@@ -912,7 +924,7 @@ public class DependencyLoaderImpl {
                             }
                             loadedLibraries.put(artifact, preferredVersion);
                             loadedLibraryMods.put(artifact, loadingModId);
-                            addToClasspath(file);
+                            addToClasspath(file.toUri().toURL());
                             return true;
                         }
                     }

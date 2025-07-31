@@ -56,6 +56,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     private static boolean obfuscated;
 
     static {
+        PreShare.initDevState(Launch.classLoader.findResource("net/minecraft/world/World.class") != null);
         LetsEncryptHelper.replaceSSLContext();
         FPLog.LOG.info("Removing skill issues...");
         try {
@@ -67,7 +68,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         //Scan for dependencies now
         FPLog.LOG.info("Scanning for deps...");
         long start = System.nanoTime();
-        DependencyLoaderImpl.executeDependencyLoading(true);
+        DependencyLoaderImpl.executeDependencyLoading();
         long end = System.nanoTime();
         FPLog.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest

@@ -25,12 +25,31 @@ package com.falsepattern.lib.internal.asm;
 import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
 import com.falsepattern.lib.internal.impl.dependencies.LetsEncryptHelper;
+import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
+import lombok.val;
+
+import java.net.URLClassLoader;
 
 public class RFBLoadingPlugin implements RfbPlugin {
     static {
+        val loader = RfbApiImpl.INSTANCE.launchClassLoader();
+        try {
+            val exc = loader.getClass()
+                            .getDeclaredMethod("addClassLoaderExclusion", String.class);
+            exc.invoke(loader, "com.falsepattern.lib.dependencies.");
+            exc.invoke(loader, "com.falsepattern.lib.internal.impl.dependencies.");
+            exc.invoke(loader, "com.falsepattern.lib.internal.Internet");
+            exc.invoke(loader, "com.falsepattern.lib.internal.Share");
+            exc.invoke(loader, "com.falsepattern.lib.internal.asm.PreShare");
+            exc.invoke(loader, "com.falsepattern.lib.internal.FPLog");
+            exc.invoke(loader, "com.falsepattern.lib.internal.Tags");
+            exc.invoke(loader, "com.falsepattern.lib.internal.config.EarlyConfig");
+            exc.invoke(loader, "com.falsepattern.lib.internal.core.LowLevelCallMultiplexer");
+        } catch (Exception ignored) {}
+        PreShare.initDevState(((URLClassLoader)loader).findResource("net/minecraft/world/World.class") != null);
         LetsEncryptHelper.replaceSSLContext();
         LowLevelCallMultiplexer.rfbDetected();
-        DependencyLoaderImpl.executeDependencyLoading(false);
+        DependencyLoaderImpl.executeDependencyLoading();
     }
 }

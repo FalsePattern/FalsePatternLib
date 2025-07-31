@@ -33,6 +33,10 @@ import java.util.List;
 public class DepRoot {
     private String source;
     @Expose
+    private Integer minJava;
+    @Expose
+    private Integer maxJava;
+    @Expose
     private List<String> repositories;
     @Expose
     private Dependencies dependencies;
