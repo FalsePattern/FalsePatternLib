@@ -738,17 +738,17 @@ public class DependencyLoaderImpl {
                 return;
             }
             setupPaths();
-            if (tryLoadingExistingFile()) {
-                return;
-            }
             for (val repo: localMavenRepositories) {
-                if (tryDownloadFromMaven(repo)) {
+                if (tryDownloadFromMaven(repo, true)) {
                     return;
                 }
             }
+            if (tryLoadingExistingFile()) {
+                return;
+            }
             validateDownloadsAllowed();
             for (var repo : remoteMavenRepositories) {
-                if (tryDownloadFromMaven(repo)) {
+                if (tryDownloadFromMaven(repo, false)) {
                     return;
                 }
             }
@@ -868,7 +868,7 @@ public class DependencyLoaderImpl {
         }
 
         private static final Object mutex = new Object();
-        private boolean tryDownloadFromMaven(String repo) {
+        private boolean tryDownloadFromMaven(String repo, boolean local) {
             synchronized (mutex) {
                 try {
                     if (!repo.endsWith("/")) {
@@ -918,9 +918,11 @@ public class DependencyLoaderImpl {
                                 case OK:
                                     break;
                                 case MISSING:
-                                    LOG.warn("The library {} had no checksum available on the repository.\n"
-                                             + "There's a chance it might have gotten corrupted during download,\n"
-                                             + "but we're loading it anyways.", artifactLogName);
+                                    if (!local) {
+                                        LOG.warn("The library {} had no checksum available on the repository.\n"
+                                                 + "There's a chance it might have gotten corrupted during download,\n"
+                                                 + "but we're loading it anyways.", artifactLogName);
+                                    }
                             }
                             loadedLibraries.put(artifact, preferredVersion);
                             loadedLibraryMods.put(artifact, loadingModId);
