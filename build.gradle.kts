@@ -48,10 +48,12 @@ minecraft_fp {
 
 repositories {
     exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon/"), "com.gtnewhorizons.retrofuturabootstrap")
-    exclusive(jitpack(), "com.github.LegacyModdingMC.UniMixins")
+    exclusive(horizon()) {
+        includeModule("io.github.legacymoddingmc", "unimixins")
+    }
 }
 
 dependencies {
     compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
-    compileOnly("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.1.19:dev")
+    compileOnly("io.github.legacymoddingmc:unimixins:0.1.23:dev")
 }
