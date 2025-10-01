@@ -37,6 +37,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -603,12 +604,13 @@ public class DependencyLoaderImpl {
         LOG.info("-----------------------------------------------------------");
         LOG.info("FalsePatternLib is downloading dependencies. Please wait...");
         LOG.info("-----------------------------------------------------------");
-        JFrame theFrame;
+        JFrame theFrame = null;
         val progresses = new HashMap<DependencyLoadTask, JProgressBar>();
-        {
-            JFrame jFrame = null;
+        if (SystemUtils.IS_OS_MAC) {
+            LOG.info("MacOS detected, not creating progress window (your OS is buggy)");
+        } else {
             try {
-                jFrame = new JFrame("Dependency Download");
+                val jFrame = new JFrame("Dependency Download");
                 val constraints = new GridBagConstraints();
                 jFrame.getContentPane().setLayout(new GridBagLayout());
                 constraints.gridy = 0;
@@ -629,9 +631,9 @@ public class DependencyLoaderImpl {
                 jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
                 jFrame.setLocation(dim.width/2-jFrame.getSize().width/2, dim.height/2-jFrame.getSize().height/2);
+                theFrame = jFrame;
             } catch (Exception ignored) {
             }
-            theFrame = jFrame;
         }
         if (theFrame != null) {
             for (val task : artifactMap.values()) {
