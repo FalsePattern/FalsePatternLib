@@ -60,7 +60,7 @@ public class TypeDiscovererModuleInfoSilencer implements TurboClassTransformer {
                 if (insn instanceof LdcInsnNode) {
                     val ldc = (LdcInsnNode) insn;
                     if (ldc.cst.equals("[^\\s\\$]+(\\$[^\\s]+)?\\.class$")) {
-                        ldc.cst = "(?!module-info)[^\\s\\$]+(\\$[^\\s]+)?\\.class$";
+                        ldc.cst = "[^\\s\\$]+(?<!module-info)(\\$[^\\s]+)?\\.class$";
                         return true;
                     }
                 }
