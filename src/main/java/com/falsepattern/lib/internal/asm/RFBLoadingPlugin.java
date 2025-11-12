@@ -48,6 +48,8 @@ public class RFBLoadingPlugin implements RfbPlugin {
             exc.invoke(loader, "com.falsepattern.lib.internal.core.LowLevelCallMultiplexer");
         } catch (Exception ignored) {}
         PreShare.initDevState(((URLClassLoader)loader).findResource("net/minecraft/world/World.class") != null);
+        PreShare.initClientState(((URLClassLoader)loader).findResource("net/minecraft/client/Minecraft.class") != null ||
+                                 ((URLClassLoader)loader).findResource("bao.class") != null);
         LetsEncryptHelper.replaceSSLContext();
         LowLevelCallMultiplexer.rfbDetected();
         DependencyLoaderImpl.executeDependencyLoading();

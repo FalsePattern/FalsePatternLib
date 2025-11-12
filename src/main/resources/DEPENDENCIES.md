@@ -9,6 +9,9 @@ DependencyLoader api. This file needs to reside inside the META-INF directory.
   "identifier": "falsepatternlib_dependencies",
   "minJava": 8,
   "maxJava": 8,
+  "bundledArtifacts": [
+    "com.example:myjar:1.2.3"
+  ],
   "repositories": [
     "https://example.com/"
   ],
@@ -22,6 +25,25 @@ DependencyLoader api. This file needs to reside inside the META-INF directory.
       "common": [
         "com.example:examplejar:1.0.0"
       ],
+      "client": [],
+      "server": []
+    },
+    "dev": {
+      "common": [],
+      "client": [],
+      "server": []
+    }
+  },
+  "modDependencies": {
+    "always": {
+      "common": [
+        "com.example:mymod:3.0.0"
+      ],
+      "client": [],
+      "server": []
+    },
+    "obf": {
+      "common": [],
       "client": [],
       "server": []
     },
@@ -45,6 +67,7 @@ Explanation:
   for any java versions above or equal minJava.
 - If both `minJava` and `maxJava` are unset, dependencies from the file will be loaded regardless of java version.
 - If you want to load dependencies for multiple different java ranges, use multiple dependency jsons.
+- `bundledArtifacts`: A list of maven artifacts which are "shaded" into this jar without relocation. Useful for recursive deploading of mc mods.
 - `repositories`: A list of maven repositories to use when downloading dependencies. These are used in addition to the
   default maven repositories. This is just a list of strings, each string being a https repository url.
   Additionally, every jar with a dependencies json file inside of it is treated as a "jar in jar" maven repository.
@@ -57,6 +80,8 @@ Explanation:
       here.
     - The `dev` category gets downloaded only in the dev environment. Usually not needed, as gradle will automatically
       download dependencies.
+- `modDependencies`: Same as `dependencies`, but files from here get downloaded into `.minecraft/mods/1.7.10`. Useful
+  if you want to download third party mods as well.
 
 Each of these categories also have 3 more subcategories:
 

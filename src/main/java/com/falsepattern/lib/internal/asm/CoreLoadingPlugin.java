@@ -36,10 +36,12 @@ import lombok.val;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+import cpw.mods.fml.relauncher.Side;
 
 import java.util.List;
 import java.util.Map;
@@ -57,6 +59,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     static {
         PreShare.initDevState(Launch.classLoader.findResource("net/minecraft/world/World.class") != null);
+        PreShare.initClientState(FMLLaunchHandler.side() == Side.CLIENT);
         LetsEncryptHelper.replaceSSLContext();
         FPLog.LOG.info("Removing skill issues...");
         try {

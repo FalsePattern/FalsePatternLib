@@ -37,9 +37,13 @@ public class DepRoot {
     @Expose
     private Integer maxJava;
     @Expose
+    private List<String> bundledArtifacts;
+    @Expose
     private List<String> repositories;
     @Expose
     private Dependencies dependencies;
+    @Expose
+    private Dependencies modDependencies;
 
     @Data
     @Accessors(fluent = true)

@@ -34,6 +34,7 @@ import java.io.IOException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Share {
     public static final boolean DEV_ENV = PreShare.devEnv();
+    public static final boolean CLIENT = PreShare.client();
 
     public static boolean EARLY_INIT_DONE = false;
 }

@@ -22,20 +22,27 @@
 
 package com.falsepattern.lib.internal.asm;
 
-import lombok.Getter;
-
 public class PreShare {
-    private static volatile boolean devEnv = false;
-    private static volatile boolean inited = false;
+    private static volatile int devEnv = -1;
+    private static volatile int client = -1;
     public static synchronized void initDevState(boolean state) {
-        if (inited) {
+        if (devEnv >= 0) {
             return;
         }
-        inited = true;
-        devEnv = state;
+        devEnv = state ? 1 : 0;
+    }
+    public static synchronized void initClientState(boolean state) {
+        if (client >= 0) {
+            return;
+        }
+        client = state ? 1 : 0;
     }
 
     public static synchronized boolean devEnv() {
-        return devEnv;
+        return devEnv == 1;
+    }
+
+    public static synchronized boolean client() {
+        return client == 1;
     }
 }

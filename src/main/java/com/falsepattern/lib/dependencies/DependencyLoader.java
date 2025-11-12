@@ -39,7 +39,7 @@ public class DependencyLoader {
      * @since 0.10.0
      */
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
-        return DependencyLoaderImpl.loadLibrariesAsync(libraries);
+        return DependencyLoaderImpl.loadLibrariesAsync(libraries).thenApply(list -> null);
     }
 
     /**

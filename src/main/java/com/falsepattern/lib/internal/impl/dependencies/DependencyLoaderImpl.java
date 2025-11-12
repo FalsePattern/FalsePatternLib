@@ -37,16 +37,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import cpw.mods.fml.relauncher.Side;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 import java.awt.Dimension;
@@ -94,6 +94,7 @@ public class DependencyLoaderImpl {
      * Library checksum formats in a decreasing order of quality.
      */
     private static final String[] CHECKSUM_TYPES = new String[]{"sha512", "sha256", "sha1", "md5"};
+    private static final Set<Path> alreadyScannedSources = new ConcurrentSet<>();
     private static final Map<String, Version> loadedLibraries = new ConcurrentHashMap<>();
     private static final Map<String, String> loadedLibraryMods = new ConcurrentHashMap<>();
     private static final Set<String> remoteMavenRepositories = new ConcurrentSet<>();
@@ -108,7 +109,10 @@ public class DependencyLoaderImpl {
         return thread;
     });
     private static final Path libDir;
+    private static final Path modsDir;
     private static final Path tempDir;
+
+    private static AtomicBoolean modDownloaded = new AtomicBoolean(false);
 
     private static void ensureExists(Path directory) {
         if (!Files.exists(directory)) {
@@ -127,14 +131,17 @@ public class DependencyLoaderImpl {
         if (homeDirStr == null) {
             homeDirStr = System.getenv("MINECRAFT_SHARED_DATA_DIR");
         }
+        Path mcHomeDir = FileUtil.getMinecraftHomePath();
         if (homeDirStr == null) {
-            homeDir = FileUtil.getMinecraftHome().toPath();
+            homeDir = mcHomeDir;
         } else {
             homeDir = Paths.get(homeDirStr);
         }
         libDir = homeDir.resolve("falsepattern");
+        modsDir = mcHomeDir.resolve(Paths.get("mods", "1.7.10"));
         tempDir = homeDir.resolve(Paths.get("logs", "falsepattern_tmp"));
         ensureExists(libDir);
+        ensureExists(modsDir);
         ensureExists(tempDir);
         val oldLibDir = homeDir.resolve(Paths.get("mods", "falsepattern"));
         if (Files.exists(oldLibDir)) {
@@ -248,7 +255,7 @@ public class DependencyLoaderImpl {
     }
 
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
-        val futures = new ArrayList<CompletableFuture<Void>>();
+        val futures = new ArrayList<CompletableFuture<URL>>();
         for (val library : libraries) {
             val task = new DependencyLoadTask(library.loadingModId,
                                               library.groupId,
@@ -257,10 +264,19 @@ public class DependencyLoaderImpl {
                                               library.maxVersion,
                                               library.preferredVersion,
                                               library.regularSuffix,
-                                              library.devSuffix);
-            futures.add(CompletableFuture.runAsync(task::load, executor));
+                                              library.devSuffix,
+                                              false);
+            futures.add(CompletableFuture.supplyAsync(task::load, executor));
         }
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(ignored -> {
+            var tasks = futures.stream().map(it -> it.getNow(null)).filter(Objects::nonNull).collect(Collectors.toSet());
+            if (!tasks.isEmpty()) {
+                var deps = scanDeps(tasks.stream());
+                while (deps != null) {
+                    deps = executeArtifactLoading(new ArrayList<>(deps), true);
+                }
+            }
+        });
     }
 
     private static boolean scanForDepSpecs(URL source, List<URL> output, List<URL> jijURLs) {
@@ -268,6 +284,17 @@ public class DependencyLoaderImpl {
             return false;
         }
         val fileName = source.getFile();
+        Path path;
+
+        try {
+            path = Paths.get(source.toURI());
+        } catch (URISyntaxException e) {
+            LOG.error("Could not scan URL " + source + " for dependencies", e);
+            return false;
+        }
+        if (alreadyScannedSources.contains(path))
+            return true;
+        alreadyScannedSources.add(path);
         boolean found = false;
         if (fileName.endsWith(".jar")) {
             //Scan jar file for json in META-INF, add them to the list
@@ -297,19 +324,12 @@ public class DependencyLoaderImpl {
                 LOG.error("Failed to open jar file {}", source.getPath());
             }
         } else {
-            Path dir;
-            try {
-                dir = Paths.get(source.toURI());
-            } catch (URISyntaxException e) {
-                LOG.error("Could not scan URL " + source + " for dependencies", e);
-                return false;
-            }
-            if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            if (!Files.exists(path) || !Files.isDirectory(path)) {
                 LOG.warn("Skipping non-directory, nor jar source: {}", source);
                 return false;
             }
             //Scan directory for json in META-INF, add them to the list
-            val metaInf = dir.resolve("META-INF");
+            val metaInf = path.resolve("META-INF");
             if (!Files.exists(metaInf) || !Files.isDirectory(metaInf)) {
                 return false;
             }
@@ -397,30 +417,50 @@ public class DependencyLoaderImpl {
         }
     }
 
-    private static Pair<DependencyScope, DepRoot.SidedDependencies> scopedDependency(DependencyScope scope, DepRoot.SidedDependencies deps) {
-        return new Pair<>(scope, deps);
-    }
-
-    private static Stream<Pair<ScopeSide, String>> sidedDependency(DependencySide side, Stream<Pair<DependencyScope, String>> deps) {
-        return deps.map(dep -> new Pair<>(new ScopeSide(dep.a, side), dep.b));
-    }
-
     private static boolean initialScan = false;
-    private static List<Pair<ScopeSide, DependencyLoadTask>> tasks;
+    private static final List<Pair<ScopeSide, DependencyLoadTask>> baseTasks = new ArrayList<>();
 
     public static void executeDependencyLoading() {
         if (!initialScan) {
             initialScan = true;
-            scanDeps();
+            val tasks = scanDeps();
+            if (tasks != null) {
+                baseTasks.addAll(tasks);
+            }
         }
 
-        executeArtifactLoading();
+        var tasks = executeArtifactLoading(baseTasks, false);
+        while (tasks != null) {
+            baseTasks.addAll(tasks);
+            tasks = executeArtifactLoading(baseTasks, false);
+        }
+        if (modDownloaded.get()) {
+            if (!SystemUtils.IS_OS_MAC) {
+                try {
+                    JOptionPane.showMessageDialog(null, "A minecraft mod has been downloaded by the FalsePatternLib dependency downloader.\nYou must restart the game to apply these changes.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
+                } catch (Exception ignored) {}
+            }
+            throw new ModDependencyDownloaded("A minecraft mod has been downloaded by the FalsePatternLib dependency downloader, and requires a game restart to get installed properly.");
+        }
     }
 
-    private static void scanDeps() {
+    private static class ModDependencyDownloaded extends Error {
+        public ModDependencyDownloaded(String message) {
+            super(message);
+        }
+    }
+
+    private static @Nullable Set<Pair<ScopeSide, DependencyLoadTask>> scanDeps() {
         LOG.debug("Discovering dependency source candidates...");
         val modsDir = FileUtil.getMinecraftHomePath().resolve("mods");
         val mods1710Dir = modsDir.resolve("1.7.10");
+        return scanDeps(Stream.of(LowLevelCallMultiplexer.getClassPathSources().stream(),
+                                  grabSourceCandidatesFromFolder(modsDir),
+                                  grabSourceCandidatesFromFolder(mods1710Dir))
+                              .flatMap(i -> i));
+    }
+
+    private static @Nullable Set<Pair<ScopeSide, DependencyLoadTask>> scanDeps(Stream<URL> candidatesUnfiltered) {
         long start = System.currentTimeMillis();
         val urlsWithoutDeps = new HashSet<String>();
         val depCache = tempDir.resolve(".depscan_cache");
@@ -431,12 +471,10 @@ public class DependencyLoaderImpl {
                 LOG.error("Could not read dependency scanner cache", e);
             }
         }
-        val candidates = Stream.of(LowLevelCallMultiplexer.getClassPathSources().stream(),
-                                   grabSourceCandidatesFromFolder(modsDir),
-                                   grabSourceCandidatesFromFolder(mods1710Dir))
-                               .flatMap((i) -> i)
-                               .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
-                               .collect(Collectors.toList());
+        val candidates = candidatesUnfiltered
+                .filter(Objects::nonNull)
+                .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
+                .collect(Collectors.toList());
         val urls = new ArrayList<URL>();
         val jijURLs = new ArrayList<URL>();
         for (val candidate : candidates) {
@@ -489,23 +527,62 @@ public class DependencyLoaderImpl {
                                                       .map(repo -> repo.endsWith("/") ? repo : repo + "/")
                                                       .collect(Collectors.toSet()));
         localMavenRepositories.addAll(jijURLs.stream().map(URL::toString).map(repo -> repo.endsWith("/") ? repo : repo + "/").collect(Collectors.toSet()));
+        for (DepRoot dependencySpec : dependencySpecs) {
+            val bundled = dependencySpec.bundledArtifacts();
+            if (bundled == null) {
+                continue;
+            }
+            for (String artifact : bundled) {
+                val parts = artifact.split(":");
+                if (parts.length < 3) {
+                    LOG.error("Invalid bundled artifact: {}", dependencySpec);
+                    continue;
+                }
+                val groupId = parts[0];
+                val artifactId = parts[1];
+                Version version = parseVersion(parts[2]);
+                final String classifier = parts.length > 3 ? parts[3] : null;
+                if (classifier != null) {
+                    LOG.info("Found bundled artifact: {}:{}:{}:{} from {}",
+                             groupId,
+                             artifactId,
+                             version,
+                             classifier,
+                             dependencySpec.source());
+                } else {
+                    LOG.info("Found bundled artifact: {}:{}:{} from {}",
+                             groupId,
+                             artifactId,
+                             version,
+                             dependencySpec.source());
+                }
+                val id = groupId + ":" + artifactId + ":" + classifier;
+                if (!loadedLibraries.containsKey(id)) {
+                    loadedLibraries.put(id, version);
+                }
+                if (!loadedLibraryMods.containsKey(id)) {
+                    loadedLibraryMods.put(id, dependencySpec.source());
+                }
+            }
+        }
         val artifacts = dependencySpecs.stream()
-                                       .map((root) -> new Pair<>(root.source(), root.dependencies()))
-                                       .flatMap(pair -> flatMap(pair,
-                                                                (dep) -> Stream.of(scopedDependency(DependencyScope.ALWAYS, dep.always()),
-                                                                                   scopedDependency(DependencyScope.DEV, dep.dev()),
-                                                                                   scopedDependency(DependencyScope.OBF, dep.obf())
-                                                                                  )))
-                                       .flatMap(pair -> flatMap(pair,
-                                                                (dep) -> Stream.concat(sidedDependency(DependencySide.COMMON, flatMap(dep, d -> d.common().stream())),
-                                                                                       Stream.concat(sidedDependency(DependencySide.CLIENT, flatMap(dep, d -> d.client().stream())),
-                                                                                                     sidedDependency(DependencySide.SERVER, flatMap(dep, d -> d.server().stream())))
-                                                                                       )))
-                                       .map((pair) -> {
-                                           val source = pair.a;
-                                           val scopedDep = pair.b;
-                                           val dep = scopedDep.b;
-                                           val scope = scopedDep.a;
+                                       .flatMap(it -> Stream.of(
+                                               new SourcedDep(it.source(), it.dependencies(), false),
+                                               new SourcedDep(it.source(), it.modDependencies(), true)))
+                                       .filter(it -> it.dep != null)
+                                       .flatMap(it -> Stream.of(
+                                               new ScopedDep(it.source, it.mod, DependencyScope.ALWAYS, it.dep.always()),
+                                               new ScopedDep(it.source, it.mod, DependencyScope.DEV, it.dep.dev()),
+                                               new ScopedDep(it.source, it.mod, DependencyScope.OBF, it.dep.obf())))
+                                       .flatMap(it -> Stream.concat(it.deps.common().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.COMMON), dep)),
+                                                                    Stream.concat(
+                                                                            it.deps.client().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.CLIENT), dep)),
+                                                                            it.deps.server().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.SERVER), dep))
+                                                                                 )))
+                                       .map((scopedSidedDep) -> {
+                                           val source = scopedSidedDep.source;
+                                           val scope = scopedSidedDep.scope;
+                                           val dep = scopedSidedDep.dep;
                                            val parts = dep.split(":");
                                            if (parts.length < 3) {
                                                LOG.error("Invalid dependency: {}", dep);
@@ -537,11 +614,38 @@ public class DependencyLoaderImpl {
                                                                                     null,
                                                                                     version,
                                                                                     classifier,
-                                                                                    classifier));
+                                                                                    classifier,
+                                                                                    scopedSidedDep.mod));
                                        })
                                        .filter(Objects::nonNull)
                                        .collect(Collectors.toSet());
-        tasks = new ArrayList<>(artifacts);
+        if (artifacts.isEmpty()) {
+            return null;
+        }
+        return artifacts;
+    }
+
+    @RequiredArgsConstructor
+    private static class SourcedDep {
+        public final String source;
+        public final DepRoot.Dependencies dep;
+        public final boolean mod;
+    }
+
+    @RequiredArgsConstructor
+    private static class ScopedDep {
+        public final String source;
+        public final boolean mod;
+        public final DependencyScope scope;
+        public final DepRoot.SidedDependencies deps;
+    }
+
+    @RequiredArgsConstructor
+    private static class ScopedSidedDep {
+        public final String source;
+        public final boolean mod;
+        public final ScopeSide scope;
+        public final String dep;
     }
 
     public static Version parseVersion(String versionString) {
@@ -565,11 +669,11 @@ public class DependencyLoaderImpl {
 
     private static class SideAwareAssistant {
         static ScopeSide current() {
-            return new ScopeSide(Share.DEV_ENV ? DependencyScope.DEV : DependencyScope.OBF, FMLLaunchHandler.side() == Side.CLIENT ? DependencySide.CLIENT : DependencySide.SERVER);
+            return new ScopeSide(Share.DEV_ENV ? DependencyScope.DEV : DependencyScope.OBF, Share.CLIENT ? DependencySide.CLIENT : DependencySide.SERVER);
         }
     }
 
-    private static void executeArtifactLoading() {
+    private static @Nullable Set<Pair<ScopeSide, DependencyLoadTask>> executeArtifactLoading(List<Pair<ScopeSide, DependencyLoadTask>> tasks, boolean silent) {
         val scopeSide = SideAwareAssistant.current();
         val iter = tasks.iterator();
         val artifactMap = new HashMap<String, DependencyLoadTask>();
@@ -598,15 +702,19 @@ public class DependencyLoaderImpl {
             }
         }
         if (artifactMap.isEmpty())
-            return;
+            return null;
 
-        val futures = new ArrayList<CompletableFuture<Void>>();
-        LOG.info("-----------------------------------------------------------");
-        LOG.info("FalsePatternLib is downloading dependencies. Please wait...");
-        LOG.info("-----------------------------------------------------------");
+        val futures = new ArrayList<CompletableFuture<URL>>();
+        if (!silent) {
+            LOG.info("-----------------------------------------------------------");
+            LOG.info("FalsePatternLib is downloading dependencies. Please wait...");
+            LOG.info("-----------------------------------------------------------");
+        }
         JFrame theFrame = null;
         val progresses = new HashMap<DependencyLoadTask, JProgressBar>();
-        if (SystemUtils.IS_OS_MAC) {
+        if (silent) {
+
+        } else if (SystemUtils.IS_OS_MAC) {
             LOG.info("MacOS detected, not creating progress window (your OS is buggy)");
         } else {
             try {
@@ -637,29 +745,36 @@ public class DependencyLoaderImpl {
         }
         if (theFrame != null) {
             for (val task : artifactMap.values()) {
-                futures.add(CompletableFuture.runAsync(() -> {
+                futures.add(CompletableFuture.supplyAsync(() -> {
                     val bar = progresses.get(task);
                     bar.setString("Downloading...");
-                    task.load();
+                    val res = task.load();
                     bar.setMinimum(0);
                     bar.setMaximum(1);
                     bar.setValue(1);
                     bar.setString("Completed!");
+                    return res;
                 }, executor));
             }
         } else {
             for (val task : artifactMap.values()) {
-                futures.add(CompletableFuture.runAsync(task::load, executor));
+                futures.add(CompletableFuture.supplyAsync(task::load, executor));
             }
         }
-        val theFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        val theFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                                         .thenApply(ignored ->
+                                                            futures.stream()
+                                                                   .map(it -> it.getNow(null))
+                                                                   .collect(Collectors.toList())
+                                                   );
         AtomicBoolean doViz = new AtomicBoolean(true);
         if (theFrame != null) {
             final var vizThread = getVizThread(doViz, progresses, theFrame);
             vizThread.start();
         }
+        List<URL> res;
         try {
-            theFuture.join();
+            res = theFuture.join();
         } catch (Error e) {
             throw e;
         } catch (Throwable t) {
@@ -669,6 +784,7 @@ public class DependencyLoaderImpl {
                 doViz.set(false);
             }
         }
+        return scanDeps(res.stream());
     }
 
     @NotNull
@@ -722,6 +838,7 @@ public class DependencyLoaderImpl {
         private final Version preferredVersion;
         private final String regularSuffix;
         private final String devSuffix;
+        private final boolean isMod;
 
         private String suffix;
         private String artifactLogName;
@@ -733,35 +850,38 @@ public class DependencyLoaderImpl {
         public volatile long contentLength = -1;
         public volatile long downloaded = 0;
 
-        private void load() {
+        private @Nullable URL load() {
             setupLibraryNames();
             if (loadedLibraries.containsKey(artifact)) {
                 alreadyLoaded();
-                return;
+                return null;
             }
             setupPaths();
             for (val repo: localMavenRepositories) {
-                if (tryDownloadFromMaven(repo, true)) {
-                    return;
+                val url = tryDownloadFromMaven(repo, true);
+                if (url != null) {
+                    return url;
                 }
             }
-            if (tryLoadingExistingFile()) {
-                return;
+            val existingUrl = tryLoadingExistingFile();
+            if (existingUrl != null) {
+                return existingUrl;
             }
             validateDownloadsAllowed();
             for (var repo : remoteMavenRepositories) {
-                if (tryDownloadFromMaven(repo, false)) {
-                    return;
+                val url = tryDownloadFromMaven(repo, false);
+                if (url != null) {
+                    return url;
                 }
             }
-            crashCouldNotDownload();
+            throw crashCouldNotDownload();
         }
 
-        private void crashCouldNotDownload() {
+        private IllegalStateException crashCouldNotDownload() {
             val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + (
                     (suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " + loadingModId;
             LOG.fatal(errorMessage);
-            throw new IllegalStateException(errorMessage);
+            return new IllegalStateException(errorMessage);
         }
 
         private void setupLibraryNames() {
@@ -771,7 +891,9 @@ public class DependencyLoaderImpl {
                                             artifactId,
                                             preferredVersion,
                                             suffix != null ? "-" + suffix : "");
-            LOG.info("Adding library {}, requested by mod {}", artifactLogName, loadingModId);
+            if (!isMod) {
+                LOG.info("Adding library {}, requested by mod {}", artifactLogName, loadingModId);
+            }
             artifact = groupId + ":" + artifactId + ":" + suffix;
         }
 
@@ -818,17 +940,17 @@ public class DependencyLoaderImpl {
             mavenJarName =
                     String.format("%s-%s%s.jar", artifactId, preferredVersion, (suffix != null) ? ("-" + suffix) : "");
             jarName = groupId + "-" + mavenJarName;
-            file = libDir.resolve(jarName);
+            file = (isMod ? modsDir : libDir).resolve(jarName);
         }
 
-        private boolean tryLoadingExistingFile() {
+        private @Nullable URL tryLoadingExistingFile() {
             if (!Files.exists(file)) {
-                return false;
+                return null;
             }
             try {
                 val status = validateChecksum(file);
                 if (status == ChecksumStatus.FAILED) {
-                    return false;
+                    return null;
                 } else if (status == ChecksumStatus.MISSING) {
                     LOG.debug("Library {} is missing checksum data! Either it was manually deleted, "
                               + "or the source repo didn't have it in the first place", artifactLogName);
@@ -836,17 +958,20 @@ public class DependencyLoaderImpl {
             } catch (IOException e) {
                 LOG.error("Failed to execute validation check for " + artifactLogName, e);
                 checkedDelete(file);
-                return false;
+                return null;
             }
             try {
-                addToClasspath(file.toUri().toURL());
+                val theUrl = file.toUri().toURL();
+                if (!isMod) {
+                    addToClasspath(theUrl);
+                }
                 loadedLibraries.put(artifact, preferredVersion);
                 LOG.debug("Library {} successfully loaded from disk!", artifactLogName);
-                return true;
+                return theUrl;
             } catch (Exception e) {
                 LOG.warn("Failed to load library {} from file! Re-downloading...", artifactLogName);
                 checkedDelete(file);
-                return false;
+                return null;
             }
         }
 
@@ -870,7 +995,7 @@ public class DependencyLoaderImpl {
         }
 
         private static final Object mutex = new Object();
-        private boolean tryDownloadFromMaven(String repo, boolean local) {
+        private @Nullable URL tryDownloadFromMaven(String repo, boolean local) {
             synchronized (mutex) {
                 try {
                     if (!repo.endsWith("/")) {
@@ -907,10 +1032,17 @@ public class DependencyLoaderImpl {
                                          },
                                          contentLength -> this.contentLength = contentLength);
                         if (success.get()) {
-                            try {
-                                Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
-                            } catch (AtomicMoveNotSupportedException ignored) {
-                                Files.move(tmpFile, file);
+                            if (FileUtils.contentEquals(tmpFile.toFile(), file.toFile())) {
+                                Files.delete(tmpFile);
+                            } else {
+                                if (isMod) {
+                                    modDownloaded.set(true);
+                                }
+                                try {
+                                    Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
+                                } catch (AtomicMoveNotSupportedException ignored) {
+                                    Files.move(tmpFile, file);
+                                }
                             }
                             LOG.debug("Validating checksum for {}", artifactLogName);
                             val hadChecksum = validateChecksum(url);
@@ -928,13 +1060,16 @@ public class DependencyLoaderImpl {
                             }
                             loadedLibraries.put(artifact, preferredVersion);
                             loadedLibraryMods.put(artifact, loadingModId);
-                            addToClasspath(file.toUri().toURL());
-                            return true;
+                            val diskUrl = file.toUri().toURL();
+                            if (!isMod) {
+                                addToClasspath(diskUrl);
+                            }
+                            return diskUrl;
                         }
                     }
                 } catch (IOException ignored) {
                 }
-                return false;
+                return null;
             }
         }
 
