@@ -20,15 +20,14 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.config;
+package com.falsepattern.deploader;
 
-import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.val;
+import lombok.var;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +48,7 @@ public class EarlyConfig {
 
     private static volatile EarlyConfig instance = null;
 
-    private static final Logger LOG = LogManager.getLogger(Tags.MODNAME + " Early Config");
+    private static final Logger LOG = LogManager.getLogger("FalsePatternLib Deploader Early Config");
 
     public static @NotNull EarlyConfig getInstance() {
         val config = instance;

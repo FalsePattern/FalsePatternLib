@@ -20,29 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.asm;
+@ApiStatus.Internal
+package com.falsepattern.deploader;
 
-public class PreShare {
-    private static volatile int devEnv = -1;
-    private static volatile int client = -1;
-    public static synchronized void initDevState(boolean state) {
-        if (devEnv >= 0) {
-            return;
-        }
-        devEnv = state ? 1 : 0;
-    }
-    public static synchronized void initClientState(boolean state) {
-        if (client >= 0) {
-            return;
-        }
-        client = state ? 1 : 0;
-    }
-
-    public static synchronized boolean devEnv() {
-        return devEnv == 1;
-    }
-
-    public static synchronized boolean client() {
-        return client == 1;
-    }
-}
+import org.jetbrains.annotations.ApiStatus;

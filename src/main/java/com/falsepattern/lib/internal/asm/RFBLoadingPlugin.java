@@ -22,14 +22,10 @@
 
 package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.lib.internal.core.LowLevelCallMultiplexer;
-import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
-import com.falsepattern.lib.internal.impl.dependencies.LetsEncryptHelper;
+import com.falsepattern.deploader.Stub;
 import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 import lombok.val;
-
-import java.net.URLClassLoader;
 
 public class RFBLoadingPlugin implements RfbPlugin {
     static {
@@ -47,11 +43,7 @@ public class RFBLoadingPlugin implements RfbPlugin {
             exc.invoke(loader, "com.falsepattern.lib.internal.config.EarlyConfig");
             exc.invoke(loader, "com.falsepattern.lib.internal.core.LowLevelCallMultiplexer");
         } catch (Exception ignored) {}
-        PreShare.initDevState(((URLClassLoader)loader).findResource("net/minecraft/world/World.class") != null);
-        PreShare.initClientState(((URLClassLoader)loader).findResource("net/minecraft/client/Minecraft.class") != null ||
-                                 ((URLClassLoader)loader).findResource("bao.class") != null);
-        LetsEncryptHelper.replaceSSLContext();
-        LowLevelCallMultiplexer.rfbDetected();
-        DependencyLoaderImpl.executeDependencyLoading();
+        Stub.bootstrap(true);
+        Stub.runDepLoader();
     }
 }

@@ -19,14 +19,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.falsepattern.deploader.version;
 
-package com.falsepattern.lib.internal;
+import com.falsepattern.deploader.DependencyLoaderImpl;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+public abstract class Version implements Comparable<Version> {
+    protected Version() {
+    }
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Share {
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Version)) {
+            return false;
+        }
+        return equals((Version) obj);
+    }
 
-    public static boolean EARLY_INIT_DONE = false;
+    public boolean equals(Version other) {
+        return compareTo(other) == 0;
+    }
+
+    /**
+     *
+     * @since 1.7.0
+     */
+    public static Version parse(String versionString) {
+        return DependencyLoaderImpl.parseVersion(versionString);
+    }
 }

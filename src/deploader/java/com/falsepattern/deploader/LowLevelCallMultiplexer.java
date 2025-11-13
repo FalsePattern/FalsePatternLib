@@ -20,7 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.core;
+package com.falsepattern.deploader;
 
 import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
 import lombok.experimental.UtilityClass;

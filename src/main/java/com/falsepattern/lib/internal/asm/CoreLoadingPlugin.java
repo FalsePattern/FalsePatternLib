@@ -21,10 +21,9 @@
  */
 package com.falsepattern.lib.internal.asm;
 
+import com.falsepattern.deploader.Stub;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Tags;
-import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
-import com.falsepattern.lib.internal.impl.dependencies.LetsEncryptHelper;
 import com.falsepattern.lib.internal.logging.CrashImprover;
 import com.falsepattern.lib.internal.logging.NotEnoughVerbosity;
 import com.falsepattern.lib.mapping.MappingManager;
@@ -36,12 +35,10 @@ import lombok.val;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
-import cpw.mods.fml.relauncher.Side;
 
 import java.util.List;
 import java.util.Map;
@@ -58,9 +55,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     private static boolean obfuscated;
 
     static {
-        PreShare.initDevState(Launch.classLoader.findResource("net/minecraft/world/World.class") != null);
-        PreShare.initClientState(FMLLaunchHandler.side() == Side.CLIENT);
-        LetsEncryptHelper.replaceSSLContext();
+        Stub.bootstrap(false);
         FPLog.LOG.info("Removing skill issues...");
         try {
             Class.forName("thermos.Thermos");
@@ -71,7 +66,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         //Scan for dependencies now
         FPLog.LOG.info("Scanning for deps...");
         long start = System.nanoTime();
-        DependencyLoaderImpl.executeDependencyLoading();
+        Stub.runDepLoader();
         long end = System.nanoTime();
         FPLog.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest

@@ -20,13 +20,29 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal;
+package com.falsepattern.deploader;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+public class PreShare {
+    private static volatile int devEnv = -1;
+    private static volatile int client = -1;
+    public static synchronized void initDevState(boolean state) {
+        if (devEnv >= 0) {
+            return;
+        }
+        devEnv = state ? 1 : 0;
+    }
+    public static synchronized void initClientState(boolean state) {
+        if (client >= 0) {
+            return;
+        }
+        client = state ? 1 : 0;
+    }
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Share {
+    public static synchronized boolean devEnv() {
+        return devEnv == 1;
+    }
 
-    public static boolean EARLY_INIT_DONE = false;
+    public static synchronized boolean client() {
+        return client == 1;
+    }
 }

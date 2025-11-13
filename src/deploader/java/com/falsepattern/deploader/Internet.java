@@ -19,9 +19,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.internal;
+package com.falsepattern.deploader;
 
 import lombok.val;
+import lombok.var;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -69,10 +70,7 @@ public class Internet {
         connection.setConnectTimeout(3500);
         connection.setReadTimeout(5000);
         connection.setRequestProperty("User-Agent",
-                                      Tags.MODNAME
-                                      + " "
-                                      + Tags.VERSION
-                                      + " Internet Connector"
+                                      "FalsePatternLib DepLoader Internet Connector"
                                       + " (https://github.com/FalsePattern/FalsePatternLib)");
         for (val header : headers.entrySet()) {
             val key = header.getKey();

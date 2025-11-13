@@ -20,7 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.impl.dependencies;
+package com.falsepattern.deploader;
 
 import com.google.gson.annotations.Expose;
 import lombok.Data;

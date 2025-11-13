@@ -19,36 +19,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.falsepattern.lib.dependencies;
+package com.falsepattern.deploader.version;
 
-import lombok.NonNull;
 import lombok.val;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class ComplexVersion extends Version {
-    final Version[] versions;
+    public final Version[] versions;
 
-    public ComplexVersion(@NonNull Version mainVersion, Version... subVersions) {
+    public ComplexVersion(@NotNull Version mainVersion, Version... subVersions) {
         this.versions = new Version[subVersions.length + 1];
         this.versions[0] = mainVersion;
         System.arraycopy(subVersions, 0, this.versions, 1, subVersions.length);
     }
 
-    @ApiStatus.Internal
     public ComplexVersion(Version[] versions) {
         this.versions = versions;
     }
 
-    @ApiStatus.Internal
-    public Version[] versionsRaw() {
-        return this.versions;
-    }
-
     @Override
-    public int compareTo(@NonNull Version o) {
+    public int compareTo(@NotNull Version o) {
         if (o instanceof ComplexVersion) {
             val other = (ComplexVersion) o;
             int count = Math.min(versions.length, other.versions.length);

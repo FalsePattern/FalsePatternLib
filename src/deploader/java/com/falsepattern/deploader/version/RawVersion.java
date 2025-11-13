@@ -20,14 +20,32 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.impl.dependencies;
+package com.falsepattern.deploader.version;
 
-public class Pair<A, B> {
-    public final A a;
-    public final B b;
+import org.jetbrains.annotations.NotNull;
 
-    public Pair(A a, B b) {
-        this.a = a;
-        this.b = b;
+public class RawVersion extends Version {
+    public final String versionString;
+
+    public RawVersion(String versionString) {
+        this.versionString = versionString;
+    }
+
+    @Override
+    public int compareTo(@NotNull Version o) {
+        if (o instanceof RawVersion) {
+            return versionString.compareTo(((RawVersion) o).versionString);
+        } else if (o instanceof SemanticVersion) {
+            return 1;
+        } else if (o instanceof ComplexVersion) {
+            return 1;
+        } else {
+            throw new IllegalArgumentException("Unknown version type: " + o.getClass().getName());
+        }
+    }
+
+    @Override
+    public String toString() {
+        return versionString;
     }
 }

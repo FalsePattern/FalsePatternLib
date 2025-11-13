@@ -20,13 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal;
+@ApiStatus.Internal
+package com.falsepattern.deploader.version;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Share {
-
-    public static boolean EARLY_INIT_DONE = false;
-}
+import org.jetbrains.annotations.ApiStatus;

@@ -20,10 +20,8 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.falsepattern.lib.internal.impl.dependencies;
+package com.falsepattern.deploader;
 
-import com.falsepattern.lib.internal.FPLog;
-import com.falsepattern.lib.internal.config.EarlyConfig;
 import lombok.val;
 
 import javax.net.ssl.SSLContext;
@@ -47,14 +45,14 @@ public class LetsEncryptHelper {
     @SuppressWarnings("java:S6437")
     public static void replaceSSLContext() {
         if (!EarlyConfig.getInstance().enableLetsEncryptRoot()) {
-            FPLog.LOG.info("[LetsEncryptHelper] Disabled by config");
+            DependencyLoaderImpl.LOG.info("[LetsEncryptHelper] Disabled by config");
             return;
         }
         if (patched) {
-            FPLog.LOG.info("[LetsEncryptHelper] Already patched");
+            DependencyLoaderImpl.LOG.info("[LetsEncryptHelper] Already patched");
             return;
         }
-        FPLog.LOG.info("[LetsEncryptHelper] Starting patcher");
+        DependencyLoaderImpl.LOG.info("[LetsEncryptHelper] Starting patcher");
         patched = true;
 
         try (val x1 = LetsEncryptHelper.class.getResourceAsStream("/letsencrypt/isrgrootx1.pem");
@@ -76,13 +74,13 @@ public class LetsEncryptHelper {
             val sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, tmf.getTrustManagers(), null);
             SSLContext.setDefault(sslContext);
-            FPLog.LOG.info("[LetsEncryptHelper] Added certificates to trust store.");
+            DependencyLoaderImpl.LOG.info("[LetsEncryptHelper] Added certificates to trust store.");
         } catch (IOException e) {
-            FPLog.LOG.error("[LetsEncryptHelper] Failed to load certificates from classpath.", e);
+            DependencyLoaderImpl.LOG.error("[LetsEncryptHelper] Failed to load certificates from classpath.", e);
         } catch (GeneralSecurityException e) {
-            FPLog.LOG.error("[LetsEncryptHelper] Failed to load default keystore.", e);
+            DependencyLoaderImpl.LOG.error("[LetsEncryptHelper] Failed to load default keystore.", e);
         } catch (Throwable t) {
-            FPLog.LOG.error("[LetsEncryptHelper] Unknown error", t);
+            DependencyLoaderImpl.LOG.error("[LetsEncryptHelper] Unknown error", t);
             throw t;
         }
     }
