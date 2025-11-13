@@ -37,7 +37,11 @@ DependencyLoader api. This file needs to reside inside the META-INF directory.
   "modDependencies": {
     "always": {
       "common": [
-        "com.example:mymod:3.0.0"
+        "com.example:mymod:3.0.0",
+        {
+          "modid": "mylib",
+          "artifact": "com.example:mylib:1.0.2"
+        }
       ],
       "client": [],
       "server": []
@@ -81,7 +85,10 @@ Explanation:
     - The `dev` category gets downloaded only in the dev environment. Usually not needed, as gradle will automatically
       download dependencies.
 - `modDependencies`: Same as `dependencies`, but files from here get downloaded into `.minecraft/mods/1.7.10`. Useful
-  if you want to download third party mods as well.
+  if you want to download third party mods as well. Additionally, instead of a single maven artifact string, you can use
+  a json object with separate `modid` and `artifact` attributes, which can be used to filter against a specific mod ID in
+  addition to plain artifact matching against other downloaded libraries and `bundledArtifacts`. This is useful if you
+  want to depload a mod that doesn't have a marker json in it.
 
 Each of these categories also have 3 more subcategories:
 

@@ -39,6 +39,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import cpw.mods.fml.common.MetadataCollection;
+import cpw.mods.fml.common.ModMetadata;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -53,6 +56,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -92,6 +96,8 @@ public class DependencyLoaderImpl {
     private static final Set<Path> alreadyScannedSources = new ConcurrentSet<>();
     private static final Map<String, Version> loadedLibraries = new ConcurrentHashMap<>();
     private static final Map<String, String> loadedLibraryMods = new ConcurrentHashMap<>();
+    private static final Map<String, Version> loadedModIds = new ConcurrentHashMap<>();
+    private static final Map<String, String> loadedModIdMods = new ConcurrentHashMap<>();
     private static final Set<String> remoteMavenRepositories = new ConcurrentSet<>();
     private static final Set<String> localMavenRepositories = new ConcurrentSet<>();
     static final Logger LOG = LogManager.getLogger("FalsePatternLib DepLoader");
@@ -106,6 +112,16 @@ public class DependencyLoaderImpl {
     private static final Path libDir;
     private static final Path modsDir;
     private static final Path tempDir;
+    private static final Field metadataCollectionModListAccessor;
+
+    static {
+        try {
+            metadataCollectionModListAccessor = MetadataCollection.class.getDeclaredField("modList");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        metadataCollectionModListAccessor.setAccessible(true);
+    }
 
     private static AtomicBoolean modDownloaded = new AtomicBoolean(false);
 
@@ -260,7 +276,8 @@ public class DependencyLoaderImpl {
                                               library.preferredVersion,
                                               library.regularSuffix,
                                               library.devSuffix,
-                                              false);
+                                              false,
+                                              null);
             futures.add(CompletableFuture.supplyAsync(task::load, executor));
         }
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(ignored -> {
@@ -272,6 +289,26 @@ public class DependencyLoaderImpl {
                 }
             }
         });
+    }
+
+    @SneakyThrows
+    private static void readMCMod(InputStream input, String name) {
+        val meta = MetadataCollection.from(input, name);
+        val modList = (ModMetadata[])metadataCollectionModListAccessor.get(meta);
+        for (val mod: modList) {
+            val id = mod.modId;
+            if (id != null) {
+                val versionStr = mod.version;
+                final Version version;
+                if (versionStr != null) {
+                    version = Version.parse(versionStr);
+                } else {
+                    version = new RawVersion("unknown");
+                }
+                loadedModIds.put(id, version);
+                loadedModIdMods.put(id, name);
+            }
+        }
     }
 
     private static boolean scanForDepSpecs(URL source, List<URL> output, List<URL> jijURLs) {
@@ -298,6 +335,9 @@ public class DependencyLoaderImpl {
                 ZipEntry entry;
                 while ((entry = jarFile.getNextEntry()) != null) {
                     val name = entry.getName();
+                    if (name.equals("mcmod.info")) {
+                        readMCMod(jarFile, source.toString());
+                    }
                     if (!name.startsWith("META-INF/"))
                         continue;
                     if (name.endsWith(".json") && name.matches("META-INF/\\w+.json")) {
@@ -430,7 +470,12 @@ public class DependencyLoaderImpl {
                     JOptionPane.showMessageDialog(null, "A minecraft mod has been downloaded by the FalsePatternLib dependency downloader.\nYou must restart the game to apply these changes.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
                 } catch (Exception ignored) {}
             }
-            throw new ModDependencyDownloaded("A minecraft mod has been downloaded by the FalsePatternLib dependency downloader, and requires a game restart to get installed properly.");
+            val msg = "A minecraft mod has been downloaded by the FalsePatternLib dependency downloader, and requires a game restart to get installed properly.";
+            for (int i = 0; i < 16; i++) {
+                LOG.warn(msg);
+            }
+            System.exit(0);
+            throw new ModDependencyDownloaded(msg);
         }
     }
 
@@ -495,6 +540,7 @@ public class DependencyLoaderImpl {
                 }
                 val builder = new GsonBuilder();
                 builder.excludeFieldsWithoutExposeAnnotation();
+                builder.registerTypeAdapterFactory(new DepRoot.Dependency.Adapter.Factory());
                 val gson = builder.create();
                 json.remove("identifier");
                 val root = gson.fromJson(json, DepRoot.class);
@@ -524,8 +570,8 @@ public class DependencyLoaderImpl {
             if (bundled == null) {
                 continue;
             }
-            for (String artifact : bundled) {
-                val parts = artifact.split(":");
+            for (var dep : bundled) {
+                val parts = dep.artifact().split(":");
                 if (parts.length < 3) {
                     LOG.error("Invalid bundled artifact: {}", dependencySpec);
                     continue;
@@ -549,11 +595,22 @@ public class DependencyLoaderImpl {
                              dependencySpec.source());
                 }
                 val id = groupId + ":" + artifactId + ":" + classifier;
+                val src = dependencySpec.source();
                 if (!loadedLibraries.containsKey(id)) {
                     loadedLibraries.put(id, version);
                 }
                 if (!loadedLibraryMods.containsKey(id)) {
-                    loadedLibraryMods.put(id, dependencySpec.source());
+                    loadedLibraryMods.put(id, src);
+                }
+                val modid = dep.modid();
+                if (modid != null) {
+                    LOG.info("With modid: {}", modid);
+                    if (!loadedModIds.containsKey(modid)) {
+                        loadedModIds.put(modid, version);
+                    }
+                    if (!loadedModIdMods.containsKey(modid)) {
+                        loadedModIdMods.put(modid, src);
+                    }
                 }
             }
         }
@@ -578,7 +635,7 @@ public class DependencyLoaderImpl {
                                            val source = scopedSidedDep.source;
                                            val scope = scopedSidedDep.scope;
                                            val dep = scopedSidedDep.dep;
-                                           val parts = dep.split(":");
+                                           val parts = dep.artifact().split(":");
                                            if (parts.length < 3) {
                                                LOG.error("Invalid dependency: {}", dep);
                                                return null;
@@ -610,7 +667,8 @@ public class DependencyLoaderImpl {
                                                                                              version,
                                                                                              classifier,
                                                                                              classifier,
-                                                                                             scopedSidedDep.mod));
+                                                                                             scopedSidedDep.mod,
+                                                                                             dep.modid()));
                                        })
                                        .filter(Objects::nonNull)
                                        .collect(Collectors.toSet());
@@ -620,7 +678,7 @@ public class DependencyLoaderImpl {
         return artifacts;
     }
 
-    private static Stream<ScopedSidedDep> concat(ScopedDep it, @Nullable Stream<ScopedSidedDep> prev, List<String> deps, DependencySide side) {
+    private static Stream<ScopedSidedDep> concat(ScopedDep it, @Nullable Stream<ScopedSidedDep> prev, List<DepRoot.Dependency> deps, DependencySide side) {
         if (deps != null) {
             val newStream = deps.stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, side), dep));
             if (prev == null) {
@@ -826,7 +884,7 @@ public class DependencyLoaderImpl {
         public final String source;
         public final boolean mod;
         public final ScopeSide scope;
-        public final String dep;
+        public final DepRoot.Dependency dep;
     }
 
     @RequiredArgsConstructor
@@ -851,6 +909,7 @@ public class DependencyLoaderImpl {
         private final String regularSuffix;
         private final String devSuffix;
         private final boolean isMod;
+        private final String modId;
 
         private String suffix;
         private String artifactLogName;
@@ -865,7 +924,11 @@ public class DependencyLoaderImpl {
         private @Nullable URL load() {
             setupLibraryNames();
             if (loadedLibraries.containsKey(artifact)) {
-                alreadyLoaded();
+                alreadyLoaded(false);
+                return null;
+            }
+            if (isMod && loadedModIds.containsKey(modId)) {
+                alreadyLoaded(true);
                 return null;
             }
             setupPaths();
@@ -909,14 +972,14 @@ public class DependencyLoaderImpl {
             artifact = groupId + ":" + artifactId + ":" + suffix;
         }
 
-        private void alreadyLoaded() {
-            val currentVer = loadedLibraries.get(artifact);
+        private void alreadyLoaded(boolean fromModId) {
+            val currentVer = fromModId ? loadedModIds.get(modId) : loadedLibraries.get(artifact);
             if (currentVer.equals(preferredVersion)) {
                 return;
             }
             val rangeString = "(minimum: " + minVersion + (maxVersion == null ? "" : ", maximum: " + maxVersion) + ")";
             if (minVersion.compareTo(currentVer) > 0 || (maxVersion != null && maxVersion.compareTo(currentVer) < 0)) {
-                for (int i = 0; i < 16; i++) {
+                for (int i = 0; i < 4; i++) {
                     LOG.fatal("ALERT VVVVVVVVVVVV ALERT");
                 }
                 LOG.fatal("Library {}:{}{} already loaded with version {}, "
@@ -928,8 +991,8 @@ public class DependencyLoaderImpl {
                           currentVer,
                           rangeString,
                           loadingModId,
-                          loadedLibraryMods.get(artifact));
-                for (int i = 0; i < 16; i++) {
+                          fromModId ? loadedModIdMods.get(modId) : loadedLibraryMods.get(artifact));
+                for (int i = 0; i < 4; i++) {
                     LOG.fatal("ALERT ^^^^^^^^^^^^ ALERT");
                 }
             } else {
@@ -944,7 +1007,7 @@ public class DependencyLoaderImpl {
                          currentVer,
                          rangeString,
                          loadingModId,
-                         loadedLibraryMods.get(artifact));
+                         fromModId ? loadedModIdMods.get(modId) : loadedLibraryMods.get(artifact));
             }
         }
 
@@ -978,6 +1041,9 @@ public class DependencyLoaderImpl {
                     addToClasspath(theUrl);
                 }
                 loadedLibraries.put(artifact, preferredVersion);
+                if (isMod && modId != null) {
+                    loadedModIds.put(modId, preferredVersion);
+                }
                 LOG.debug("Library {} successfully loaded from disk!", artifactLogName);
                 return theUrl;
             } catch (Exception e) {
@@ -1074,6 +1140,10 @@ public class DependencyLoaderImpl {
                             val diskUrl = file.toUri().toURL();
                             if (!isMod) {
                                 addToClasspath(diskUrl);
+                            }
+                            if (isMod && modId != null) {
+                                loadedModIds.put(modId, preferredVersion);
+                                loadedModIdMods.put(modId, loadingModId);
                             }
                             return diskUrl;
                         }

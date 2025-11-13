@@ -4,6 +4,9 @@ plugins {
 
 group = "com.falsepattern"
 
+//bump this after ANY change to the deploader!
+val deploaderVersion = 2
+
 minecraft_fp {
     java {
         compatibility = jvmDowngrader
@@ -95,7 +98,7 @@ val depLoaderJar = tasks.register<Jar>(depLoader.jarTaskName) {
     archiveVersion = minecraft_fp.mod.version
     archiveClassifier = "deploader"
     manifest {
-        attributes("FPLib-Deploader-Version" to "1")
+        attributes("FPLib-Deploader-Version" to deploaderVersion)
     }
 }
 
