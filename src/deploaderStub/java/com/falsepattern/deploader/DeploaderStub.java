@@ -45,7 +45,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
-public final class Stub {
+public final class DeploaderStub {
     private static final String BLACKBOARD_MARKER = "FPLIB_DEPLOADER";
     private static final String BLACKBOARD_RUN_DEPLOADER_MARKER = "FPLIB_RUN_DEPLOADER";
     private static boolean rfbDetected = false;
@@ -61,7 +61,7 @@ public final class Stub {
         if (deploader != null) {
             return;
         }
-        Stub scanner = new Stub();
+        DeploaderStub scanner = new DeploaderStub();
         @SuppressWarnings("resource")
         URLClassLoader cl = classLoader();
         for (URL url: cl.getURLs()) {
@@ -169,7 +169,7 @@ public final class Stub {
         try {
             ((Method)runDepLoader).invoke(null);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Could not run FalsePatternLib deploader!", e);
+            throw new RuntimeException("FalsePatternLib Deploader exited with an exception.", e);
         }
     }
 

@@ -21,7 +21,7 @@
  */
 package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.deploader.Stub;
+import com.falsepattern.deploader.DeploaderStub;
 import com.falsepattern.lib.internal.FPLog;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.logging.CrashImprover;
@@ -55,7 +55,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
     private static boolean obfuscated;
 
     static {
-        Stub.bootstrap(false);
+        DeploaderStub.bootstrap(false);
         FPLog.LOG.info("Removing skill issues...");
         try {
             Class.forName("thermos.Thermos");
@@ -66,7 +66,7 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         //Scan for dependencies now
         FPLog.LOG.info("Scanning for deps...");
         long start = System.nanoTime();
-        Stub.runDepLoader();
+        DeploaderStub.runDepLoader();
         long end = System.nanoTime();
         FPLog.LOG.info("Scanned in " + (end - start) / 1000000 + "ms");
         //Initializing the rest

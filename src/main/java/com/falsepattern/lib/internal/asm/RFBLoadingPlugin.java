@@ -22,7 +22,7 @@
 
 package com.falsepattern.lib.internal.asm;
 
-import com.falsepattern.deploader.Stub;
+import com.falsepattern.deploader.DeploaderStub;
 import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
 import com.gtnewhorizons.retrofuturabootstrap.api.RfbPlugin;
 import lombok.val;
@@ -43,7 +43,7 @@ public class RFBLoadingPlugin implements RfbPlugin {
             exc.invoke(loader, "com.falsepattern.lib.internal.config.EarlyConfig");
             exc.invoke(loader, "com.falsepattern.lib.internal.core.LowLevelCallMultiplexer");
         } catch (Exception ignored) {}
-        Stub.bootstrap(true);
-        Stub.runDepLoader();
+        DeploaderStub.bootstrap(true);
+        DeploaderStub.runDepLoader();
     }
 }
