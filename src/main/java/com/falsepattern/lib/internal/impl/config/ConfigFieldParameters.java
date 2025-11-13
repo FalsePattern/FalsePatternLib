@@ -22,13 +22,10 @@
 
 package com.falsepattern.lib.internal.impl.config;
 
-import com.github.bsideup.jabel.Desugar;
-
 import net.minecraftforge.common.config.Configuration;
 
 import java.lang.reflect.Field;
 
-@Desugar
 public record ConfigFieldParameters(
         Field field,
         Configuration configuration,

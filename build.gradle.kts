@@ -1,12 +1,13 @@
 plugins {
-    id("com.falsepattern.fpgradle-mc") version("1.1.4")
+    id("com.falsepattern.fpgradle-mc") version("3.1.0")
 }
 
 group = "com.falsepattern"
 
 minecraft_fp {
     java {
-        compatibility = jabel
+        compatibility = jvmDowngrader
+        jvmDowngraderShade = projectIsLgpl21PlusCompatible
         version = JavaVersion.VERSION_17
     }
     mod {
