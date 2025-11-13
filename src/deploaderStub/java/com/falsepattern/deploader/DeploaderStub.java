@@ -118,7 +118,7 @@ public final class DeploaderStub {
             throw new RuntimeException("Failed to add deploader to classpath!", e);
         }
         try {
-            Class<?> bootstrap = cl.loadClass("com.falsepattern.deploader.Bootstrap");
+            Class<?> bootstrap = cl.loadClass("com_falsepattern_deploader_Bootstrap".replace("_", "."));
             Method bootstrapMethod = bootstrap.getDeclaredMethod("bootstrap", boolean.class, Path.class);
             bootstrapMethod.invoke(null, rfb, mcHomeDir);
             Method runDepLoaderMethod = bootstrap.getDeclaredMethod("runDepLoader");
@@ -203,7 +203,7 @@ public final class DeploaderStub {
             try {
                 Method exc = loader.getClass()
                                 .getDeclaredMethod("addClassLoaderExclusion", String.class);
-                exc.invoke(loader, "com.falsepattern.deploader.");
+                exc.invoke(loader, "com_falsepattern_deploader_".replace("_", "."));
             } catch (Exception ignored) {}
         }
 
