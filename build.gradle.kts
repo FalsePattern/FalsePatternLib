@@ -129,6 +129,13 @@ tasks.jar {
     }
 }
 
+tasks.processResources {
+    val ver = minecraft_fp.mod.version
+    filesMatching("META-INF/deps.json") {
+        expand("modVersion" to ver.get())
+    }
+}
+
 repositories {
     exclusive(maven("horizon", "https://mvn.falsepattern.com/horizon/"), "com.gtnewhorizons.retrofuturabootstrap")
     exclusive(horizon()) {

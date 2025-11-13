@@ -1,0 +1,7 @@
+{
+  "identifier": "falsepatternlib_dependencies",
+  "bundledArtifacts": [
+    "com.falsepattern:falsepatternlib-mc1.7.10:${modVersion}",
+    "com.falsepattern:falsepatternlib-mc1.7.10:${modVersion}:dev"
+  ]
+}

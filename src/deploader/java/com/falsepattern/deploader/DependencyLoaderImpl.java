@@ -63,6 +63,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -512,7 +513,9 @@ public class DependencyLoaderImpl {
         long end = System.currentTimeMillis();
         LOG.debug("Discovered {} dependency source candidates in {}ms", dependencySpecs.size(), end - start);
         remoteMavenRepositories.addAll(dependencySpecs.stream()
-                                                      .flatMap((dep) -> dep.repositories().stream())
+                                                      .map(DepRoot::repositories)
+                                                      .filter(Objects::nonNull)
+                                                      .flatMap(Collection::stream)
                                                       .map(repo -> repo.endsWith("/") ? repo : repo + "/")
                                                       .collect(Collectors.toSet()));
         localMavenRepositories.addAll(jijURLs.stream().map(URL::toString).map(repo -> repo.endsWith("/") ? repo : repo + "/").collect(Collectors.toSet()));
@@ -563,11 +566,14 @@ public class DependencyLoaderImpl {
                                                new ScopedDep(it.source, it.mod, DependencyScope.ALWAYS, it.dep.always()),
                                                new ScopedDep(it.source, it.mod, DependencyScope.DEV, it.dep.dev()),
                                                new ScopedDep(it.source, it.mod, DependencyScope.OBF, it.dep.obf())))
-                                       .flatMap(it -> Stream.concat(it.deps.common().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.COMMON), dep)),
-                                                                    Stream.concat(
-                                                                            it.deps.client().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.CLIENT), dep)),
-                                                                            it.deps.server().stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, DependencySide.SERVER), dep))
-                                                                                 )))
+                                       .filter(it -> it.deps != null)
+                                       .flatMap(it -> {
+                                           Stream<ScopedSidedDep> result = null;
+                                           result = concat(it, result, it.deps.common(), DependencySide.COMMON);
+                                           result = concat(it, result, it.deps.client(), DependencySide.CLIENT);
+                                           result = concat(it, result, it.deps.server(), DependencySide.SERVER);
+                                           return result;
+                                       })
                                        .map((scopedSidedDep) -> {
                                            val source = scopedSidedDep.source;
                                            val scope = scopedSidedDep.scope;
@@ -612,6 +618,17 @@ public class DependencyLoaderImpl {
             return null;
         }
         return artifacts;
+    }
+
+    private static Stream<ScopedSidedDep> concat(ScopedDep it, @Nullable Stream<ScopedSidedDep> prev, List<String> deps, DependencySide side) {
+        if (deps != null) {
+            val newStream = deps.stream().map(dep -> new ScopedSidedDep(it.source, it.mod, new ScopeSide(it.scope, side), dep));
+            if (prev == null) {
+                return newStream;
+            }
+            return Stream.concat(prev, newStream);
+        }
+        return prev;
     }
 
     public static Version parseVersion(String versionString) {
