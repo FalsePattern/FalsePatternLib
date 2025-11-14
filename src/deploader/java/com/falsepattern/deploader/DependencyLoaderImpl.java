@@ -25,6 +25,7 @@ import com.falsepattern.deploader.version.RawVersion;
 import com.falsepattern.deploader.version.SemanticVersion;
 import com.falsepattern.deploader.version.Version;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.netty.util.internal.ConcurrentSet;
 import lombok.NonNull;
@@ -41,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.fpdeploader.SystemExitBypassHelper;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -81,6 +83,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -123,7 +126,7 @@ public class DependencyLoaderImpl {
         metadataCollectionModListAccessor.setAccessible(true);
     }
 
-    private static AtomicBoolean modDownloaded = new AtomicBoolean(false);
+    private static AtomicBoolean needReboot = new AtomicBoolean(false);
 
     private static void ensureExists(Path directory) {
         if (!Files.exists(directory)) {
@@ -464,17 +467,17 @@ public class DependencyLoaderImpl {
             baseTasks.addAll(tasks);
             tasks = executeArtifactLoading(baseTasks, false);
         }
-        if (modDownloaded.get()) {
+        if (needReboot.get()) {
+            val msg = "One or more minecraft mods which have been loaded by the FP DepLoader require a game restart to fully install.";
             if (!SystemUtils.IS_OS_MAC) {
                 try {
-                    JOptionPane.showMessageDialog(null, "A minecraft mod has been downloaded by the FalsePatternLib dependency downloader.\nYou must restart the game to apply these changes.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, msg + "\nThe game will exit when you close this prompt.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
                 } catch (Exception ignored) {}
             }
-            val msg = "A minecraft mod has been downloaded by the FalsePatternLib dependency downloader, and requires a game restart to get installed properly.";
             for (int i = 0; i < 16; i++) {
                 LOG.warn(msg);
             }
-            System.exit(0);
+            SystemExitBypassHelper.exit();
             throw new ModDependencyDownloaded(msg);
         }
     }
@@ -1113,7 +1116,7 @@ public class DependencyLoaderImpl {
                                 Files.delete(tmpFile);
                             } else {
                                 if (isMod) {
-                                    modDownloaded.set(true);
+                                    detectModReloadRequirement(tmpFile);
                                 }
                                 try {
                                     Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
@@ -1151,6 +1154,60 @@ public class DependencyLoaderImpl {
                 } catch (IOException ignored) {
                 }
                 return null;
+            }
+        }
+
+        private void detectModReloadRequirement(Path file) {
+            if (needReboot.get())
+                return;
+            try (val jar = new JarFile(file.toFile())) {
+                if (LowLevelCallMultiplexer.rfbDetected) {
+                    //Detect RFB plugins
+                    val entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        val entry = entries.nextElement();
+                        if (entry.getName().contains("META-INF/rfb-plugin")) {
+                            needReboot.set(true);
+                            return;
+                        }
+                    }
+                    return;
+                }
+                //Detect coremods
+                val manifest = jar.getManifest().getMainAttributes();
+                val isCoreMod = manifest.getValue("TweakClass") != null || manifest.getValue("FMLCorePlugin") != null;
+                if (isCoreMod) {
+                    needReboot.set(true);
+                    return;
+                }
+                //Detect mixins
+                val entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    val entry = entries.nextElement();
+                    val name = entry.getName();
+                    if (name.contains("META-INF/rfb-plugin")) {
+                        needReboot.set(true);
+                        return;
+                    }
+                    if (!name.endsWith(".json")) {
+                        continue;
+                    }
+                    val data = jar.getInputStream(entry);
+                    val gson = new GsonBuilder().create();
+                    val element = gson.fromJson(new InputStreamReader(data), JsonElement.class);
+                    if (!element.isJsonObject()) {
+                        continue;
+                    }
+                    val obj = element.getAsJsonObject();
+                    if (obj.has("refmap") || obj.has("compatibilityLevel") || obj.has("target")) {
+                        //Most likely contains mixins, better safe than sorry
+                        needReboot.set(true);
+                        return;
+                    }
+                }
+            } catch (IOException e) {
+                //bail out safely
+                needReboot.set(true);
             }
         }
 

@@ -56,6 +56,8 @@ public final class DeploaderStub {
         if (rfb) {
             rfbDetected = true;
             RFBUtil.preinit();
+        } else {
+            LaunchWrapperUtil.preinit();
         }
         Object deploader = Launch.blackboard.get(BLACKBOARD_MARKER);
         if (deploader != null) {
@@ -203,7 +205,7 @@ public final class DeploaderStub {
             try {
                 Method exc = loader.getClass()
                                 .getDeclaredMethod("addClassLoaderExclusion", String.class);
-                exc.invoke(loader, "com_falsepattern_deploader_".replace("_", "."));
+                exc.invoke(loader, "com_falsepattern_deploader_".replace('_', '.'));
             } catch (Exception ignored) {}
         }
 
@@ -221,6 +223,9 @@ public final class DeploaderStub {
     }
 
     private static class LaunchWrapperUtil {
+        static void preinit() {
+            Launch.classLoader.addTransformerExclusion("com_falsepattern_deploader_".replace('_', '.'));
+        }
         static Path gameDir() {
             return Launch.minecraftHome == null ? Paths.get(".") : Launch.minecraftHome.toPath();
         }

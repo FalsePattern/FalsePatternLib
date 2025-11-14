@@ -37,7 +37,7 @@ import java.util.List;
 
 @UtilityClass
 public class LowLevelCallMultiplexer {
-    private static boolean rfbDetected = false;
+    public static boolean rfbDetected = false;
     public static void rfbDetected() {
         rfbDetected = true;
     }
