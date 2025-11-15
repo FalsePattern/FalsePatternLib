@@ -117,6 +117,10 @@ public class DependencyLoaderImpl {
     private static final Path tempDir;
     private static final Field metadataCollectionModListAccessor;
 
+    private static final AtomicBoolean needReboot = new AtomicBoolean(false);
+    private static final Set<String> downloadedMods = new ConcurrentSet<>();
+    private static final Set<String> downloadFailed = new ConcurrentSet<>();
+
     static {
         try {
             metadataCollectionModListAccessor = MetadataCollection.class.getDeclaredField("modList");
@@ -125,8 +129,6 @@ public class DependencyLoaderImpl {
         }
         metadataCollectionModListAccessor.setAccessible(true);
     }
-
-    private static AtomicBoolean needReboot = new AtomicBoolean(false);
 
     private static void ensureExists(Path directory) {
         if (!Files.exists(directory)) {
@@ -468,13 +470,20 @@ public class DependencyLoaderImpl {
             tasks = executeArtifactLoading(baseTasks, false);
         }
         if (needReboot.get()) {
-            val msg = "One or more minecraft mods which have been loaded by the FP DepLoader require a game restart to fully install.";
+            var msgBuilder = new StringBuilder("One or more minecraft mods which have been loaded by the FP DepLoader require a game restart to fully install.");
+            if (!downloadedMods.isEmpty()) {
+                msgBuilder.append("\nDownloaded mods:");
+                for (var mod : downloadedMods) {
+                    msgBuilder.append('\n').append(mod);
+                }
+            }
+            val msg = msgBuilder.toString();
             if (!SystemUtils.IS_OS_MAC) {
                 try {
-                    JOptionPane.showMessageDialog(null, msg + "\nThe game will exit when you close this prompt.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, msg + "\n\nThe game will exit when you close this prompt.", "Mod Dependency Download notice", JOptionPane.WARNING_MESSAGE);
                 } catch (Exception ignored) {}
             }
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 8; i++) {
                 LOG.warn(msg);
             }
             SystemExitBypassHelper.exit();
@@ -805,28 +814,51 @@ public class DependencyLoaderImpl {
                 futures.add(CompletableFuture.supplyAsync(task::load, executor));
             }
         }
-        val theFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                                         .thenApply(ignored ->
-                                                            futures.stream()
-                                                                   .map(it -> it.getNow(null))
-                                                                   .collect(Collectors.toList())
-                                                   );
         AtomicBoolean doViz = new AtomicBoolean(true);
         if (theFrame != null) {
             final var vizThread = getVizThread(doViz, progresses, theFrame);
             vizThread.start();
         }
-        List<URL> res;
+        List<URL> res = new ArrayList<>();
+        Error err = null;
         try {
-            res = theFuture.join();
-        } catch (Error e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new Error(t);
+            for (val future: futures) {
+                try {
+                    res.add(future.get());
+                } catch (Error e) {
+                    if (err != null) {
+                        err.addSuppressed(e);
+                    } else {
+                        err = e;
+                    }
+                } catch (Throwable t) {
+                    if (err != null) {
+                        err.addSuppressed(t);
+                    } else {
+                        err = new Error(t);
+                    }
+                }
+            }
         } finally {
             if (theFrame != null) {
                 doViz.set(false);
             }
+        }
+        if (err != null) {
+            if (downloadFailed.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "FP DepLoader has encountered an error while trying to download libraries.\nSee the log for more details.", "Dependency download error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                var msgBuilder = new StringBuilder("FP DepLoader has encountered an error while trying to download the following libraries:");
+                for (val f: downloadFailed) {
+                    msgBuilder.append('\n').append(f);
+                }
+                msgBuilder.append("\n\nSee the log for more details.");
+                JOptionPane.showMessageDialog(null, msgBuilder.toString(), "Dependency download error", JOptionPane.ERROR_MESSAGE);
+            }
+            throw err;
+        }
+        if (res.isEmpty()) {
+            return null;
         }
         return scanDeps(res.stream());
     }
@@ -956,9 +988,11 @@ public class DependencyLoaderImpl {
         }
 
         private IllegalStateException crashCouldNotDownload() {
-            val errorMessage = "Failed to download library " + groupId + ":" + artifactId + ":" + preferredVersion + (
-                    (suffix != null) ? ":" + suffix : "") + " from any repository! Requested by mod: " + loadingModId;
+            val lib = groupId + ":" + artifactId + ":" + preferredVersion + (
+                    (suffix != null) ? ":" + suffix : "");
+            val errorMessage = "Failed to download library " + lib + " from any repository! Requested by mod: " + loadingModId;
             LOG.fatal(errorMessage);
+            downloadFailed.add(lib);
             return new IllegalStateException(errorMessage);
         }
 
@@ -1117,6 +1151,7 @@ public class DependencyLoaderImpl {
                             } else {
                                 if (isMod) {
                                     detectModReloadRequirement(tmpFile);
+                                    downloadedMods.add(file.getFileName().toString());
                                 }
                                 try {
                                     Files.move(tmpFile, file, StandardCopyOption.ATOMIC_MOVE);
