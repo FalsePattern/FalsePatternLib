@@ -298,22 +298,24 @@ public class DependencyLoaderImpl {
 
     @SneakyThrows
     private static void readMCMod(InputStream input, String name) {
-        val meta = MetadataCollection.from(input, name);
-        val modList = (ModMetadata[])metadataCollectionModListAccessor.get(meta);
-        for (val mod: modList) {
-            val id = mod.modId;
-            if (id != null) {
-                val versionStr = mod.version;
-                final Version version;
-                if (versionStr != null) {
-                    version = Version.parse(versionStr);
-                } else {
-                    version = new RawVersion("unknown");
+        try {
+            val meta = MetadataCollection.from(input, name);
+            val modList = (ModMetadata[]) metadataCollectionModListAccessor.get(meta);
+            for (val mod : modList) {
+                val id = mod.modId;
+                if (id != null) {
+                    val versionStr = mod.version;
+                    final Version version;
+                    if (versionStr != null) {
+                        version = Version.parse(versionStr);
+                    } else {
+                        version = new RawVersion("unknown");
+                    }
+                    loadedModIds.put(id, version);
+                    loadedModIdMods.put(id, name);
                 }
-                loadedModIds.put(id, version);
-                loadedModIdMods.put(id, name);
             }
-        }
+        } catch (Throwable ignored) {}
     }
 
     private static boolean scanForDepSpecs(URL source, List<URL> output, List<URL> jijURLs) {
