@@ -22,22 +22,13 @@
 
 package com.falsepattern.deploader;
 
-import java.nio.file.Path;
+import net.minecraft.launchwrapper.Launch;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import cpw.mods.fml.relauncher.Side;
 
-public class Bootstrap {
-    public static Path MINECRAFT_HOME_PATH;
-
-    public static void bootstrap(boolean rfb, Path homePath) {
-        MINECRAFT_HOME_PATH = homePath;
-        if (rfb) {
-            BootstrapRFB.init();
-        } else {
-            BootstrapLW.init();
-        }
-        LetsEncryptHelper.replaceSSLContext();
-    }
-
-    public static void runDepLoader() {
-        DependencyLoaderImpl.executeDependencyLoading();
+class BootstrapLW {
+    static void init() {
+        PreShare.initDevState(Launch.classLoader.findResource("net/minecraft/world/World.class") != null);
+        PreShare.initClientState(FMLLaunchHandler.side() == Side.CLIENT);
     }
 }

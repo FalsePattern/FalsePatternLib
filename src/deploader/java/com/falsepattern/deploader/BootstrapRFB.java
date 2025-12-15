@@ -22,22 +22,17 @@
 
 package com.falsepattern.deploader;
 
-import java.nio.file.Path;
+import com.gtnewhorizons.retrofuturabootstrap.RfbApiImpl;
+import lombok.val;
 
-public class Bootstrap {
-    public static Path MINECRAFT_HOME_PATH;
+import java.net.URLClassLoader;
 
-    public static void bootstrap(boolean rfb, Path homePath) {
-        MINECRAFT_HOME_PATH = homePath;
-        if (rfb) {
-            BootstrapRFB.init();
-        } else {
-            BootstrapLW.init();
-        }
-        LetsEncryptHelper.replaceSSLContext();
-    }
-
-    public static void runDepLoader() {
-        DependencyLoaderImpl.executeDependencyLoading();
+class BootstrapRFB {
+    static void init() {
+        val loader = (URLClassLoader) RfbApiImpl.INSTANCE.launchClassLoader();
+        PreShare.initDevState(loader.findResource("net/minecraft/world/World.class") != null);
+        PreShare.initClientState(loader.findResource("net/minecraft/client/Minecraft.class") != null
+                                 || loader.findResource("bao.class") != null);
+        LowLevelCallMultiplexer.rfbDetected();
     }
 }
