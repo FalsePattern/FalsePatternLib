@@ -40,8 +40,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import cpw.mods.fml.common.MetadataCollection;
-import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.fpdeploader.SystemExitBypassHelper;
 
 import javax.swing.JFrame;
@@ -58,7 +56,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -103,7 +100,7 @@ public class DependencyLoaderImpl {
     private static final Map<String, String> loadedModIdMods = new ConcurrentHashMap<>();
     private static final Set<String> remoteMavenRepositories = new ConcurrentSet<>();
     private static final Set<String> localMavenRepositories = new ConcurrentSet<>();
-    static final Logger LOG = LogManager.getLogger("FalsePatternLib DepLoader");
+    public static final Logger LOG = LogManager.getLogger("FalsePatternLib DepLoader");
 
     private static final AtomicLong counter = new AtomicLong(0);
     private static final ExecutorService executor = Executors.newCachedThreadPool(r -> {
@@ -115,20 +112,10 @@ public class DependencyLoaderImpl {
     private static final Path libDir;
     private static final Path modsDir;
     private static final Path tempDir;
-    private static final Field metadataCollectionModListAccessor;
 
     private static final AtomicBoolean needReboot = new AtomicBoolean(false);
     private static final Set<String> downloadedMods = new ConcurrentSet<>();
     private static final Set<String> downloadFailed = new ConcurrentSet<>();
-
-    static {
-        try {
-            metadataCollectionModListAccessor = MetadataCollection.class.getDeclaredField("modList");
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-        metadataCollectionModListAccessor.setAccessible(true);
-    }
 
     private static void ensureExists(Path directory) {
         if (!Files.exists(directory)) {
@@ -300,8 +287,7 @@ public class DependencyLoaderImpl {
     private static void readMCMod(InputStream input, String name) {
         try {
             val meta = MetadataCollection.from(input, name);
-            val modList = (ModMetadata[]) metadataCollectionModListAccessor.get(meta);
-            for (val mod : modList) {
+            for (val mod : meta.modList) {
                 val id = mod.modId;
                 if (id != null) {
                     val versionStr = mod.version;
