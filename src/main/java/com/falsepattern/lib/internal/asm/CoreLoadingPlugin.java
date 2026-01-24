@@ -56,11 +56,12 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     static {
         DeploaderStub.bootstrap(false);
-        FPLog.LOG.info("Removing skill issues...");
         try {
             Class.forName("thermos.Thermos");
-            FPLog.LOG.fatal("Sorry, i prefer iced coffee.");
-            throw skillIssue("Thermos is not supported by FalsePatternLib, please use a normal forge server.");
+            loudWarning("Thermos is not officially supported by FalsePatternLib, or any of our other mods. " +
+                        "Do not report any bugs to FalsePattern or MEGA from Thermos servers, unless " +
+                        "you're also submitting a pull request to fix it. All non Thermos-specific errors " +
+                        "MUST be reproducible in a non-Thermos environment to be considered valid.");
         } catch (ClassNotFoundException ignored) {
         }
         //Scan for dependencies now
@@ -75,54 +76,24 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
         CrashImprover.probe();
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private static Error skillIssue(String message) {
-        int width = message.length();
-        String shutup = "Any bug reports concerning this message will be silently deleted.";
-        int suWidth = shutup.length();
-        int padding = width - suWidth;
-        boolean padMSG = padding < 0;
-        if (padMSG) {
-            padding = -padding;
+    private static void loudWarning(String message) {
+        val len = message.length();
+        val lines = new StringBuilder(4 + len);
+        lines.append("--");
+        for (int i = 0; i < len; i++) {
+            lines.append('-');
         }
-        int padLeft = padding / 2;
-        int padRight = padding - padLeft;
-        int maxWidth = Math.max(width, suWidth);
-        StringBuilder bld = new StringBuilder("\n\n");
-        for (int i = 0; i < maxWidth + 2; i++) {
-            bld.append('-');
+        lines.append("--");
+        val l = lines.toString();
+        for (int i = 0; i < 5; i++) {
+            FPLog.LOG.fatal(l);
         }
-        bld.append("\n|");
-        if (padMSG) {
-            for (int i = 0; i < padLeft; i++) {
-                bld.append(' ');
-            }
-            bld.append(message);
-            for (int i = 0; i < padRight; i++) {
-                bld.append(' ');
-            }
-        } else {
-            bld.append(message);
+        for (int i = 0; i < 5; i++) {
+            FPLog.LOG.fatal("| {} |", message);
         }
-        bld.append("|\n|");
-        if (!padMSG) {
-            for (int i = 0; i < padLeft; i++) {
-                bld.append(' ');
-            }
-            bld.append(shutup);
-            for (int i = 0; i < padRight; i++) {
-                bld.append(' ');
-            }
-        } else {
-            bld.append(shutup);
+        for (int i = 0; i < 5; i++) {
+            FPLog.LOG.fatal(l);
         }
-        bld.append("|\n");
-        for (int i = 0; i < maxWidth + 2; i++) {
-            bld.append('-');
-        }
-        val skillIssue = new Error(bld.toString());
-        skillIssue.setStackTrace(new StackTraceElement[0]);
-        return skillIssue;
     }
 
     @Override
