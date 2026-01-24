@@ -56,6 +56,20 @@ public class CoreLoadingPlugin implements IFMLLoadingPlugin {
 
     static {
         DeploaderStub.bootstrap(false);
+        //Cool banner
+        FPLog.LOG.info("");
+        FPLog.LOG.info("");
+        FPLog.LOG.info(" ________  _______   __        __  __");
+        FPLog.LOG.info("|        \\|       \\ |  \\      |  \\|  \\");
+        FPLog.LOG.info("| $$$$$$$$| $$$$$$$\\| $$       \\$$| $$____");
+        FPLog.LOG.info("| $$__    | $$__/ $$| $$      |  \\| $$    \\");
+        FPLog.LOG.info("| $$  \\   | $$    $$| $$      | $$| $$$$$$$\\");
+        FPLog.LOG.info("| $$$$$   | $$$$$$$ | $$      | $$| $$  | $$");
+        FPLog.LOG.info("| $$      | $$      | $$_____ | $$| $$__/ $$");
+        FPLog.LOG.info("| $$      | $$      | $$     \\| $$| $$    $$");
+        FPLog.LOG.info(" \\$$       \\$$       \\$$$$$$$$ \\$$ \\$$$$$$$");
+        FPLog.LOG.info("");
+        FPLog.LOG.info("");
         try {
             Class.forName("thermos.Thermos");
             loudWarning("Thermos is not officially supported by FalsePatternLib, or any of our other mods. " +
