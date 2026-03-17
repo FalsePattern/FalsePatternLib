@@ -49,6 +49,13 @@ public class CrashImprover {
     }
 
     public static void injectLatest(FileWriter writer) {
+        if ("iAgreeAndIWillNotCreateBugReportsToFalsePatternWithTheseFiles".equals(System.getProperty("ISABLE_FALSEPATTERN_CRASH_REPORT_IMPROVER_NO_UPSTREAM_SUPPORT_WILL_BE_PROVIDED_IF_YOU_ENABLE_THIS_FLAG"))) {
+            try {
+                writer.write("\n\n\n\n\nFalsePatternLib CRASH REPORT IMPROVER DISABLED. NO UPSTREAM SUPPORT WILL BE PROVIDED.\n\n\n\n\n");
+            } catch (IOException e) {
+            }
+            return;
+        }
         val potentialLogs = Arrays.asList(new File(Launch.minecraftHome, "logs/fml-client-latest.log"),
                                           new File(Launch.minecraftHome, "logs/fml-server-latest.log"));
         for (val file: potentialLogs) {
