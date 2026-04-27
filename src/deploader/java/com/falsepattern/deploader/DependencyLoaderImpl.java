@@ -46,6 +46,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -76,8 +77,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
@@ -102,11 +106,10 @@ public class DependencyLoaderImpl {
     private static final Set<String> localMavenRepositories = new ConcurrentSet<>();
     public static final Logger LOG = LogManager.getLogger("FalsePatternLib DepLoader");
 
-    private static final AtomicLong counter = new AtomicLong(0);
-    private static final ExecutorService executor = Executors.newCachedThreadPool(r -> {
+    private static final ExecutorService executor = new ThreadPoolExecutor(0, 4, 60L, TimeUnit.SECONDS, new LinkedBlockingDeque<>(), r -> {
         val thread = new Thread(r);
         thread.setDaemon(true);
-        thread.setName("Dependency Download Thread " + counter.incrementAndGet());
+        thread.setName("Dependency Download Thread");
         return thread;
     });
     private static final Path libDir;
@@ -752,30 +755,38 @@ public class DependencyLoaderImpl {
             LOG.info("-----------------------------------------------------------");
         }
         JFrame theFrame = null;
-        val progresses = new HashMap<DependencyLoadTask, JProgressBar>();
+        JProgressBar bar = null;
+        JProgressBar subBar = null;
         if (silent) {
 
         } else if (SystemUtils.IS_OS_MAC) {
             LOG.info("MacOS detected, not creating progress window (your OS is buggy)");
         } else {
             try {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Throwable ignored) {}
                 val jFrame = new JFrame("Dependency Download");
                 val constraints = new GridBagConstraints();
                 jFrame.getContentPane().setLayout(new GridBagLayout());
                 constraints.gridy = 0;
-                constraints.gridwidth = 2;
-                jFrame.add(new JLabel("FalsePatternLib is downloading dependencies, please wait!"), constraints);
+                constraints.gridx = 0;
                 constraints.gridwidth = 1;
-                for (val artifact : artifactMap.entrySet()) {
-                    constraints.gridy++;
-                    jFrame.add(new JLabel(artifact.getKey()), constraints);
-                    val status = new JProgressBar();
-                    status.setIndeterminate(true);
-                    status.setStringPainted(true);
-                    status.setString("Waiting...");
-                    progresses.put(artifact.getValue(), status);
-                    jFrame.add(status, constraints);
-                }
+                constraints.gridheight = 1;
+                constraints.fill = GridBagConstraints.HORIZONTAL;
+                jFrame.add(new JLabel("Downloading additional jar files required by the modpack, please wait..."), constraints);
+                constraints.gridy++;
+                bar = new JProgressBar();
+                bar.setIndeterminate(true);
+                bar.setStringPainted(true);
+                bar.setString("Waiting...");
+                jFrame.add(bar, constraints);
+                constraints.gridy++;
+                subBar = new JProgressBar();
+                subBar.setIndeterminate(true);
+                subBar.setStringPainted(true);
+                subBar.setString("...");
+                jFrame.add(subBar, constraints);
                 jFrame.pack();
                 jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -784,27 +795,12 @@ public class DependencyLoaderImpl {
             } catch (Exception ignored) {
             }
         }
-        if (theFrame != null) {
-            for (val task : artifactMap.values()) {
-                futures.add(CompletableFuture.supplyAsync(() -> {
-                    val bar = progresses.get(task);
-                    bar.setString("Downloading...");
-                    val res = task.load();
-                    bar.setMinimum(0);
-                    bar.setMaximum(1);
-                    bar.setValue(1);
-                    bar.setString("Completed!");
-                    return res;
-                }, executor));
-            }
-        } else {
-            for (val task : artifactMap.values()) {
-                futures.add(CompletableFuture.supplyAsync(task::load, executor));
-            }
+        for (val task : artifactMap.values()) {
+            futures.add(CompletableFuture.supplyAsync(task::load, executor));
         }
         AtomicBoolean doViz = new AtomicBoolean(true);
         if (theFrame != null) {
-            final var vizThread = getVizThread(doViz, progresses, theFrame);
+            final var vizThread = getVizThread(doViz, artifactMap, bar, subBar, theFrame);
             vizThread.start();
         }
         List<URL> res = new ArrayList<>();
@@ -852,7 +848,7 @@ public class DependencyLoaderImpl {
     }
 
     @NotNull
-    private static Thread getVizThread(AtomicBoolean doViz, HashMap<DependencyLoadTask, JProgressBar> progresses, JFrame theFrame) {
+    private static Thread getVizThread(AtomicBoolean doViz, Map<String, DependencyLoadTask> progresses, JProgressBar mainProgress, JProgressBar subProgress, JFrame theFrame) {
         val vizThread = new Thread(() -> {
             int waitBeforeShowing = 100;
             while (doViz.get()) {
@@ -862,19 +858,50 @@ public class DependencyLoaderImpl {
                     theFrame.setVisible(true);
                     waitBeforeShowing = -1;
                 }
-                for (val progress : progresses.entrySet()) {
-                    val task = progress.getKey();
-                    val bar = progress.getValue();
-                    if (task.contentLength == -1) {
-                        bar.setIndeterminate(true);
-                    } else {
-                        bar.setIndeterminate(false);
-                        bar.setMinimum(0);
-                        bar.setMaximum((int) task.contentLength);
-                        bar.setValue((int) task.downloaded);
+                mainProgress.setIndeterminate(false);
+                mainProgress.setMaximum(0);
+                mainProgress.setMaximum(progresses.size() * 100);
+                var currentProgress = 0;
+                var pending = progresses.size();
+                boolean first = true;
+                for (val pair: progresses.entrySet()) {
+                    val progress = pair.getValue();
+                    val dls = progress.dlState.get();
+                    val cl = progress.contentLength.get();
+                    val dl = progress.downloaded.get();
+                    switch (dls) {
+                        case 0: break;
+                        case 1: {
+                            var div = cl == -1 ? dl : cl;
+                            if (div <= 0) {
+                                div = 1;
+                            }
+                            val prog = (int) Math.max(0, Math.min(100, dl * 100 / div));
+                            currentProgress += prog;
+                            if (first) {
+                                first = false;
+                                subProgress.setIndeterminate(false);
+                                subProgress.setString(pair.getKey());
+                                subProgress.setMinimum(0);
+                                subProgress.setMaximum(100);
+                                subProgress.setValue(prog);
+                            }
+                            break;
+                        }
+                        default: {
+                            currentProgress += 100;
+                            pending--;
+                        }
                     }
                 }
-                theFrame.repaint();
+                if (first) {
+                    subProgress.setIndeterminate(true);
+                    subProgress.setString("...");
+                }
+                mainProgress.setString(pending + " files remaining...");
+                mainProgress.setValue(currentProgress);
+                mainProgress.repaint();
+                subProgress.repaint();
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException ignored) {
@@ -941,34 +968,40 @@ public class DependencyLoaderImpl {
         public volatile String jarName;
         private Path file;
 
-        public volatile long contentLength = -1;
-        public volatile long downloaded = 0;
+        public final AtomicLong contentLength = new AtomicLong(-1);
+        public final AtomicLong downloaded = new AtomicLong(0);
+        public final AtomicInteger dlState = new AtomicInteger(0);
 
         private @Nullable URL load() {
             setupLibraryNames();
             if (loadedLibraries.containsKey(artifact)) {
                 alreadyLoaded(false);
+                dlState.set(3);
                 return null;
             }
             if (isMod && loadedModIds.containsKey(modId)) {
                 alreadyLoaded(true);
+                dlState.set(3);
                 return null;
             }
             setupPaths();
             for (val repo: localMavenRepositories) {
                 val url = tryDownloadFromMaven(repo, true);
                 if (url != null) {
+                    dlState.set(3);
                     return url;
                 }
             }
             val existingUrl = tryLoadingExistingFile();
             if (existingUrl != null) {
+                dlState.set(3);
                 return existingUrl;
             }
             validateDownloadsAllowed();
             for (var repo : remoteMavenRepositories) {
                 val url = tryDownloadFromMaven(repo, false);
                 if (url != null) {
+                    dlState.set(3);
                     return url;
                 }
             }
@@ -1121,6 +1154,7 @@ public class DependencyLoaderImpl {
                         if (Files.exists(tmpFile)) {
                             Files.delete(tmpFile);
                         }
+                        dlState.set(1);
                         Internet.connect(new URL(url),
                                          ex -> LOG.debug("Artifact {} could not be downloaded from repo {}: {}",
                                                          artifactLogName,
@@ -1128,11 +1162,10 @@ public class DependencyLoaderImpl {
                                                          ex.getMessage()),
                                          input -> {
                                              LOG.debug("Downloading {} from {}", artifactLogName, finalRepo);
-                                             download(input, tmpFile, d -> downloaded += d);
+                                             download(input, tmpFile, downloaded::getAndAdd);
                                              LOG.debug("Downloaded {} from {}", artifactLogName, finalRepo);
                                              success.set(true);
-                                         },
-                                         contentLength -> this.contentLength = contentLength);
+                                         }, this.contentLength::getAndAdd);
                         if (success.get()) {
                             if (FileUtils.contentEquals(tmpFile.toFile(), file.toFile())) {
                                 Files.delete(tmpFile);
@@ -1171,11 +1204,13 @@ public class DependencyLoaderImpl {
                                 loadedModIds.put(modId, preferredVersion);
                                 loadedModIdMods.put(modId, loadingModId);
                             }
+                            dlState.set(2);
                             return diskUrl;
                         }
                     }
                 } catch (IOException ignored) {
                 }
+                dlState.set(2);
                 return null;
             }
         }
