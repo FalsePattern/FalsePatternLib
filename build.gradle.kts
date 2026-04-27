@@ -147,6 +147,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.7")
-    compileOnly("io.github.legacymoddingmc:unimixins:0.1.23:dev")
+    compileOnly("com.gtnewhorizons.retrofuturabootstrap:RetroFuturaBootstrap:1.0.16")
+    compileOnly("io.github.legacymoddingmc:unimixins:0.3.0:dev")
 }
