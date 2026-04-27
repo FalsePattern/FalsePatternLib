@@ -1,5 +1,5 @@
 plugins {
-    id("com.falsepattern.fpgradle-mc") version("3.1.1")
+    id("com.falsepattern.fpgradle-mc") version("4.0.1")
 }
 
 group = "com.falsepattern"
