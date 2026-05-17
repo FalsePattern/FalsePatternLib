@@ -27,3 +27,15 @@ The contents of the [util](src/main/java/com/falsepattern/lib/util) package so f
 
 The update checker module and the library downloader module can be toggled with the `ENABLE_UPDATE_CHECKER` and 
 `ENABLE_LIBRARY_DOWNLOADS` booleans in the `falsepatternlib.cfg` config file respectively.
+
+### Strict No LLM / No AI Policy
+
+No LLMs for issues.
+
+No LLMs for patches / pull requests.
+
+No LLMs for comments on the bug tracker, including translation.
+
+English is encouraged, but not required. You are welcome to post in your native
+language and rely on others to have their own translation tools of choice to
+interpret your words.
