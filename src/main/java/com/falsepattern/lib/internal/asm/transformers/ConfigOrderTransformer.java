@@ -25,6 +25,8 @@ package com.falsepattern.lib.internal.asm.transformers;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.internal.Tags;
 import com.falsepattern.lib.internal.impl.config.DeclOrderInternal;
+import com.falsepattern.lib.turboasm.BytePatternMatcher;
+import com.falsepattern.lib.turboasm.ClassHeaderMetadata;
 import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
@@ -36,6 +38,8 @@ public class ConfigOrderTransformer implements TurboClassTransformer {
     private static final String DESC_CONFIG = Type.getDescriptor(Config.class);
     private static final String DESC_CONFIG_IGNORE = Type.getDescriptor(Config.Ignore.class);
     private static final String DESC_ORDER = Type.getDescriptor(DeclOrderInternal.class);
+
+    final BytePatternMatcher configAnnotationMatcher = new BytePatternMatcher(DESC_CONFIG, BytePatternMatcher.Mode.Equals);
 
     @Override
     public String name() {
@@ -49,17 +53,12 @@ public class ConfigOrderTransformer implements TurboClassTransformer {
 
     @Override
     public boolean shouldTransformClass(@NotNull String className, @NotNull ClassNodeHandle classNode) {
-        val cn = classNode.getNode();
-        if (cn == null)
+        final ClassHeaderMetadata metadata = classNode.getOriginalMetadata();
+        if (metadata == null) {
             return false;
-        if (cn.visibleAnnotations != null) {
-            for (val ann : cn.visibleAnnotations) {
-                if (DESC_CONFIG.equals(ann.desc)) {
-                    return true;
-                }
-            }
         }
-        return false;
+
+        return metadata.matchesBytes(configAnnotationMatcher);
     }
 
     @Override
@@ -75,7 +74,9 @@ public class ConfigOrderTransformer implements TurboClassTransformer {
                 || (field.access & Opcodes.ACC_STATIC) == 0
                 || (field.access & Opcodes.ACC_FINAL) != 0) {
                 continue;
-            } else if (field.visibleAnnotations != null) {
+            }
+
+            if (field.visibleAnnotations != null) {
                 for (val ann : field.visibleAnnotations) {
                     if (DESC_CONFIG_IGNORE.equals(ann.desc)) {
                         continue outer;

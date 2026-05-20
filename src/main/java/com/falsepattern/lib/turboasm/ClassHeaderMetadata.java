@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import java.util.List;
  */
 public final class ClassHeaderMetadata implements FastClassAccessor {
 
+    public final byte[] classBytes;
     public final int minorVersion;
     public final int majorVersion;
     public final int constantPoolEntryCount;
@@ -46,6 +48,9 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
     public final int @NotNull [] constantPoolEntryOffsets;
     /** Type of each parsed constant pool entry, zero-indexed! */
     public final ConstantPoolEntryTypes @NotNull [] constantPoolEntryTypes;
+
+    /** Approximately only half of the entries are utf-8, so this array can be used to iterate over them more quickly */
+    public final int @NotNull [] constantPoolUtf8EntryOffsets;
 
     public final int constantPoolEndOffset;
     public final int accessFlags;
@@ -66,15 +71,17 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
         if (!isValidClass(bytes)) {
             throw new IllegalArgumentException("Invalid class detected");
         }
+        this.classBytes = bytes;
         this.minorVersion = u16(bytes, Offsets.minorVersionU16);
         this.majorVersion = u16(bytes, Offsets.majorVersionU16);
         this.constantPoolEntryCount = u16(bytes, Offsets.constantPoolCountU16);
         this.constantPoolEntryOffsets = new int[constantPoolEntryCount];
         this.constantPoolEntryTypes = new ConstantPoolEntryTypes[constantPoolEntryCount];
         // scan through CP entries
-        final int cpOff;
         {
             int off = Offsets.constantPoolStart;
+            final int[] utf8EntryOffsets = new int[constantPoolEntryCount];
+            int utf8Entries = 0;
             for (int entry = 0; entry < constantPoolEntryCount - 1; entry++) {
                 constantPoolEntryOffsets[entry] = off;
                 ConstantPoolEntryTypes type = ConstantPoolEntryTypes.parse(bytes, off);
@@ -84,18 +91,18 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
                     entry++;
                     constantPoolEntryOffsets[entry] = off;
                     constantPoolEntryTypes[entry] = type;
+                } else if (type == ConstantPoolEntryTypes.Utf8) {
+                    utf8EntryOffsets[utf8Entries++] = off;
                 }
                 off += type.byteLength(bytes, off);
             }
-            cpOff = off;
-            this.constantPoolEndOffset = cpOff;
+            this.constantPoolEndOffset = off;
+            this.constantPoolUtf8EntryOffsets = Arrays.copyOf(utf8EntryOffsets, utf8Entries);
         }
-        this.accessFlags = u16(bytes, cpOff + Offsets.pastCpAccessFlagsU16);
-        this.thisClassIndex = u16(bytes, cpOff + Offsets.pastCpThisClassU16);
-        this.superClassIndex = u16(bytes, cpOff + Offsets.pastCpSuperClassU16);
-        this.interfacesCount = u16(bytes, cpOff + Offsets.pastCpInterfacesCountU16);
-        this.interfaceIndices = new int[this.interfacesCount];
-        List<String> interfaceNames = new ArrayList<>(this.interfacesCount);
+        this.accessFlags = u16(bytes, this.constantPoolEndOffset + Offsets.pastCpAccessFlagsU16);
+        this.thisClassIndex = u16(bytes, this.constantPoolEndOffset + Offsets.pastCpThisClassU16);
+        this.superClassIndex = u16(bytes, this.constantPoolEndOffset + Offsets.pastCpSuperClassU16);
+        this.interfacesCount = u16(bytes, this.constantPoolEndOffset + Offsets.pastCpInterfacesCountU16);
 
         // Parse this&super names
         if (constantPoolEntryTypes[thisClassIndex - 1] != ConstantPoolEntryTypes.Class) {
@@ -121,8 +128,10 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
         }
 
         // Parse interface names
+        List<String> interfaceNames = new ArrayList<>(this.interfacesCount);
+        this.interfaceIndices = new int[this.interfacesCount];
         for (int i = 0; i < this.interfacesCount; i++) {
-            final int interfaceOffset = cpOff + Offsets.pastCpInterfacesList + i * 2;
+            final int interfaceOffset = this.constantPoolEndOffset + Offsets.pastCpInterfacesList + i * 2;
             final int interfaceIndex = u16(bytes, interfaceOffset);
             if (constantPoolEntryTypes[interfaceIndex - 1] != ConstantPoolEntryTypes.Class) {
                 throw new IllegalArgumentException("Interface " + i + " index is not a class ref");
@@ -314,11 +323,26 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
     }
 
     /**
-     * Searches for a sub"string" (byte array) in a longer byte array. Not efficient for long search strings.
-     * @param classBytes The long byte string to search in.
-     * @param substring The short substring to search for.
-     * @return If the substring was found somewhere in the long string.
+     * Searches for byte patterns in the constant pool.
+     * @param matcher A configured byte matcher with patterns to search for.
+     * @return {@code true} if there is a match for at least one constant pool entry.
      */
+    public boolean matchesBytes(final BytePatternMatcher matcher) {
+        for (final int offset : constantPoolUtf8EntryOffsets) {
+            // first byte is entry type, second and third bytes are length
+            final int length = u16(classBytes, offset + 1);
+            final int start = offset + 3;
+
+            if (matcher.matches(classBytes, start, length)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** @deprecated This method is very slow, use {@link #matchesBytes} instead */
+    @Deprecated
     public static boolean hasSubstring(final byte @Nullable [] classBytes, final byte @NotNull [] substring) {
         if (classBytes == null) {
             return false;
