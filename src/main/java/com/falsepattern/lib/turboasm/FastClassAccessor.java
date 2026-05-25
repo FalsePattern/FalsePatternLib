@@ -28,6 +28,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /** An accessor to metadata about a class that is quickly accessible without fully parsing one. */
 public interface FastClassAccessor {
@@ -51,6 +54,9 @@ public interface FastClassAccessor {
     /** Binary (slash-separated packages) name of the super-class, null for the Object class */
     @Nullable
     String binarySuperName();
+    /** Binary (slash-separated packages) names of the implemented interfaces, list is unmodifiable */
+    @NotNull
+    List<@NotNull String> binaryInterfaceNames();
 
     static OfLoaded ofLoaded(Class<?> loadedClass) {
         return new OfLoaded(loadedClass);
@@ -111,10 +117,18 @@ public interface FastClassAccessor {
         public @Nullable String binarySuperName() {
             return handle.superName;
         }
+
+        @Override
+        public @NotNull List<@NotNull String> binaryInterfaceNames() {
+            return handle.interfaces == null
+                   ? Collections.emptyList()
+                   : Collections.unmodifiableList(handle.interfaces);
+        }
     }
 
     final class OfLoaded implements FastClassAccessor {
         public final Class<?> handle;
+        private @Nullable List<@NotNull String> interfacesCache = null;
 
         private OfLoaded(Class<?> handle) {
             this.handle = handle;
@@ -164,6 +178,21 @@ public interface FastClassAccessor {
         public @Nullable String binarySuperName() {
             final Class<?> superclass = handle.getSuperclass();
             return superclass == null ? null : superclass.getName().replace('.', '/');
+        }
+
+        @Override
+        public @NotNull List<@NotNull String> binaryInterfaceNames() {
+            if (interfacesCache != null) {
+                return interfacesCache;
+            }
+
+            Class<?>[] interfaces = handle.getInterfaces();
+            List<String> binaryInterfaceNames = new ArrayList<>(interfaces.length);
+            for (Class<?> iface : interfaces) {
+                binaryInterfaceNames.add(iface.getName().replace('.', '/'));
+            }
+            interfacesCache = Collections.unmodifiableList(binaryInterfaceNames);
+            return interfacesCache;
         }
     }
 }

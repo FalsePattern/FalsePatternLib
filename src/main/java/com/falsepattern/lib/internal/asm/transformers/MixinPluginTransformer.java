@@ -23,6 +23,7 @@
 package com.falsepattern.lib.internal.asm.transformers;
 
 import com.falsepattern.lib.internal.Tags;
+import com.falsepattern.lib.turboasm.ClassHeaderMetadata;
 import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
@@ -75,17 +76,11 @@ public class MixinPluginTransformer implements TurboClassTransformer {
         if (!classNode.isPresent())
             return false;
 
-        if (classNode.isOriginal()) {
-            val meta = classNode.getOriginalMetadata();
-            if (meta != null && meta.interfacesCount == 0)
-                return false;
-        }
-
-        val cn = classNode.getNode();
-        if (cn == null)
+        ClassHeaderMetadata metadata = classNode.getOriginalMetadata();
+        if (metadata == null)
             return false;
 
-        for (String i : cn.interfaces) {
+        for (String i : metadata.binaryInterfaceNames()) {
             if (IMIXINPLUGIN_INTERNAL.equals(i) || IMIXINCONFIGPLUGIN_INTERNAL.equals(i)) {
                 return true;
             }
