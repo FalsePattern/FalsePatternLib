@@ -31,9 +31,7 @@ import net.minecraft.launchwrapper.Launch;
 import java.io.IOException;
 import java.util.Optional;
 
-/**
- * @since 0.10.2
- */
+@ApiStatus.AvailableSince("0.10.2")
 public final class MixinInfo {
     public static final MixinBootstrapperType mixinBootstrapper;
 
@@ -65,16 +63,12 @@ public final class MixinInfo {
         return mixinBootstrapper == MixinBootstrapperType.MixinBooterLegacy;
     }
 
-    /**
-     * @since 0.10.14
-     */
+    @ApiStatus.AvailableSince("0.10.14")
     public static boolean isGasStation() {
         return mixinBootstrapper == MixinBootstrapperType.GasStation;
     }
 
-    /**
-     * @since 0.10.15
-     */
+    @ApiStatus.AvailableSince("0.10.15")
     public static boolean isUniMixin() {
         return mixinBootstrapper == MixinBootstrapperType.UniMixin;
     }
@@ -129,18 +123,16 @@ public final class MixinInfo {
         return MixinBootstrapperType.Other;
     }
 
-    /**
-     * @since 0.10.2
-     */
+    @ApiStatus.AvailableSince("0.10.2")
     public enum MixinBootstrapperType {
         None,
-        /** @since 0.10.9 */
+        @ApiStatus.AvailableSince("0.10.9")
         GasStation,
         SpongeMixins,
         Grimoire,
         MixinBooterLegacy,
         Other,
-        /** @since 0.10.15 */
+        @ApiStatus.AvailableSince("0.10.15")
         UniMixin
     }
 }

@@ -23,6 +23,7 @@
 package com.falsepattern.lib.mixin;
 
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +32,8 @@ import java.util.List;
 /**
  * This is a class you can use to interact with MixinInfo before it gets classloaded.
  * (Originally placed here for future unimixins compat in case they change the class names)
- *
- * @since 0.10.15
  */
+@ApiStatus.AvailableSince("0.10.15")
 public class MixinInfoCompatCompanion {
     /**
      * A list of all mixin classes that are candidates for unimixins.

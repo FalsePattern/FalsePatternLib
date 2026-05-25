@@ -24,15 +24,14 @@ package com.falsepattern.lib.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @since 0.8.0
- */
+@ApiStatus.AvailableSince("0.8.0")
 @UtilityClass
 public final class LangUtil {
     public static final String DEFAULT_LOCALE = "en_US";

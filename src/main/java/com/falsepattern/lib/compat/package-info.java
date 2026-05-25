@@ -20,7 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * @since 0.6.0
- */
+@ApiStatus.AvailableSince("0.6.0")
 package com.falsepattern.lib.compat;
+
+import org.jetbrains.annotations.ApiStatus;

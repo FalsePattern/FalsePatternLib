@@ -23,6 +23,7 @@ package com.falsepattern.lib.text;
 
 import lombok.NonNull;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -51,9 +52,8 @@ import java.util.function.Consumer;
 
 /**
  * Universal escape sequence-based text rendering and chat messages.
- *
- * @since 0.6.0
  */
+@ApiStatus.AvailableSince("0.6.0")
 public final class FormattedText {
     private static final Map<Character, EnumChatFormatting> reverseMap = new HashMap<>();
     private static final Map<EnumChatFormatting, Color> colorMap = new HashMap<>();

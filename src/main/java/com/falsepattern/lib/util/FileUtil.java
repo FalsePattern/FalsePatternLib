@@ -22,6 +22,7 @@
 package com.falsepattern.lib.util;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.launchwrapper.Launch;
 
@@ -29,18 +30,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * @since 0.8.2
- */
+@ApiStatus.AvailableSince("0.8.2")
 @UtilityClass
 public final class FileUtil {
     public static File getMinecraftHome() {
         return getMinecraftHomePath().toFile();
     }
 
-    /**
-     * @since 1.0.0
-     */
+    @ApiStatus.AvailableSince("1.0.0")
     public static Path getMinecraftHomePath() {
         return Launch.minecraftHome == null ? Paths.get("").toAbsolutePath() : Launch.minecraftHome.toPath();
     }

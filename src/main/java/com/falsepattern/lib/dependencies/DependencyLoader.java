@@ -22,6 +22,7 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -35,16 +36,12 @@ public class DependencyLoader {
         DependencyLoaderImpl.addMavenRepo(url);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         return DependencyLoaderImpl.loadLibrariesAsync(libraries).thenApply(list -> null);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void loadLibraries(Library... libraries) {
         DependencyLoaderImpl.loadLibraries(libraries);
     }

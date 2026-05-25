@@ -20,9 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * @since 1.9.0
- */
+@ApiStatus.AvailableSince("1.9.0")
 @ApiStatus.Experimental
 package com.falsepattern.lib.mixin.v2;
 

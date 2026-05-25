@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import cpw.mods.fml.client.config.IConfigElement;
 
@@ -42,26 +43,21 @@ import java.util.function.BiConsumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfigurationManager {
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void initialize(Class<?>... configClasses) throws ConfigException {
         initialize((a, b) -> {}, configClasses);
     }
 
     /**
      * You can use this method in the static initializer of a config class to self-load it without extra effort.
-     *
-     * @since 0.10.3
      */
+    @ApiStatus.AvailableSince("0.10.3")
     @SneakyThrows
     public static void selfInit() {
         initialize(ReflectionUtil.getCallerClass());
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void initialize(BiConsumer<Class<?>, Field> validatorErrorCallback, Class<?>... configClasses)
             throws ConfigException {
         for (val clazz : configClasses) {
@@ -72,16 +68,12 @@ public class ConfigurationManager {
         }
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static boolean validate(boolean resetInvalid, Class<?>... configClasses) throws ConfigException {
         return validate((x, y) -> {}, resetInvalid, configClasses);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static boolean validate(BiConsumer<Class<?>, Field> validatorErrorCallback, boolean resetInvalid, Class<?>... configClasses)
             throws ConfigException {
         boolean valid = true;
@@ -91,18 +83,14 @@ public class ConfigurationManager {
         return valid;
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void loadFromFile(Class<?>... configClasses) throws ConfigException {
         for (val clazz : configClasses) {
             ConfigurationManagerImpl.load(clazz);
         }
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void saveToFile(boolean validateAndResetInvalid, Class<?>... configClasses) throws ConfigException {
         for (val clazz : configClasses) {
             if (validateAndResetInvalid) {
@@ -130,9 +118,8 @@ public class ConfigurationManager {
      * @param configClasses The classes to process.
      *
      * @return The configuration elements.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @SuppressWarnings("rawtypes")
     public static List<IConfigElement> getConfigElementsMulti(Class<?>... configClasses) throws ConfigException {
         switch (configClasses.length) {
@@ -151,9 +138,8 @@ public class ConfigurationManager {
     /**
      * @return The configuration elements, structured with DummyCategoryElement groups per config class
      * @see #getConfigElementsMulti(Class[])
-     *
-     * @since 1.5.0
      */
+    @ApiStatus.AvailableSince("1.5.0")
     @SuppressWarnings("rawtypes")
     public static List<IConfigElement> getConfigElementsMultiStructured(Class<?>... configClasses) throws ConfigException {
         if (configClasses.length == 0) {

@@ -23,6 +23,7 @@ package com.falsepattern.lib.compat;
 
 import lombok.NonNull;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -38,9 +39,8 @@ import java.util.List;
 
 /**
  * A functional equivalent to GuiLabel present in Minecraft 1.12.
- *
- * @since 0.8.0
  */
+@ApiStatus.AvailableSince("0.8.0")
 @SideOnly(Side.CLIENT)
 public class GuiLabel extends Gui {
     private final List<String> lines = new ArrayList<>();

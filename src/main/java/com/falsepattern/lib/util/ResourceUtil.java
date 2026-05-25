@@ -24,6 +24,7 @@ package com.falsepattern.lib.util;
 import com.falsepattern.lib.internal.FPLog;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -35,9 +36,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * A utility class for reading resources in many ways.
- *
- * @since 0.6.0
  */
+@ApiStatus.AvailableSince("0.6.0")
 @UtilityClass
 public final class ResourceUtil {
 

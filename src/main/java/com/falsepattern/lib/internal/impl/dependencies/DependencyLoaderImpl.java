@@ -27,6 +27,7 @@ import com.falsepattern.lib.dependencies.Library;
 import com.falsepattern.lib.dependencies.SemanticVersion;
 import com.falsepattern.lib.dependencies.Version;
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,9 +39,7 @@ public class DependencyLoaderImpl {
         com.falsepattern.deploader.DependencyLoaderImpl.addMavenRepo(url);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static CompletableFuture<Void> loadLibrariesAsync(Library... libraries) {
         val libs = new com.falsepattern.deploader.Library[libraries.length];
         for (int i = 0; i < libraries.length; i++) {
@@ -49,9 +48,7 @@ public class DependencyLoaderImpl {
         return com.falsepattern.deploader.DependencyLoaderImpl.loadLibrariesAsync(libs);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static void loadLibraries(Library... libraries) {
         val libs = new com.falsepattern.deploader.Library[libraries.length];
         for (int i = 0; i < libraries.length; i++) {

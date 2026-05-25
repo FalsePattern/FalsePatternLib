@@ -29,6 +29,7 @@ import lombok.Setter;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -364,9 +365,7 @@ public class BlockPos extends Vec3i {
         return this;
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     @Setter
     @Getter
     public static class MutableBlockPos extends BlockPos {
@@ -453,9 +452,7 @@ public class BlockPos extends Vec3i {
         }
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static final class PooledMutableBlockPos extends BlockPos.MutableBlockPos {
         private static final List<BlockPos.PooledMutableBlockPos> POOL = new ArrayList<>();
         private boolean released;

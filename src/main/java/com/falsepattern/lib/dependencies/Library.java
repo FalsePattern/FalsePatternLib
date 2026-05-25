@@ -26,9 +26,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @since 0.10.0
- */
+@ApiStatus.AvailableSince("0.10.0")
 public class Library {
     @NonNull
     public final String loadingModId;
@@ -62,9 +60,7 @@ public class Library {
         return new LibraryBuilder();
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static class LibraryBuilder {
         private String loadingModId;
         private String groupId;

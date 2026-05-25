@@ -22,6 +22,7 @@
 package com.falsepattern.lib.config;
 
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -94,9 +95,8 @@ public @interface Config {
      * Define category migrations here.
      * Used to rename config categories without losing data.
      * @see #pathMigrations()
-     *
-     * @since 1.5.0
      */
+    @ApiStatus.AvailableSince("1.5.0")
     String[] categoryMigrations() default {};
 
     /**
@@ -110,9 +110,8 @@ public @interface Config {
      * customPath = "mymod.config" -> .minecraft/config/mymod.config
      * <br>
      * @see #modid()
-     *
-     * @since 1.5.0
      */
+    @ApiStatus.AvailableSince("1.5.0")
     String customPath() default "";
 
     /**
@@ -126,9 +125,8 @@ public @interface Config {
      * the category of this config.
      * @see #customPath()
      * @see #categoryMigrations()
-     *
-     * @since 1.5.0
      */
+    @ApiStatus.AvailableSince("1.5.0")
     String[] pathMigrations() default {};
 
     // region Common
@@ -182,9 +180,8 @@ public @interface Config {
 
         /**
          * Use this to migrate from old config names. "" is resolved to the name of the field
-         *
-         * @since 1.5.0
          */
+        @ApiStatus.AvailableSince("1.5.0")
         String[] migrations() default {};
     }
 
@@ -214,9 +211,8 @@ public @interface Config {
      * <p>
      * Note that synchronization ALWAYS happens FROM the server TO the client. The server should NEVER attempt to get
      * configuration values from a client. This is to avoid malicious clients manipulating the server configs.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
@@ -224,9 +220,8 @@ public @interface Config {
 
     /**
      * Use this to mark config fields you don't want to synchronize in a class marked with {@link Synchronize}.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -281,9 +276,8 @@ public @interface Config {
     /**
      * The default value for a double field.
      * @see RangeDouble
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -293,9 +287,8 @@ public @interface Config {
 
     /**
      * The range of possible values a double config can have.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -325,9 +318,8 @@ public @interface Config {
      * This annotation limits the maximum number of characters present in a string configuration.
      * <p>
      * When used with a string list, this limit will apply to each element individually, not to the size of the list as a whole.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -368,9 +360,8 @@ public @interface Config {
      * The default value for a boolean array field.
      * @see ListFixedLength
      * @see ListMaxLength
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -383,9 +374,8 @@ public @interface Config {
      * @see ListFixedLength
      * @see ListMaxLength
      * @see RangeInt
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -398,9 +388,8 @@ public @interface Config {
      * @see ListFixedLength
      * @see ListMaxLength
      * @see RangeDouble
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -426,9 +415,8 @@ public @interface Config {
      * If this annotation is present, the list in the config will be forced to have exactly the amount of elements as
      * the default value.
      * @see ListMaxLength
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -437,9 +425,8 @@ public @interface Config {
     /**
      * This annotation limits the maximum number of elements present in an array configuration. Only effective if
      * {@link ListFixedLength} is NOT present.
-     *
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)

@@ -23,13 +23,12 @@ package com.falsepattern.lib.util;
 
 import com.falsepattern.lib.compat.Vec3i;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Random;
 import java.util.UUID;
 
-/**
- * @since 0.10.0
- */
+@ApiStatus.AvailableSince("0.10.0")
 @UtilityClass
 public final class MathUtil {
     public static final float SQRT_2 = sqrt(2.0F);

@@ -21,6 +21,8 @@
  */
 package com.falsepattern.lib;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -55,8 +57,8 @@ import java.lang.annotation.Target;
  * error, unlike __INTERNAL__, but if any issues arise from the usage of the API or the API changing, the API developer
  * shall not be blamed for it.
  * @deprecated since 1.7.0
- * @since 0.6.0
  */
+@ApiStatus.AvailableSince("0.6.0")
 @Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -80,8 +82,8 @@ public @interface StableAPI {
      * inner classes still need to use {@link StableAPI}.
      *
      * @deprecated since 1.7.0
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
@@ -99,8 +101,8 @@ public @interface StableAPI {
      * changed or removed in any version in the library without prior notice.
      *
      * @deprecated since 1.7.0
-     * @since 0.10.0
      */
+    @ApiStatus.AvailableSince("0.10.0")
     @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)

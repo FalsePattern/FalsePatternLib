@@ -22,6 +22,8 @@
 
 package com.falsepattern.lib;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,18 +33,16 @@ import java.lang.annotation.RetentionPolicy;
  * <p>
  * Used together with {@link Deprecated} to specify when an API was marked stable, and when it was marked for deprecation.
  * Deprecated classes MAY be removed after a full deprecation cycle as described inside the {@link StableAPI} javadoc.
- * @since 0.10.0
  * @deprecated since 1.7.0
  */
+@ApiStatus.AvailableSince("0.10.0")
 @Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DeprecationDetails {
     String deprecatedSince();
 
-    /**
-     * @since 0.11.0
-     */
+    @ApiStatus.AvailableSince("0.11.0")
     String replacement() default "";
 
     /**
@@ -50,9 +50,9 @@ public @interface DeprecationDetails {
      * <p>
      * This marks an API for removal in a future version.
      *
-     * @since 0.12.0
      * @deprecated since 1.7.0
      */
+    @ApiStatus.AvailableSince("0.12.0")
     @Deprecated
     @Documented
     @Retention(RetentionPolicy.RUNTIME)

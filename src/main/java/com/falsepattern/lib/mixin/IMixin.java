@@ -22,6 +22,7 @@
 package com.falsepattern.lib.mixin;
 
 import lombok.val;
+import org.jetbrains.annotations.ApiStatus;
 
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
@@ -41,18 +42,14 @@ public interface IMixin {
                 || side == Side.CLIENT && FMLLaunchHandler.side().isClient()) && getFilter().test(loadedMods);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     enum Side {
         COMMON,
         CLIENT,
         SERVER
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     final class PredicateHelpers {
         public static Predicate<List<ITargetedMod>> never() {
             return (list) -> false;

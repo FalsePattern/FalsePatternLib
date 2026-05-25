@@ -58,17 +58,13 @@ public class SemanticVersion extends Version {
         this(majorVersion, minorVersion, patchVersion, null, null);
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public SemanticVersion(int majorVersion, int minorVersion) {
         this(majorVersion, minorVersion, -1, null, null);
     }
 
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public SemanticVersion(int majorVersion) {
         this(majorVersion, -1, -1, null, null);
     }
@@ -119,9 +115,7 @@ public class SemanticVersion extends Version {
         // @formatter:on
     }
 
-    /**
-     * @since 0.10.0
-     */
+    @ApiStatus.AvailableSince("0.10.0")
     public static class SemanticVersionBuilder {
         private int majorVersion;
         private int minorVersion = -1;

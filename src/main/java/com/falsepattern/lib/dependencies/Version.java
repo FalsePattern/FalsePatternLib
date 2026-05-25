@@ -22,6 +22,7 @@
 package com.falsepattern.lib.dependencies;
 
 import com.falsepattern.lib.internal.impl.dependencies.DependencyLoaderImpl;
+import org.jetbrains.annotations.ApiStatus;
 
 public abstract class Version implements Comparable<Version> {
     protected Version() {
@@ -39,10 +40,7 @@ public abstract class Version implements Comparable<Version> {
         return compareTo(other) == 0;
     }
 
-    /**
-     *
-     * @since 1.7.0
-     */
+    @ApiStatus.AvailableSince("1.7.0")
     public static Version parse(String versionString) {
         return DependencyLoaderImpl.parseVersion(versionString);
     }

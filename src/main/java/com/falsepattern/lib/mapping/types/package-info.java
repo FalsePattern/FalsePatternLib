@@ -20,7 +20,7 @@
  * along with FalsePatternLib. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * @since 0.10.0
- */
+@ApiStatus.AvailableSince("0.10.0")
 package com.falsepattern.lib.mapping.types;
+
+import org.jetbrains.annotations.ApiStatus;

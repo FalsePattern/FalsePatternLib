@@ -82,9 +82,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
         return result;
     }
 
-    /**
-     * @since 1.4.0
-     */
+    @ApiStatus.AvailableSince("1.4.0")
     static Set<File> findJarsOf(IMixinPlugin self, final ITargetedMod mod) {
         if (!self.useNewFindJar()) {
             val jar = findJarOf(mod);
@@ -116,9 +114,7 @@ public interface IMixinPlugin extends IMixinConfigPlugin {
 
     ITargetedMod[] getTargetedModEnumValues();
 
-    /**
-     * @since 1.4.0
-     */
+    @ApiStatus.AvailableSince("1.4.0")
     default boolean useNewFindJar() {
         return false;
     }
