@@ -1,8 +1,11 @@
 package com.falsepattern.lib.turboasm;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+@ApiStatus.AvailableSince("1.12.0")
 public class BytePatternMatcher {
     final Mode mode;
     // first byte -> matched patterns

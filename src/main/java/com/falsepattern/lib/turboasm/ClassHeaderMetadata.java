@@ -22,6 +22,7 @@
 
 package com.falsepattern.lib.turboasm;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,7 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
     public final ConstantPoolEntryTypes @NotNull [] constantPoolEntryTypes;
 
     /** Approximately only half of the entries are utf-8, so this array can be used to iterate over them more quickly */
+    @ApiStatus.AvailableSince("1.12.0")
     public final int @NotNull [] constantPoolUtf8EntryOffsets;
 
     public final int constantPoolEndOffset;
@@ -57,10 +59,12 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
     public final int thisClassIndex;
     public final int superClassIndex;
     public final int interfacesCount;
+    @ApiStatus.AvailableSince("1.12.0")
     public final int @NotNull [] interfaceIndices;
     public final @NotNull String binaryThisName;
     public final @Nullable String binarySuperName;
     /** List is unmodifiable */
+    @ApiStatus.AvailableSince("1.12.0")
     public final @NotNull List<@NotNull String> binaryInterfaceNames;
 
     /**
@@ -227,6 +231,7 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
         /** The value of the interfaces_count item gives the number of direct superinterfaces of this class or interface type */
         public static final int pastCpInterfacesCountU16 = pastCpSuperClassU16 + 2;
 
+        @ApiStatus.AvailableSince("1.12.0")
         public static final int pastCpInterfacesList = pastCpInterfacesCountU16 + 2;
     }
 
@@ -327,6 +332,7 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
      * @param matcher A configured byte matcher with patterns to search for.
      * @return {@code true} if there is a match for at least one constant pool entry.
      */
+    @ApiStatus.AvailableSince("1.12.0")
     public boolean matchesBytes(final BytePatternMatcher matcher) {
         for (final int offset : constantPoolUtf8EntryOffsets) {
             // first byte is entry type, second and third bytes are length
@@ -341,7 +347,11 @@ public final class ClassHeaderMetadata implements FastClassAccessor {
         return false;
     }
 
-    /** @deprecated This method is very slow, use {@link #matchesBytes} instead */
+    /**
+     * @deprecated since 1.12.0
+     * <p>
+     * This method is very slow, use {@link #matchesBytes} instead
+     * */
     @Deprecated
     public static boolean hasSubstring(final byte @Nullable [] classBytes, final byte @NotNull [] substring) {
         if (classBytes == null) {

@@ -22,6 +22,7 @@
 
 package com.falsepattern.lib.turboasm;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -55,6 +56,7 @@ public interface FastClassAccessor {
     @Nullable
     String binarySuperName();
     /** Binary (slash-separated packages) names of the implemented interfaces, list is unmodifiable */
+    @ApiStatus.AvailableSince("1.12.0")
     @NotNull
     List<@NotNull String> binaryInterfaceNames();
 
