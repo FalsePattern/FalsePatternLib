@@ -5,7 +5,7 @@ plugins {
 group = "com.falsepattern"
 
 //bump this after ANY change to the deploader!
-val deploaderVersion = 8
+val deploaderVersion = 9
 
 minecraft_fp {
     java {

@@ -1307,7 +1307,7 @@ public class DependencyLoaderImpl {
 
         private ChecksumStatus getChecksumStatus(Path file, String checksumType, Path checksumFile) throws IOException {
             val fileHash = hash(checksumType, file);
-            val referenceHash = new String(Files.readAllBytes(checksumFile));
+            val referenceHash = new String(Files.readAllBytes(checksumFile)).trim();
             if (!fileHash.equals(referenceHash)) {
                 LOG.error("Failed {} checksum validation for {}.", checksumType, artifactLogName);
                 checkedDelete(file);
