@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -119,6 +120,7 @@ public class DependencyLoaderImpl {
     private static final AtomicBoolean needReboot = new AtomicBoolean(false);
     private static final Set<String> downloadedMods = new ConcurrentSet<>();
     private static final Set<String> downloadFailed = new ConcurrentSet<>();
+    private static final AtomicBoolean anyDownloadFailCausedByGradle = new AtomicBoolean(false);
 
     private static void ensureExists(Path directory) {
         if (!Files.exists(directory)) {
@@ -498,6 +500,72 @@ public class DependencyLoaderImpl {
                               .flatMap(i -> i));
     }
 
+    private static final String[] MAVEN_PREFIXES = new String[]{
+            "modules-2/files-2.1/",
+            ".m2/repository/"
+    };
+    private static void detectLocalDep(String str) {
+        str = str.replace('\\', '/');
+        if (detectLocalDepSingle(str, "modules-2/files-2.1/", true))
+            return;
+        detectLocalDepSingle(str, ".m2/repository/", false);
+    }
+
+    private static boolean detectLocalDepSingle(String str, String prefix, boolean extraPathSegment) {
+        val idx = str.indexOf(prefix);
+        if (idx == -1) {
+            return false;
+        }
+        val dep = str.substring(idx + prefix.length());
+        val tok = new StringTokenizer(dep, "/");
+        if (!tok.hasMoreTokens())
+            return true;
+        val group = tok.nextToken();
+        if (!tok.hasMoreTokens())
+            return true;
+        val artifact = tok.nextToken();
+        if (!tok.hasMoreTokens())
+            return true;
+        val version = tok.nextToken();
+        if (extraPathSegment) {
+            if (!tok.hasMoreTokens())
+                return true;
+            tok.nextToken();
+        }
+        if (!tok.hasMoreTokens())
+            return true;
+        val file = tok.nextToken();
+
+        val filePrefix = artifact + "-" + version;
+
+        if (!file.contains(filePrefix))
+            return true;
+
+        val fileSuffix = file.substring(filePrefix.length());
+
+        if (!fileSuffix.endsWith(".jar"))
+            return true;
+
+        String classifier = null;
+        if (fileSuffix.startsWith("-")) {
+            classifier = fileSuffix.substring(1, fileSuffix.length() - 4);
+        }
+
+        val id = group + ":" + artifact + ":" + classifier;
+        val versionParsed = Version.parse(version);
+
+        LOG.warn("Found dev dependency pulled in via Gradle {}:{}:{}{}", group, artifact, version, classifier == null ? "" : ":" + classifier);
+        if (!loadedLibraries.containsKey(id)) {
+            loadedLibraries.put(id, versionParsed);
+        } else {
+            LOG.warn("Duplicate gradle dependency {}:{}:{}{}", group, artifact, version, classifier == null ? "" : ":" + classifier);
+        }
+        if (!loadedLibraryMods.containsKey(id)) {
+            loadedLibraryMods.put(id, "Gradle");
+        }
+        return true;
+    }
+
     private static @Nullable Set<ScopedSidedTask> scanDeps(Stream<URL> candidatesUnfiltered) {
         long start = System.currentTimeMillis();
         val urlsWithoutDeps = new HashSet<String>();
@@ -509,10 +577,16 @@ public class DependencyLoaderImpl {
                 LOG.error("Could not read dependency scanner cache", e);
             }
         }
-        val candidates = candidatesUnfiltered
-                .filter(Objects::nonNull)
-                .filter((url) -> !urlsWithoutDeps.contains(url.toString()))
-                .collect(Collectors.toList());
+        val candidates = new ArrayList<URL>();
+        candidatesUnfiltered.forEach(candidate -> {
+            if (candidate == null)
+                return;
+            val str = candidate.toString();
+            detectLocalDep(str);
+            if (urlsWithoutDeps.contains(str))
+                return;
+            candidates.add(candidate);
+        });
         val urls = new ArrayList<URL>();
         val jijURLs = new ArrayList<URL>();
         for (val candidate : candidates) {
@@ -832,7 +906,7 @@ public class DependencyLoaderImpl {
             if (downloadFailed.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "FP DepLoader has encountered an error while trying to download libraries.\nSee the log for more details.", "Dependency download error", JOptionPane.ERROR_MESSAGE);
             } else {
-                var msgBuilder = new StringBuilder("FP DepLoader has encountered an error while trying to download the following libraries:");
+                var msgBuilder = new StringBuilder("FP DepLoader has encountered an error while trying to download the following libraries:\n");
                 for (val f: downloadFailed) {
                     msgBuilder.append('\n').append(f);
                 }
@@ -840,6 +914,19 @@ public class DependencyLoaderImpl {
                 JOptionPane.showMessageDialog(null, msgBuilder.toString(), "Dependency download error", JOptionPane.ERROR_MESSAGE);
             }
             throw err;
+        } else if (!downloadFailed.isEmpty()) {
+            var msgBuilder = new StringBuilder("FP DepLoader has encountered an error while trying to download the following libraries:\n");
+            for (val f: downloadFailed) {
+                msgBuilder.append('\n').append(f);
+            }
+            msgBuilder.append("\n\nSee the log for more details. Click OK to continue anyway (may cause issues!).\n\n");
+            if (anyDownloadFailCausedByGradle.get() && scopeSide.scope == DependencyScope.DEV) {
+                msgBuilder.append("One or more of these dependency version mismatches were caused by a gradle dependency being too old compared to a deploaded dependency!\n"
+                                  + "Try manually depending on the newer versions of the required libraries via runtimeOnly(...)!");
+            }
+            if (JOptionPane.showConfirmDialog(null, msgBuilder.toString(), "Dependency download error", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE) != JOptionPane.OK_OPTION) {
+                throw new IllegalStateException("User terminated game after dependency load error");
+            }
         }
         if (res.isEmpty()) {
             return null;
@@ -1040,16 +1127,22 @@ public class DependencyLoaderImpl {
                 for (int i = 0; i < 4; i++) {
                     LOG.fatal("ALERT VVVVVVVVVVVV ALERT");
                 }
+                val loader = fromModId ? loadedModIdMods.get(modId) : loadedLibraryMods.get(artifact);
+                val sfx = suffix != null ? ":" + suffix : "";
                 LOG.fatal("Library {}:{}{} already loaded with version {}, "
                           + "but a version in the range {} was requested! Thing may go horribly wrong! "
                           + "Requested by mod: {}, previously loaded by mod: {}",
                           groupId,
                           artifactId,
-                          suffix != null ? ":" + suffix : "",
+                          sfx,
                           currentVer,
                           rangeString,
                           loadingModId,
-                          fromModId ? loadedModIdMods.get(modId) : loadedLibraryMods.get(artifact));
+                          loader);
+                downloadFailed.add(String.format("%s:%s:%s%s already loaded by: %s, but mod %s requested version %s!", groupId, artifactId, currentVer, sfx, loader, loadingModId, rangeString));
+                if ("Gradle".equals(loader)) {
+                    anyDownloadFailCausedByGradle.set(true);
+                }
                 for (int i = 0; i < 4; i++) {
                     LOG.fatal("ALERT ^^^^^^^^^^^^ ALERT");
                 }
